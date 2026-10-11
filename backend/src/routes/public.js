@@ -4,7 +4,7 @@ const pool = require('../db/pool');
 // Компанийг slug эсвэл анхны компаниар олох
 async function findCompany(slug) {
   const { rows } = await pool.query(
-    `SELECT id, name, phone, address, logo_url, show_prices
+    `SELECT id, name, phone, address, email, working_hours, logo_url, show_prices
      FROM companies
      WHERE ($1::text IS NULL OR slug=$1 OR TRUE)
      ORDER BY created_at ASC LIMIT 1`,
@@ -19,6 +19,19 @@ router.get('/', async (req, res) => {
     const comp = await findCompany(null);
     if (!comp) return res.status(404).json({ error: 'Компани олдсонгүй' });
     res.json(comp);
+  } catch (err) { res.status(500).json({ error: err.message }); }
+});
+
+// GET /api/public/team
+router.get('/team', async (req, res) => {
+  try {
+    const comp = await findCompany(null);
+    if (!comp) return res.json([]);
+    const { rows } = await pool.query(
+      'SELECT id, name, position, bio, photo_url FROM team_members WHERE company_id=$1 ORDER BY sort_order, created_at',
+      [comp.id]
+    );
+    res.json(rows);
   } catch (err) { res.status(500).json({ error: err.message }); }
 });
 

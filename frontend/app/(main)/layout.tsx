@@ -74,29 +74,31 @@ function MainLayoutInner({ children }: { children: React.ReactNode }) {
   const SidebarContent = () => (
     <>
       {/* Компани */}
-      <div className="px-5 py-5 border-b border-[#e4e4e7]">
+      <div className="px-5 py-5 border-b border-white/10">
         <div className="flex items-center gap-3">
-          <div className="w-8 h-8 bg-brand rounded-lg flex items-center justify-center shrink-0">
-            <span className="text-white text-sm font-bold">{companyName?.[0] || 'A'}</span>
+          <div className="w-10 h-10 bg-brand rounded-sm flex items-center justify-center shrink-0">
+            <span className="text-white text-base font-black">{companyName?.[0] || 'A'}</span>
           </div>
           <div className="min-w-0">
-            <div className="text-sm font-bold text-[#09090b] leading-none truncate">{companyName || 'Удирдлага'}</div>
-            <div className="text-[10px] text-[#a1a1aa] mt-0.5">Удирдлагын систем</div>
+            <div className="text-sm font-black text-white leading-tight truncate">{companyName || 'Удирдлага'}</div>
+            <div className="text-[9px] font-bold text-white/40 uppercase tracking-[0.2em] mt-1">Админ самбар</div>
           </div>
         </div>
       </div>
 
       {/* Nav */}
-      <nav className="flex-1 px-3 py-3 space-y-0.5 overflow-y-auto">
+      <nav className="flex-1 px-3 py-4 space-y-1 overflow-y-auto">
+        <div className="px-3 pb-2 text-[9px] font-black text-white/30 uppercase tracking-[0.25em]">Цэс</div>
         {SIDE_NAV.map(({ href, label, Icon }) => {
           const active = isActive(href);
           return (
             <Link key={href} href={href}
-              className={`flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm transition-all ${
+              className={`relative flex items-center gap-3 pl-4 pr-3 py-3 rounded-sm text-[13px] font-semibold transition-all ${
                 active
-                  ? 'bg-brand text-white font-medium shadow-sm'
-                  : 'text-[#52525b] hover:text-[#09090b] hover:bg-[#f4f4f5]'
+                  ? 'bg-white/10 text-white'
+                  : 'text-white/55 hover:text-white hover:bg-white/5'
               }`}>
+              <span className={`absolute left-0 top-1.5 bottom-1.5 w-[3px] rounded-full transition-colors ${active ? 'bg-brand-light' : 'bg-transparent'}`} />
               <Icon />
               {label}
             </Link>
@@ -105,26 +107,26 @@ function MainLayoutInner({ children }: { children: React.ReactNode }) {
       </nav>
 
       {/* Вэбсайт */}
-      <div className="px-3 pb-2">
+      <div className="px-3 pb-3">
         <a href="/" target="_blank" rel="noreferrer"
-          className="flex items-center gap-3 px-3 py-2 rounded-xl text-sm text-[#16a34a] bg-[#f0fdf4] hover:bg-[#dcfce7] transition-colors">
+          className="flex items-center justify-center gap-2 px-3 py-3 rounded-sm text-[11px] font-black uppercase tracking-[0.15em] text-white bg-brand hover:bg-brand-dark transition-colors">
           <IcGlobe />
           Вэбсайт үзэх
         </a>
       </div>
 
       {/* Хэрэглэгч */}
-      <div className="px-3 pb-3 border-t border-[#e4e4e7] pt-3">
-        <div className="flex items-center gap-3 px-3 py-2">
-          <div className="w-8 h-8 rounded-full bg-brand flex items-center justify-center shrink-0">
-            <span className="text-white text-xs font-semibold">{initials || '?'}</span>
+      <div className="px-3 pb-3 border-t border-white/10 pt-3">
+        <div className="flex items-center gap-3 px-2 py-2">
+          <div className="w-9 h-9 rounded-full bg-white/10 flex items-center justify-center shrink-0">
+            <span className="text-white text-xs font-black">{initials || '?'}</span>
           </div>
           <div className="flex-1 min-w-0">
-            <div className="text-xs font-semibold text-[#09090b] truncate">{userName}</div>
-            <div className="text-[10px] text-[#a1a1aa]">{userRole}</div>
+            <div className="text-xs font-bold text-white truncate">{userName}</div>
+            <div className="text-[10px] text-white/40 uppercase tracking-wider">{userRole}</div>
           </div>
           <button onClick={logout} title="Гарах"
-            className="text-[#d4d4d8] hover:text-red-400 transition-colors shrink-0">
+            className="text-white/40 hover:text-brand-light transition-colors shrink-0">
             <IcOut />
           </button>
         </div>
@@ -136,20 +138,20 @@ function MainLayoutInner({ children }: { children: React.ReactNode }) {
     <div className="min-h-screen bg-[#f5f5f5] flex">
 
       {/* ── Desktop sidebar ── */}
-      <aside className="hidden lg:flex w-56 shrink-0 bg-white border-r border-[#e4e4e7] flex-col fixed h-full shadow-sm z-30">
+      <aside className="hidden lg:flex w-60 shrink-0 bg-[#111] flex-col fixed h-full z-30 border-r-4 border-brand">
         <SidebarContent />
       </aside>
 
       {/* ── Mobile top header ── */}
-      <header className="lg:hidden fixed top-0 left-0 right-0 z-40 bg-white border-b border-[#e4e4e7] flex items-center justify-between px-4 h-14 shadow-sm">
+      <header className="lg:hidden fixed top-0 left-0 right-0 z-40 bg-[#111] border-b-2 border-brand flex items-center justify-between px-4 h-14">
         <div className="flex items-center gap-2.5">
-          <div className="w-7 h-7 bg-brand rounded-md flex items-center justify-center">
-            <span className="text-white text-xs font-bold">{companyName?.[0] || 'A'}</span>
+          <div className="w-8 h-8 bg-brand rounded-sm flex items-center justify-center">
+            <span className="text-white text-sm font-black">{companyName?.[0] || 'A'}</span>
           </div>
-          <span className="text-sm font-bold text-[#09090b] truncate max-w-[160px]">{companyName || 'Удирдлага'}</span>
+          <span className="text-sm font-black text-white truncate max-w-[180px]">{companyName || 'Удирдлага'}</span>
         </div>
         <button onClick={() => setDrawer(v => !v)}
-          className="w-9 h-9 flex items-center justify-center rounded-lg hover:bg-[#f4f4f5] transition-colors text-[#52525b]">
+          className="w-9 h-9 flex items-center justify-center rounded-sm hover:bg-white/10 transition-colors text-white">
           {drawerOpen ? <IcX /> : <IcMenu />}
         </button>
       </header>
@@ -157,34 +159,31 @@ function MainLayoutInner({ children }: { children: React.ReactNode }) {
       {/* ── Mobile drawer ── */}
       {drawerOpen && (
         <>
-          <div className="lg:hidden fixed inset-0 z-30 bg-black/40 backdrop-blur-sm" onClick={() => setDrawer(false)} />
-          <aside className="lg:hidden fixed top-14 left-0 bottom-0 w-72 z-40 bg-white shadow-xl flex flex-col overflow-y-auto">
+          <div className="lg:hidden fixed inset-0 z-30 bg-black/60 backdrop-blur-sm" onClick={() => setDrawer(false)} />
+          <aside className="lg:hidden fixed top-14 left-0 bottom-0 w-72 z-40 bg-[#111] shadow-2xl flex flex-col overflow-y-auto">
             <SidebarContent />
           </aside>
         </>
       )}
 
       {/* ── Main content ── */}
-      <main className="flex-1 lg:ml-56 min-w-0 overflow-auto pt-14 lg:pt-0 pb-20 lg:pb-0">
+      <main className="flex-1 lg:ml-60 min-w-0 overflow-auto pt-14 lg:pt-0 pb-20 lg:pb-0">
         {children}
       </main>
 
       {/* ── Mobile bottom tab bar ── */}
-      <nav className="lg:hidden fixed bottom-0 left-0 right-0 z-40 bg-white border-t border-[#e4e4e7] shadow-[0_-2px_12px_rgba(0,0,0,0.06)]">
+      <nav className="lg:hidden fixed bottom-0 left-0 right-0 z-40 bg-white border-t border-zinc-200 shadow-[0_-4px_16px_rgba(0,0,0,0.06)]">
         <div className="flex items-stretch h-16">
           {TAB_NAV.map(({ href, label, Icon }) => {
             const active = isActive(href);
             return (
               <Link key={href} href={href}
-                className={`flex-1 flex flex-col items-center justify-center gap-0.5 transition-colors ${
-                  active ? 'text-[#09090b]' : 'text-[#a1a1aa]'
+                className={`relative flex-1 flex flex-col items-center justify-center gap-0.5 transition-colors ${
+                  active ? 'text-brand' : 'text-zinc-400'
                 }`}>
-                <div className={`p-1.5 rounded-xl transition-colors ${active ? 'bg-[#f4f4f5]' : ''}`}>
-                  <Icon />
-                </div>
-                <span className={`text-[10px] font-semibold ${active ? 'text-[#09090b]' : 'text-[#a1a1aa]'}`}>
-                  {label}
-                </span>
+                <span className={`absolute top-0 h-[3px] w-8 rounded-b-full transition-colors ${active ? 'bg-brand' : 'bg-transparent'}`} />
+                <Icon />
+                <span className="text-[10px] font-bold">{label}</span>
               </Link>
             );
           })}

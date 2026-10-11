@@ -106,6 +106,26 @@ export const api = {
     return request('/sales', { method: 'POST', body: JSON.stringify(data) });
   },
 
+  getTeam: () => request('/team'),
+  createTeamMember: (data: { name: string; position: string; bio: string }) =>
+    request('/team', { method: 'POST', body: JSON.stringify(data) }),
+  updateTeamMember: (id: string, data: { name: string; position: string; bio: string }) =>
+    request(`/team/${id}`, { method: 'PATCH', body: JSON.stringify(data) }),
+  deleteTeamMember: (id: string) =>
+    request(`/team/${id}`, { method: 'DELETE' }),
+  uploadTeamPhoto: async (id: string, file: File) => {
+    const fd = new FormData();
+    fd.append('photo', file);
+    const res = await fetch(`${BACKEND}/api/upload/team/${id}`, {
+      method: 'POST',
+      headers: { Authorization: `Bearer ${getToken() || ''}` },
+      body: fd,
+    });
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.error || 'Upload алдаа');
+    return data;
+  },
+
   searchCustomers: (q: string) =>
     request(`/customers?q=${encodeURIComponent(q)}`),
   createCustomer: (data: { name: string; phone: string }) =>

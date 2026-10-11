@@ -21,10 +21,13 @@ app.use('/api/finance',   require('./routes/finance'));
 app.use('/api/billing',   require('./routes/billing'));
 app.use('/api/public',    require('./routes/public'));
 app.use('/api/settings',  require('./routes/settings'));
+app.use('/api/team',      require('./routes/team'));
 app.use('/api/upload',    require('./routes/upload'));
 app.use('/uploads',       require('express').static(require('path').join(__dirname, '../uploads')));
 
 app.get('/health', (_, res) => res.json({ status: 'ok' }));
 
 const PORT = process.env.PORT || 4000;
-app.listen(PORT, () => console.log(`Server ажиллаж байна: http://localhost:${PORT}`));
+require('./db/ensureSchema')()
+  .catch(err => console.error('Schema шинэчлэхэд алдаа:', err.message))
+  .finally(() => app.listen(PORT, () => console.log(`Server ажиллаж байна: http://localhost:${PORT}`)));

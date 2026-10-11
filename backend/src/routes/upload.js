@@ -37,7 +37,7 @@ const upload = multer({
   },
 });
 
-async function saveImage(buffer, vehicleId) {
+async function saveImage(buffer, folder) {
   if (USE_CLOUDINARY) {
     // WebP болгоод Cloudinary-д upload
     const webpBuf = await sharp(buffer)
@@ -47,7 +47,7 @@ async function saveImage(buffer, vehicleId) {
 
     return new Promise((resolve, reject) => {
       cloudinary.uploader.upload_stream(
-        { folder: `car-saas/vehicles/${vehicleId}`, resource_type: 'image', format: 'webp' },
+        { folder: `car-saas/${folder}`, resource_type: 'image', format: 'webp' },
         (err, result) => {
           if (err) reject(err);
           else resolve(result.secure_url);
@@ -69,7 +69,7 @@ async function saveImage(buffer, vehicleId) {
 async function deleteImage(url) {
   if (USE_CLOUDINARY && url.includes('cloudinary.com')) {
     // public_id: "car-saas/vehicles/<id>/<filename>" — extension-гүй
-    const match = url.match(/\/([^/]+\/[^/]+\/[^/]+\/[^/.]+)(?:\.\w+)?$/);
+    const match = url.match(/\/upload\/(?:v\d+\/)?(.+?)(?:\.\w+)?$/);
     if (match) {
       try { await cloudinary.uploader.destroy(match[1]); } catch (_) {}
     }
@@ -96,7 +96,7 @@ router.post('/vehicle/:id', auth, upload.array('images', 20), async (req, res) =
     const saved = [];
 
     for (const file of req.files) {
-      const url    = await saveImage(file.buffer, vehicleId);
+      const url    = await saveImage(file.buffer, `vehicles/${vehicleId}`);
       const isMain = sortOrder === 0;
       const { rows: imgRows } = await pool.query(
         `INSERT INTO vehicle_images (vehicle_id, url, is_main, sort_order)
@@ -106,6 +106,26 @@ router.post('/vehicle/:id', auth, upload.array('images', 20), async (req, res) =
       saved.push(imgRows[0]);
     }
     res.json(saved);
+  } catch (err) { res.status(500).json({ error: err.message }); }
+});
+
+// POST /api/upload/team/:id  (гишүүний зураг)
+router.post('/team/:id', auth, upload.single('photo'), async (req, res) => {
+  try {
+    if (!req.file) return res.status(400).json({ error: 'Зураг сонгоно уу' });
+    const { rows } = await pool.query(
+      'SELECT photo_url FROM team_members WHERE id=$1 AND company_id=$2',
+      [req.params.id, req.user.company_id]
+    );
+    if (!rows[0]) return res.status(404).json({ error: 'Олдсонгүй' });
+
+    const url = await saveImage(req.file.buffer, 'team');
+    if (rows[0].photo_url) await deleteImage(rows[0].photo_url);
+    const { rows: upd } = await pool.query(
+      'UPDATE team_members SET photo_url=$1 WHERE id=$2 RETURNING id, name, position, bio, photo_url, sort_order',
+      [url, req.params.id]
+    );
+    res.json(upd[0]);
   } catch (err) { res.status(500).json({ error: err.message }); }
 });
 

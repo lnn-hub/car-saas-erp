@@ -1,30 +1,12 @@
 "use client";
-import { useEffect, useState, Suspense } from "react";
+import { useState, Suspense } from "react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
+import { imgUrl } from "@/lib/site";
+import { useSiteData } from "@/lib/useSiteData";
+import { SiteHeader } from "@/components/site/SiteHeader";
+import { SiteCta, SiteFooter } from "@/components/site/SiteFooter";
+import { IcPhone, IcWa, IcPin } from "@/components/site/icons";
 
-const BACKEND = process.env.NEXT_PUBLIC_API_URL || "http://localhost:4000";
-
-interface Company {
-  name: string;
-  phone: string;
-  address: string;
-  logo_url: string | null;
-}
-interface Vehicle {
-  id: string;
-  brand: string;
-  model: string;
-  year: number;
-  color: string;
-  fuel_type: string;
-  transmission: string;
-  engine_cc: string;
-  mileage: number;
-  has_plates: boolean;
-  total_cost: string | null;
-  main_image: string | null;
-}
 
 const FUEL: Record<string, string> = {
   PETROL: "Бензин",
@@ -33,10 +15,6 @@ const FUEL: Record<string, string> = {
   ELECTRIC: "Цахилгаан",
 };
 
-function imgUrl(u: string | null) {
-  if (!u) return null;
-  return u.startsWith("http") ? u : `${BACKEND}${u}`;
-}
 function fmtPrice(n: string | number | null) {
   if (!n || Number(n) === 0) return null;
   const num = Number(n);
@@ -49,40 +27,6 @@ function fmtKm(n: number) {
 }
 
 /* ─── Icons ─── */
-function IcPhone({ cls = "w-4 h-4" }: { cls?: string }) {
-  return (
-    <svg
-      className={cls}
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth={2}
-    >
-      <path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07A19.5 19.5 0 013.07 9.81 19.79 19.79 0 01.07 1.18 2 2 0 012.05 0h3a2 2 0 012 1.72c.127.96.361 1.903.7 2.81a2 2 0 01-.45 2.11L6.09 7.91a16 16 0 006 6l1.27-1.27a2 2 0 012.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0122 16.92z" />
-    </svg>
-  );
-}
-function IcWa({ cls = "w-4 h-4" }: { cls?: string }) {
-  return (
-    <svg className={cls} viewBox="0 0 24 24" fill="currentColor">
-      <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z" />
-    </svg>
-  );
-}
-function IcPin({ cls = "w-4 h-4" }: { cls?: string }) {
-  return (
-    <svg
-      className={cls}
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth={2}
-    >
-      <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z" />
-      <circle cx="12" cy="10" r="3" />
-    </svg>
-  );
-}
 function IcSearch({ cls = "w-4 h-4" }: { cls?: string }) {
   return (
     <svg
@@ -154,127 +98,12 @@ function IcEngine() {
   );
 }
 
-function AdminModal({ onClose }: { onClose: () => void }) {
-  const router = useRouter();
-  const [email, setEmail]       = useState('');
-  const [password, setPassword] = useState('');
-  const [error, setError]       = useState('');
-  const [loading, setLoading]   = useState(false);
-
-  useEffect(() => {
-    // Аль хэдийн нэвтэрсэн бол шууд явна
-    if (typeof window !== 'undefined' && localStorage.getItem('token')) {
-      router.push('/dashboard');
-    }
-    const onKey = (e: KeyboardEvent) => { if (e.key === 'Escape') onClose(); };
-    window.addEventListener('keydown', onKey);
-    return () => window.removeEventListener('keydown', onKey);
-  }, [onClose, router]);
-
-  async function handleLogin(e: React.FormEvent) {
-    e.preventDefault();
-    setLoading(true); setError('');
-    try {
-      const res = await fetch(`${BACKEND}/api/auth/login`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email, password }),
-      });
-      const data = await res.json();
-      if (!res.ok) throw new Error(data.error || 'Алдаа гарлаа');
-      localStorage.setItem('token', data.token);
-      localStorage.setItem('user', JSON.stringify(data.user));
-      router.push('/dashboard');
-    } catch (err: unknown) {
-      setError(err instanceof Error ? err.message : 'Алдаа гарлаа');
-      setLoading(false);
-    }
-  }
-
-  return (
-    <div className="fixed inset-0 z-[100] flex items-center justify-center px-4"
-      onClick={e => { if (e.target === e.currentTarget) onClose(); }}>
-      <div className="absolute inset-0 bg-black/50 backdrop-blur-sm" />
-      <div className="relative bg-white rounded-2xl shadow-2xl w-full max-w-sm p-7 animate-[fadeUp_0.18s_ease]">
-        <button onClick={onClose}
-          className="absolute top-4 right-4 text-gray-300 hover:text-gray-500 transition-colors">
-          <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2}><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
-        </button>
-        <div className="mb-6">
-          <div className="w-8 h-8 bg-brand rounded-lg mb-4 flex items-center justify-center">
-            <svg className="w-4 h-4 text-white" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2}><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg>
-          </div>
-          <h2 className="text-lg font-bold text-[#09090b]">Админ нэвтрэх</h2>
-          <p className="text-sm text-gray-400 mt-0.5">Удирдлагын систем</p>
-        </div>
-        <form onSubmit={handleLogin} className="space-y-3">
-          <input type="email" value={email} onChange={e => setEmail(e.target.value)}
-            placeholder="И-мэйл" required autoFocus
-            className="w-full border border-gray-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-[#09090b] transition-colors" />
-          <input type="password" value={password} onChange={e => setPassword(e.target.value)}
-            placeholder="Нууц үг" required
-            className="w-full border border-gray-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-[#09090b] transition-colors" />
-          {error && (
-            <div className="bg-red-50 border border-red-100 rounded-xl px-4 py-2.5 text-xs text-red-600">{error}</div>
-          )}
-          <button type="submit" disabled={loading}
-            className="w-full bg-brand hover:bg-brand-dark disabled:opacity-40 text-white font-semibold py-3 rounded-xl text-sm transition-colors">
-            {loading ? 'Нэвтэрж байна...' : 'Нэвтрэх'}
-          </button>
-        </form>
-      </div>
-    </div>
-  );
-}
-
-function useClock() {
-  const [now, setNow] = useState(new Date());
-  useEffect(() => { const t = setInterval(() => setNow(new Date()), 1000); return () => clearInterval(t); }, []);
-  const days = ['Ням','Дав','Мяг','Лха','Пүр','Баа','Бям'];
-  return `${now.getFullYear()}.${String(now.getMonth()+1).padStart(2,'0')}.${String(now.getDate()).padStart(2,'0')} ${days[now.getDay()]} ${String(now.getHours()).padStart(2,'0')}:${String(now.getMinutes()).padStart(2,'0')}`;
-}
-
 function HomeContent() {
-  const [company, setCompany] = useState<Company | null>(null);
-  const [vehicles, setVehicles] = useState<Vehicle[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [retrying, setRetrying] = useState(false);
+  const { company, vehicles, loading, retrying } = useSiteData();
   const [search, setSearch] = useState("");
   const [filterFuel, setFilterFuel] = useState("");
   const [filterTrans, setFilterTrans] = useState("");
   const [filterBrand, setBrand] = useState("");
-  const [menuOpen, setMenu]     = useState(false);
-  const [adminModal, setAdminModal] = useState(false);
-  const clock = useClock();
-
-  useEffect(() => {
-    let cancelled = false;
-    async function load(retry = 0) {
-      try {
-        const [comp, data] = await Promise.all([
-          fetch(`${BACKEND}/api/public`).then(r => r.json()),
-          fetch(`${BACKEND}/api/public/vehicles`).then(r => r.json()),
-        ]);
-        if (cancelled) return;
-        if (!comp.error) setCompany(comp);
-        setVehicles(data.vehicles || []);
-        setLoading(false);
-        setRetrying(false);
-      } catch {
-        if (cancelled) return;
-        if (retry < 3) {
-          setRetrying(true);
-          setTimeout(() => load(retry + 1), 3000 * (retry + 1));
-        } else {
-          setLoading(false);
-          setRetrying(false);
-        }
-      }
-    }
-    fetch(`${BACKEND}/health`).catch(() => {});
-    load();
-    return () => { cancelled = true; };
-  }, []);
 
   const uniqueBrands = [...new Set(vehicles.map((v) => v.brand))].sort();
   const fuelsInUse = [...new Set(vehicles.map((v) => v.fuel_type))];
@@ -297,128 +126,7 @@ function HomeContent() {
       className="min-h-screen bg-[#f5f5f5]"
       style={{ fontFamily: "'Inter','Segoe UI',sans-serif" }}
     >
-      {adminModal && <AdminModal onClose={() => setAdminModal(false)} />}
-      {/* ━━━ NAVBAR ━━━ */}
-      <header className="sticky top-0 z-50 bg-white shadow-sm">
-        {/* Top bar */}
-        <div className="bg-brand text-white text-xs">
-          <div className="max-w-7xl mx-auto px-4 h-8 flex items-center justify-between">
-            <span className="opacity-80 font-mono tracking-wide">{clock}</span>
-            <div className="flex items-center gap-4">
-              {company?.phone && (
-                <a href={`tel:${company.phone}`} className="hidden sm:flex items-center gap-1.5 font-semibold">
-                  <IcPhone cls="w-3 h-3" />{company.phone}
-                </a>
-              )}
-              <span className="opacity-40">|</span>
-              <span className="opacity-80 hidden sm:block">{company?.address || "Улаанбаатар хот"}</span>
-            </div>
-          </div>
-        </div>
-        {/* Main nav */}
-        <div className="max-w-7xl mx-auto px-4">
-          <div className="h-16 flex items-center justify-between">
-            <a href="#" className="flex items-center gap-3">
-              {company?.logo_url ? (
-                <img
-                  src={imgUrl(company.logo_url)!}
-                  className="h-10 object-contain"
-                  alt=""
-                />
-              ) : (
-                <div className="flex items-center gap-2">
-                  <div className="w-9 h-9 bg-brand rounded flex items-center justify-center">
-                    <span className="text-white font-black text-lg leading-none">
-                      {cname[0]}
-                    </span>
-                  </div>
-                  <span className="font-black text-[#111] text-lg tracking-tight">
-                    {cname}
-                  </span>
-                </div>
-              )}
-            </a>
-
-            <nav className="hidden md:flex items-center gap-1">
-              {[
-                ["#", "Нүүр хуудас"],
-                ["#cars", "Машинууд"],
-                ["#about", "Бидний тухай"],
-                ["#contact", "Холбоо барих"],
-              ].map(([h, l]) => (
-                <a
-                  key={h}
-                  href={h}
-                  className="px-4 py-2 text-[11px] font-black uppercase tracking-[0.15em] text-[#333] hover:text-brand transition-colors border-b-2 border-transparent hover:border-brand"
-                >
-                  {l}
-                </a>
-              ))}
-            </nav>
-
-            <div className="flex items-center gap-2 sm:gap-3">
-              {company?.phone && (
-                <a
-                  href={`tel:${company.phone}`}
-                  className="hidden lg:flex items-center gap-2 bg-brand hover:bg-[#111] text-white text-[11px] font-black uppercase tracking-[0.15em] px-5 py-3 rounded-sm transition-colors"
-                >
-                  <IcPhone /> Залгах
-                </a>
-              )}
-              <button onClick={() => setAdminModal(true)}
-                className="hidden md:flex items-center gap-1.5 border border-gray-200 hover:border-[#09090b] hover:text-[#09090b] text-gray-500 text-xs font-semibold px-3 py-1.5 rounded transition-colors">
-                <svg className="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2}><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg>
-                Админ
-              </button>
-              <button
-                onClick={() => setMenu(!menuOpen)}
-                className="md:hidden w-9 h-9 flex items-center justify-center rounded hover:bg-gray-100"
-              >
-                <svg
-                  className="w-5 h-5"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth={2}
-                >
-                  {menuOpen ? (
-                    <>
-                      <line x1="18" y1="6" x2="6" y2="18" />
-                      <line x1="6" y1="6" x2="18" y2="18" />
-                    </>
-                  ) : (
-                    <>
-                      <line x1="3" y1="6" x2="21" y2="6" />
-                      <line x1="3" y1="12" x2="21" y2="12" />
-                      <line x1="3" y1="18" x2="21" y2="18" />
-                    </>
-                  )}
-                </svg>
-              </button>
-            </div>
-          </div>
-        </div>
-        {menuOpen && (
-          <div className="md:hidden border-t bg-white px-4 py-3 space-y-1">
-            {[
-              ["#", "Нүүр хуудас"],
-              ["#cars", "Машинууд"],
-              ["#about", "Бидний тухай"],
-              ["#contact", "Холбоо барих"],
-            ].map(([h, l]) => (
-              <a key={h} href={h} onClick={() => setMenu(false)}
-                className="block py-2 px-3 text-sm font-semibold text-[#333] hover:text-brand rounded hover:bg-brand-soft">
-                {l}
-              </a>
-            ))}
-            <button onClick={() => { setMenu(false); setAdminModal(true); }}
-              className="w-full text-left py-2 px-3 text-sm font-semibold text-[#09090b] rounded hover:bg-gray-50 flex items-center gap-2">
-              <svg className="w-4 h-4 text-gray-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2}><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg>
-              Админ нэвтрэх
-            </button>
-          </div>
-        )}
-      </header>
+      <SiteHeader company={company} />
 
       {/* ━━━ HERO ━━━ */}
       <section className="relative bg-[#111] text-white overflow-hidden">
@@ -442,7 +150,9 @@ function HomeContent() {
         <div className="relative max-w-7xl mx-auto px-4 py-12 sm:py-28">
           <div className="max-w-2xl">
             <div className="inline-flex items-center gap-2 bg-white/5 border border-white/15 text-white/80 text-[10px] font-black px-3 py-1.5 rounded-sm mb-4 sm:mb-6 tracking-[0.2em] uppercase">
-              <span className={`w-1.5 h-1.5 bg-red-400 rounded-full ${(loading || retrying) ? 'animate-pulse' : ''}`} />
+              <span
+                className={`w-1.5 h-1.5 bg-red-400 rounded-full ${loading || retrying ? "animate-pulse" : ""}`}
+              />
               {retrying
                 ? "Сервер асаж байна, түр хүлээнэ үү..."
                 : loading
@@ -450,8 +160,8 @@ function HomeContent() {
                   : `${vehicles.length} машин зарагдаж байна`}
             </div>
             <h1 className="text-3xl sm:text-6xl font-black leading-tight tracking-tight mb-3 sm:mb-5">
-              Чанартай машин —<br />
-              <span className="text-brand-light">шууд таны гарт</span>
+              Чанартай машин
+              <span className="text-brand-light"> шууд таны гарт</span>
             </h1>
             <p className="text-gray-400 text-sm sm:text-lg leading-relaxed mb-6 sm:mb-10 max-w-xl">
               {company?.address
@@ -780,75 +490,20 @@ function HomeContent() {
         </div>
       </section>
 
-      {/* ━━━ ABOUT ━━━ */}
-      <section id="about" className="py-16 sm:py-24 px-4 bg-white border-t border-zinc-200">
-        <div className="max-w-7xl mx-auto grid lg:grid-cols-2 gap-10 lg:gap-16 items-center">
-          <div>
-            <div className="text-[10px] font-black text-brand uppercase tracking-[0.25em] mb-3">
-              Бидний тухай
-            </div>
-            <h2 className="text-3xl sm:text-4xl font-black text-[#111] leading-tight border-l-4 border-brand pl-4 mb-5">
-              Яагаад бидэнд<br />итгэх вэ?
-            </h2>
-            <p className="text-gray-500 text-sm sm:text-base leading-relaxed mb-8 max-w-lg">
-              {new Date().getFullYear() - 2010}+ жилийн туршлагатай баг. Бид зөвхөн нягт шалгагдсан,
-              мэдээлэл нь бүрэн ил тод машиныг танд санал болгоно.
-            </p>
-
-            <div className="divide-y divide-zinc-200 border-y border-zinc-200 mb-8">
-              {[
-                ["01", "Нягт техникийн үзлэг", "Борлуулахын өмнө бүх машин үзлэгт орж, шалгагдана."],
-                ["02", "Ил тод мэдээлэл", "Он, гүйлт, түлш, хурдны хайрцаг бүгд тодорхой харагдана."],
-                ["03", "Шууд холбоо", "Утас, WhatsApp-аар холбогдож машиныг очиж үзэх боломжтой."],
-              ].map(([n, t, d]) => (
-                <div key={n} className="flex gap-4 py-4 group">
-                  <div className="text-2xl font-black text-zinc-300 group-hover:text-brand transition-colors tabular-nums w-10 shrink-0">{n}</div>
-                  <div>
-                    <div className="text-sm font-black text-[#111] uppercase tracking-wider">{t}</div>
-                    <div className="text-sm text-gray-500 mt-0.5">{d}</div>
-                  </div>
-                </div>
-              ))}
-            </div>
-
-            <a href="#contact"
-              className="inline-flex items-center gap-2 bg-[#111] hover:bg-brand text-white text-[11px] font-black uppercase tracking-[0.15em] px-7 py-3.5 rounded-sm transition-colors">
-              Холбогдох
-              <svg className="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2.5}><path d="M5 12h14M13 6l6 6-6 6" /></svg>
-            </a>
-          </div>
-
-          <div className="relative bg-[#111] border-t-4 border-brand overflow-hidden">
-            <div className="pointer-events-none select-none absolute -bottom-6 -right-2 text-[120px] sm:text-[180px] font-black leading-none text-white/[0.04]">
-              {new Date().getFullYear() - 2010}+
-            </div>
-            <div className="relative grid grid-cols-2 divide-x divide-y divide-white/10">
-              {[
-                { n: loading ? "—" : vehicles.length, l: "Нийт машин", sub: "Одоо зарагдаж буй" },
-                { n: loading ? "—" : uniqueBrands.length, l: "Брэнд", sub: "Сонголтын олон хувилбар" },
-                { n: `${new Date().getFullYear() - 2010}+`, l: "Жил", sub: "Зах зээлийн туршлага" },
-                { n: "100%", l: "Шалгасан", sub: "Бүх машин үзлэгт орсон" },
-              ].map(({ n, l, sub }) => (
-                <div key={l} className="p-6 sm:p-9">
-                  <div className="text-4xl sm:text-5xl font-black text-white tabular-nums leading-none mb-3">{n}</div>
-                  <div className="text-[11px] font-black text-brand-light uppercase tracking-[0.2em]">{l}</div>
-                  <div className="text-xs text-gray-500 mt-1">{sub}</div>
-                </div>
-              ))}
-            </div>
-          </div>
-        </div>
-      </section>
-
       {/* ━━━ CONTACT ━━━ */}
-      <section id="contact" className="py-16 sm:py-24 px-4 bg-[#f5f5f5] border-t border-zinc-200">
+      <section
+        id="contact"
+        className="py-16 sm:py-24 px-4 bg-[#f5f5f5] border-t border-zinc-200"
+      >
         <div className="max-w-7xl mx-auto grid lg:grid-cols-[1fr_1.3fr] gap-10 lg:gap-16 items-start">
           <div>
             <div className="text-[10px] font-black text-brand uppercase tracking-[0.25em] mb-3">
               Холбоо барих
             </div>
             <h2 className="text-3xl sm:text-4xl font-black text-[#111] leading-tight border-l-4 border-brand pl-4 mb-5">
-              Бидэнтэй<br />холбогдоорой
+              Бидэнтэй
+              <br />
+              холбогдоорой
             </h2>
             <p className="text-gray-500 text-sm sm:text-base leading-relaxed max-w-md">
               Машин сонирхсон, үнэ болон үзэх цагийн талаар асуух зүйл байвал
@@ -859,35 +514,98 @@ function HomeContent() {
           <div className="space-y-3">
             {[
               company?.phone && {
-                href: `tel:${company.phone}`, label: "Утас", value: company.phone,
-                icon: <IcPhone cls="w-5 h-5" />, bg: "bg-brand", ext: false,
+                href: `tel:${company.phone}`,
+                label: "Утас",
+                value: company.phone,
+                icon: <IcPhone cls="w-5 h-5" />,
+                bg: "bg-brand",
+                ext: false,
               },
               company?.phone && {
-                href: `https://wa.me/976${company.phone.replace(/\D/g, "")}`, label: "WhatsApp", value: "Мессеж бичих",
-                icon: <IcWa cls="w-5 h-5" />, bg: "bg-[#25d366]", ext: true,
+                href: `https://wa.me/976${company.phone.replace(/\D/g, "")}`,
+                label: "WhatsApp",
+                value: "Мессеж бичих",
+                icon: <IcWa cls="w-5 h-5" />,
+                bg: "bg-[#25d366]",
+                ext: true,
+              },
+              company?.email && {
+                href: `mailto:${company.email}`,
+                label: "И-мэйл",
+                value: company.email,
+                icon: (
+                  <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2}>
+                    <rect x="2" y="4" width="20" height="16" rx="2" />
+                    <path d="M22 7l-10 6L2 7" />
+                  </svg>
+                ),
+                bg: "bg-brand-dark",
+                ext: false,
+              },
+              company?.working_hours && {
+                href: "#contact",
+                label: "Ажлын цаг",
+                value: company.working_hours,
+                icon: (
+                  <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2}>
+                    <circle cx="12" cy="12" r="10" />
+                    <path d="M12 6v6l4 2" />
+                  </svg>
+                ),
+                bg: "bg-zinc-500",
+                ext: false,
               },
               company?.address && {
                 href: `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(company.address)}`,
-                label: "Байршил", value: company.address,
-                icon: <IcPin cls="w-5 h-5" />, bg: "bg-[#111]", ext: true,
+                label: "Байршил",
+                value: company.address,
+                icon: <IcPin cls="w-5 h-5" />,
+                bg: "bg-[#111]",
+                ext: true,
               },
-            ].filter(Boolean).map((c) => {
-              const it = c as { href: string; label: string; value: string; icon: React.ReactNode; bg: string; ext: boolean };
-              return (
-                <a key={it.label} href={it.href}
-                  {...(it.ext ? { target: "_blank", rel: "noreferrer" } : {})}
-                  className="group flex items-center gap-4 bg-white border border-zinc-200 border-l-4 border-l-zinc-300 hover:border-l-brand p-4 sm:p-5 transition-all hover:shadow-md">
-                  <div className={`w-12 h-12 ${it.bg} rounded-sm flex items-center justify-center text-white shrink-0`}>
-                    {it.icon}
-                  </div>
-                  <div className="flex-1 min-w-0">
-                    <div className="text-[10px] font-black text-gray-400 uppercase tracking-[0.2em] mb-0.5">{it.label}</div>
-                    <div className="font-black text-[#111] text-base sm:text-lg truncate">{it.value}</div>
-                  </div>
-                  <svg className="w-5 h-5 text-zinc-300 group-hover:text-brand group-hover:translate-x-1 transition-all shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2}><path d="M5 12h14M13 6l6 6-6 6" /></svg>
-                </a>
-              );
-            })}
+            ]
+              .filter(Boolean)
+              .map((c) => {
+                const it = c as {
+                  href: string;
+                  label: string;
+                  value: string;
+                  icon: React.ReactNode;
+                  bg: string;
+                  ext: boolean;
+                };
+                return (
+                  <a
+                    key={it.label}
+                    href={it.href}
+                    {...(it.ext ? { target: "_blank", rel: "noreferrer" } : {})}
+                    className="group flex items-center gap-4 bg-white border border-zinc-200 border-l-4 border-l-zinc-300 hover:border-l-brand p-4 sm:p-5 transition-all hover:shadow-md"
+                  >
+                    <div
+                      className={`w-12 h-12 ${it.bg} rounded-sm flex items-center justify-center text-white shrink-0`}
+                    >
+                      {it.icon}
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <div className="text-[10px] font-black text-gray-400 uppercase tracking-[0.2em] mb-0.5">
+                        {it.label}
+                      </div>
+                      <div className="font-black text-[#111] text-base sm:text-lg truncate">
+                        {it.value}
+                      </div>
+                    </div>
+                    <svg
+                      className="w-5 h-5 text-zinc-300 group-hover:text-brand group-hover:translate-x-1 transition-all shrink-0"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth={2}
+                    >
+                      <path d="M5 12h14M13 6l6 6-6 6" />
+                    </svg>
+                  </a>
+                );
+              })}
             {!company?.phone && !company?.address && (
               <div className="bg-white border border-zinc-200 p-6 text-sm text-gray-400">
                 Холбоо барих мэдээлэл удахгүй нэмэгдэнэ.
@@ -897,65 +615,8 @@ function HomeContent() {
         </div>
       </section>
 
-      {/* ━━━ CTA BANNER ━━━ */}
-      {company?.phone && (
-        <section className="bg-[#111] relative overflow-hidden">
-          <div className="pointer-events-none select-none absolute -top-6 left-1/2 -translate-x-1/2 text-[90px] sm:text-[220px] font-black uppercase tracking-tighter text-white/[0.03] whitespace-nowrap">
-            {cname}
-          </div>
-          <div className="relative max-w-7xl mx-auto px-4 py-10 sm:py-14 flex flex-col md:flex-row items-center justify-between gap-6 border-l-4 border-brand">
-            <div className="text-center md:text-left">
-              <div className="text-[10px] font-black text-brand-light uppercase tracking-[0.25em] mb-2">Захиалга өгөх</div>
-              <h3 className="text-2xl sm:text-3xl font-black text-white leading-tight">Хүссэн машинаа хайж олоогүй юу?</h3>
-              <p className="text-sm text-gray-400 mt-2">Бидэнтэй холбогдоорой — таны сонголтод тохирох машиныг олж өгнө.</p>
-            </div>
-            <a href={`tel:${company.phone}`}
-              className="shrink-0 flex items-center gap-2 bg-brand hover:bg-white hover:text-[#111] text-white text-[11px] font-black uppercase tracking-[0.2em] px-8 py-4 rounded-sm transition-colors">
-              <IcPhone cls="w-4 h-4" /> {company.phone}
-            </a>
-          </div>
-        </section>
-      )}
-
-      {/* ━━━ FOOTER ━━━ */}
-      <footer className="bg-[#0b0b0b] text-gray-500 border-t border-white/10">
-        <div className="max-w-7xl mx-auto px-4 py-8">
-          <div className="flex flex-col sm:flex-row items-center justify-between gap-5 mb-6">
-            <div className="flex items-center gap-2.5">
-              <div className="w-8 h-8 bg-brand rounded flex items-center justify-center">
-                <span className="text-white font-black text-sm">
-                  {cname[0]}
-                </span>
-              </div>
-              <span className="text-white font-black text-base">{cname}</span>
-            </div>
-            <div className="flex items-center gap-6 text-xs">
-              {[
-                ["#cars", "Машинууд"],
-                ["#about", "Бидний тухай"],
-                ["#contact", "Холбоо барих"],
-              ].map(([h, l]) => (
-                <a
-                  key={h}
-                  href={h}
-                  className="hover:text-white transition-colors"
-                >
-                  {l}
-                </a>
-              ))}
-              <Link
-                href="/admin"
-                className="hover:text-white transition-colors"
-              >
-                Нэвтрэх
-              </Link>
-            </div>
-          </div>
-          <div className="border-t border-white/10 pt-6 text-xs text-center text-gray-600">
-            © {new Date().getFullYear()} {cname}. Бүх эрх хуулиар хамгаалагдсан.
-          </div>
-        </div>
-      </footer>
+      <SiteCta company={company} />
+      <SiteFooter company={company} />
     </div>
   );
 }

@@ -58,18 +58,24 @@ export default function DashboardPage() {
   return (
     <div className="px-4 sm:px-6 py-4 sm:py-6 space-y-4 sm:space-y-5 max-w-5xl">
 
-      {/* Greeting */}
-      <div className="flex items-center justify-between gap-3">
-        <div>
-          <h1 className="text-base sm:text-lg font-bold text-[#09090b]">{greeting}{userName ? `, ${userName.split(' ')[0]}` : ''}!</h1>
-          <p className="text-xs sm:text-sm text-[#71717a] mt-0.5 hidden sm:block">Өнөөдрийн борлуулалт, агуулахын байдал</p>
+      {/* Banner */}
+      <div className="relative bg-[#111] text-white overflow-hidden rounded-sm border-l-4 border-brand px-5 sm:px-8 py-6 sm:py-8">
+        <div className="pointer-events-none select-none absolute -right-2 -bottom-6 text-[90px] sm:text-[150px] font-black uppercase tracking-tighter text-white/[0.04] leading-none">
+          ADMIN
         </div>
-        <Link href="/vehicles/new"
-          className="flex items-center gap-2 bg-brand hover:bg-brand-dark text-white font-semibold px-3 sm:px-4 py-2 sm:py-2.5 rounded-xl transition-colors text-sm shadow-sm shrink-0">
-          <svg className="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2.5}><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
-          <span className="hidden sm:inline">Машин нэмэх</span>
-          <span className="sm:hidden">Нэмэх</span>
-        </Link>
+        <div className="relative flex items-center justify-between gap-4">
+          <div>
+            <div className="text-[10px] font-black text-brand-light uppercase tracking-[0.25em] mb-2">Админ самбар</div>
+            <h1 className="text-xl sm:text-3xl font-black leading-tight">{greeting}{userName ? `, ${userName.split(' ')[0]}` : ''}!</h1>
+            <p className="text-xs sm:text-sm text-white/50 mt-1.5 hidden sm:block">Өнөөдрийн борлуулалт, агуулахын байдал</p>
+          </div>
+          <Link href="/vehicles/new"
+            className="flex items-center gap-2 bg-brand hover:bg-white hover:text-[#111] text-white text-[11px] font-black uppercase tracking-[0.15em] px-4 sm:px-6 py-3 rounded-sm transition-colors shrink-0">
+            <svg className="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2.5}><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+            <span className="hidden sm:inline">Машин нэмэх</span>
+            <span className="sm:hidden">Нэмэх</span>
+          </Link>
+        </div>
       </div>
 
       {/* KPI cards */}
@@ -80,12 +86,12 @@ export default function DashboardPage() {
           { label: 'Цэвэр ашиг',      value: fmt(summary?.total_profit ?? 0),  unit: '',           color: 'bg-violet-50 border-violet-100',   textColor: 'text-violet-700',  icon: <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.8}><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/></svg> },
           { label: 'Агуулахын үнэ',   value: fmt(totalCost),                   unit: `${inStock} машин`, color: 'bg-amber-50 border-amber-100', textColor: 'text-amber-700',   icon: <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.8}><path d="M21 16V8a2 2 0 00-1-1.73l-7-4a2 2 0 00-2 0l-7 4A2 2 0 003 8v8a2 2 0 001 1.73l7 4a2 2 0 002 0l7-4A2 2 0 0021 16z"/></svg> },
         ].map(c => (
-          <div key={c.label} className={`rounded-xl border px-3 sm:px-5 py-3 sm:py-4 ${c.color}`}>
+          <div key={c.label} className="rounded-sm bg-white border border-zinc-200 border-t-[3px] border-t-brand px-3 sm:px-5 py-3 sm:py-4 shadow-sm">
             <div className="flex items-center justify-between mb-3">
-              <span className="text-xs font-medium text-[#71717a]">{c.label}</span>
-              <span className={c.textColor}>{c.icon}</span>
+              <span className="text-[10px] font-black text-[#71717a] uppercase tracking-[0.15em]">{c.label}</span>
+              <span className="w-8 h-8 rounded-sm bg-brand-soft text-brand flex items-center justify-center">{c.icon}</span>
             </div>
-            <div className={`text-2xl font-bold tabular-nums leading-none ${c.textColor}`}>{c.value}</div>
+            <div className="text-xl sm:text-2xl font-black tabular-nums leading-none text-[#111]">{c.value}</div>
             {c.unit && <div className="text-xs text-[#71717a] mt-1.5">{c.unit}</div>}
           </div>
         ))}
@@ -94,7 +100,7 @@ export default function DashboardPage() {
       {/* Status overview */}
       <div className="bg-white rounded-xl border border-[#e4e4e7] overflow-hidden shadow-sm">
         <div className="px-5 py-3.5 border-b border-[#e4e4e7]">
-          <span className="text-sm font-semibold text-[#09090b]">Агуулахын байдал</span>
+          <span className="text-[11px] font-black text-[#09090b] uppercase tracking-[0.15em]">Агуулахын байдал</span>
         </div>
         <div className="grid grid-cols-2 sm:grid-cols-4 divide-x divide-y sm:divide-y-0 divide-[#f4f4f5]">
           {Object.entries(STATUS).map(([key, val]) => (
@@ -130,7 +136,7 @@ export default function DashboardPage() {
         {/* Recent vehicles */}
         <div className="bg-white rounded-xl border border-[#e4e4e7] overflow-hidden shadow-sm">
           <div className="px-5 py-3.5 border-b border-[#e4e4e7] flex items-center justify-between">
-            <span className="text-sm font-semibold text-[#09090b]">Сүүлд нэмэгдсэн</span>
+            <span className="text-[11px] font-black text-[#09090b] uppercase tracking-[0.15em]">Сүүлд нэмэгдсэн</span>
             <Link href="/vehicles" className="text-xs text-[#a1a1aa] hover:text-[#09090b] transition-colors font-medium">
               Бүгд →
             </Link>
@@ -164,7 +170,7 @@ export default function DashboardPage() {
         {/* Quick actions */}
         <div className="space-y-3">
           <div className="bg-white rounded-xl border border-[#e4e4e7] p-4 shadow-sm">
-            <div className="text-xs font-semibold text-[#a1a1aa] uppercase tracking-wider mb-3">Хурдан үйлдэл</div>
+            <div className="text-[10px] font-black text-[#a1a1aa] uppercase tracking-[0.2em] mb-3">Хурдан үйлдэл</div>
             <div className="space-y-1.5">
               {[
                 { href: '/vehicles/new', label: 'Машин нэмэх',  primary: true },
@@ -187,7 +193,7 @@ export default function DashboardPage() {
 
           {/* Mini stat */}
           <div className="bg-white rounded-xl border border-[#e4e4e7] p-4 shadow-sm">
-            <div className="text-xs font-semibold text-[#a1a1aa] uppercase tracking-wider mb-3">Нэгж дундаж</div>
+            <div className="text-[10px] font-black text-[#a1a1aa] uppercase tracking-[0.2em] mb-3">Нэгж дундаж</div>
             <div className="space-y-2.5">
               {[
                 { label: 'Нэг машины ашиг', value: fmt(summary?.avg_profit ?? 0) },

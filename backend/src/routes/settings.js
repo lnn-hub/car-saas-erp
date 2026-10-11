@@ -6,7 +6,7 @@ const auth = require('../middleware/auth');
 router.get('/', auth, async (req, res) => {
   try {
     const { rows } = await pool.query(
-      'SELECT name, slug, phone, address, logo_url, show_prices FROM companies WHERE id=$1',
+      'SELECT name, slug, phone, address, email, working_hours, logo_url, show_prices FROM companies WHERE id=$1',
       [req.user.company_id]
     );
     res.json(rows[0] || {});
@@ -15,7 +15,7 @@ router.get('/', auth, async (req, res) => {
 
 // PATCH /api/settings — тохиргоо хадгалах
 router.patch('/', auth, async (req, res) => {
-  const { slug, phone, address, logo_url, show_prices } = req.body;
+  const { slug, phone, address, email, working_hours, logo_url, show_prices } = req.body;
 
   // Slug зөвхөн a-z, 0-9, - тэмдэгт байна
   if (slug && !/^[a-z0-9-]{3,50}$/.test(slug))
@@ -36,11 +36,14 @@ router.patch('/', auth, async (req, res) => {
         phone       = COALESCE($2, phone),
         address     = COALESCE($3, address),
         logo_url    = COALESCE($4, logo_url),
-        show_prices = COALESCE($5, show_prices)
+        show_prices = COALESCE($5, show_prices),
+        email         = COALESCE($7, email),
+        working_hours = COALESCE($8, working_hours)
        WHERE id=$6
-       RETURNING name, slug, phone, address, logo_url, show_prices`,
+       RETURNING name, slug, phone, address, email, working_hours, logo_url, show_prices`,
       [slug || null, phone || null, address || null, logo_url || null,
-       show_prices !== undefined ? show_prices : null, req.user.company_id]
+       show_prices !== undefined ? show_prices : null, req.user.company_id,
+       email ?? null, working_hours ?? null]
     );
     res.json(rows[0]);
   } catch (err) { res.status(500).json({ error: err.message }); }
