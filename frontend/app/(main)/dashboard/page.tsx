@@ -37,8 +37,10 @@ export default function DashboardPage() {
   const [summary, setSummary]   = useState<Summary | null>(null);
   const [vehicles, setVehicles] = useState<Vehicle[]>([]);
   const [userName, setUserName] = useState('');
+  const [hour, setHour]         = useState(0);
 
   useEffect(() => {
+    setHour(new Date().getHours());
     api.getSummary().then(setSummary).catch(console.error);
     api.getVehicles().then(setVehicles).catch(console.error);
     const u = JSON.parse(localStorage.getItem('user') || '{}');
@@ -51,7 +53,6 @@ export default function DashboardPage() {
   const totalCost  = vehicles.reduce((s, v) => s + Number(v.total_cost), 0);
   const recent     = vehicles.slice(0, 6);
 
-  const hour = new Date().getHours();
   const greeting = hour < 12 ? 'Өглөөний мэнд' : hour < 17 ? 'Өдрийн мэнд' : 'Оройн мэнд';
 
   return (
