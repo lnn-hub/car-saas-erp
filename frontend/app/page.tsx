@@ -781,55 +781,58 @@ function HomeContent() {
       </section>
 
       {/* ━━━ ABOUT ━━━ */}
-      <section
-        id="about"
-        className="py-16 px-4 bg-white border-t border-gray-100"
-      >
-        <div className="max-w-7xl mx-auto">
-          <div className="flex flex-col md:flex-row gap-12 items-center">
-            <div className="flex-1">
-              <div className="text-[10px] font-black text-brand uppercase tracking-[0.25em] mb-3">
-                Бидний тухай
-              </div>
-              <h2 className="text-3xl sm:text-4xl font-black text-[#111] mb-4 leading-tight border-l-4 border-brand pl-4">
-                Яагаад бидэнд
-                <br />
-                хандах вэ?
-              </h2>
-              <p className="text-gray-500 text-sm leading-relaxed mb-6">
-                {new Date().getFullYear() - 2010}+ жилийн туршлагатай баг. Бүх
-                машин техникийн нягт үзлэгт орж, шалгагдсаны дараа зарагдана.
-              </p>
-              <a
-                href="#contact"
-                className="inline-flex items-center gap-2 bg-[#111] hover:bg-brand text-white text-[11px] font-black uppercase tracking-[0.15em] px-7 py-3.5 rounded-sm transition-colors"
-              >
-                Холбогдох
-              </a>
+      <section id="about" className="py-16 sm:py-24 px-4 bg-white border-t border-zinc-200">
+        <div className="max-w-7xl mx-auto grid lg:grid-cols-2 gap-10 lg:gap-16 items-center">
+          <div>
+            <div className="text-[10px] font-black text-brand uppercase tracking-[0.25em] mb-3">
+              Бидний тухай
             </div>
-            <div className="flex-1 grid grid-cols-3 gap-4">
+            <h2 className="text-3xl sm:text-4xl font-black text-[#111] leading-tight border-l-4 border-brand pl-4 mb-5">
+              Яагаад бидэнд<br />итгэх вэ?
+            </h2>
+            <p className="text-gray-500 text-sm sm:text-base leading-relaxed mb-8 max-w-lg">
+              {new Date().getFullYear() - 2010}+ жилийн туршлагатай баг. Бид зөвхөн нягт шалгагдсан,
+              мэдээлэл нь бүрэн ил тод машиныг танд санал болгоно.
+            </p>
+
+            <div className="divide-y divide-zinc-200 border-y border-zinc-200 mb-8">
               {[
-                {
-                  n: `${vehicles.length}`,
-                  l: "Нийт машин",
-                  sub: "Агуулахад байгаа",
-                },
-                {
-                  n: `${new Date().getFullYear() - 2010}+`,
-                  l: "Жил",
-                  sub: "Туршлага",
-                },
-                { n: "100%", l: "Шалгасан", sub: "Бүх машин" },
-              ].map(({ n, l, sub }) => (
-                <div
-                  key={l}
-                  className="bg-[#f9f9f9] rounded-sm p-5 text-center border border-zinc-200 border-t-2 border-t-brand"
-                >
-                  <div className="text-3xl font-black text-brand mb-1">
-                    {n}
+                ["01", "Нягт техникийн үзлэг", "Борлуулахын өмнө бүх машин үзлэгт орж, шалгагдана."],
+                ["02", "Ил тод мэдээлэл", "Он, гүйлт, түлш, хурдны хайрцаг бүгд тодорхой харагдана."],
+                ["03", "Шууд холбоо", "Утас, WhatsApp-аар холбогдож машиныг очиж үзэх боломжтой."],
+              ].map(([n, t, d]) => (
+                <div key={n} className="flex gap-4 py-4 group">
+                  <div className="text-2xl font-black text-zinc-300 group-hover:text-brand transition-colors tabular-nums w-10 shrink-0">{n}</div>
+                  <div>
+                    <div className="text-sm font-black text-[#111] uppercase tracking-wider">{t}</div>
+                    <div className="text-sm text-gray-500 mt-0.5">{d}</div>
                   </div>
-                  <div className="text-sm font-bold text-[#111]">{l}</div>
-                  <div className="text-[11px] text-gray-400 mt-0.5">{sub}</div>
+                </div>
+              ))}
+            </div>
+
+            <a href="#contact"
+              className="inline-flex items-center gap-2 bg-[#111] hover:bg-brand text-white text-[11px] font-black uppercase tracking-[0.15em] px-7 py-3.5 rounded-sm transition-colors">
+              Холбогдох
+              <svg className="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2.5}><path d="M5 12h14M13 6l6 6-6 6" /></svg>
+            </a>
+          </div>
+
+          <div className="relative bg-[#111] border-t-4 border-brand overflow-hidden">
+            <div className="pointer-events-none select-none absolute -bottom-6 -right-2 text-[120px] sm:text-[180px] font-black leading-none text-white/[0.04]">
+              {new Date().getFullYear() - 2010}+
+            </div>
+            <div className="relative grid grid-cols-2 divide-x divide-y divide-white/10">
+              {[
+                { n: loading ? "—" : vehicles.length, l: "Нийт машин", sub: "Одоо зарагдаж буй" },
+                { n: loading ? "—" : uniqueBrands.length, l: "Брэнд", sub: "Сонголтын олон хувилбар" },
+                { n: `${new Date().getFullYear() - 2010}+`, l: "Жил", sub: "Зах зээлийн туршлага" },
+                { n: "100%", l: "Шалгасан", sub: "Бүх машин үзлэгт орсон" },
+              ].map(({ n, l, sub }) => (
+                <div key={l} className="p-6 sm:p-9">
+                  <div className="text-4xl sm:text-5xl font-black text-white tabular-nums leading-none mb-3">{n}</div>
+                  <div className="text-[11px] font-black text-brand-light uppercase tracking-[0.2em]">{l}</div>
+                  <div className="text-xs text-gray-500 mt-1">{sub}</div>
                 </div>
               ))}
             </div>
@@ -838,63 +841,56 @@ function HomeContent() {
       </section>
 
       {/* ━━━ CONTACT ━━━ */}
-      <section
-        id="contact"
-        className="py-16 px-4 bg-[#f5f5f5] border-t border-gray-200"
-      >
-        <div className="max-w-7xl mx-auto">
-          <div className="text-center mb-10">
-            <div className="text-[10px] font-black text-brand uppercase tracking-[0.25em] mb-2">
+      <section id="contact" className="py-16 sm:py-24 px-4 bg-[#f5f5f5] border-t border-zinc-200">
+        <div className="max-w-7xl mx-auto grid lg:grid-cols-[1fr_1.3fr] gap-10 lg:gap-16 items-start">
+          <div>
+            <div className="text-[10px] font-black text-brand uppercase tracking-[0.25em] mb-3">
               Холбоо барих
             </div>
-            <h2 className="text-3xl sm:text-4xl font-black text-[#111]">
-              Бидэнтэй холбогдоорой
+            <h2 className="text-3xl sm:text-4xl font-black text-[#111] leading-tight border-l-4 border-brand pl-4 mb-5">
+              Бидэнтэй<br />холбогдоорой
             </h2>
+            <p className="text-gray-500 text-sm sm:text-base leading-relaxed max-w-md">
+              Машин сонирхсон, үнэ болон үзэх цагийн талаар асуух зүйл байвал
+              доорх сувгуудаар шууд холбогдоорой.
+            </p>
           </div>
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 max-w-3xl mx-auto">
-            {company?.phone && (
-              <a
-                href={`tel:${company.phone}`}
-                className="bg-white rounded-sm p-6 text-center border border-zinc-200 hover:border-brand hover:shadow-md transition-all group"
-              >
-                <div className="w-12 h-12 bg-brand rounded-sm flex items-center justify-center text-white mx-auto mb-3 group-hover:scale-110 transition-transform">
-                  <IcPhone cls="w-5 h-5" />
-                </div>
-                <div className="text-[10px] font-bold text-gray-400 uppercase tracking-[0.2em] mb-1">
-                  Утас
-                </div>
-                <div className="font-black text-[#111] text-base">
-                  {company.phone}
-                </div>
-              </a>
-            )}
-            {company?.phone && (
-              <a
-                href={`https://wa.me/976${company.phone.replace(/\D/g, "")}`}
-                target="_blank"
-                rel="noreferrer"
-                className="bg-white rounded-sm p-6 text-center border border-zinc-200 hover:border-[#25d366] hover:shadow-md transition-all group"
-              >
-                <div className="w-12 h-12 bg-[#25d366] rounded-sm flex items-center justify-center text-white mx-auto mb-3 group-hover:scale-110 transition-transform">
-                  <IcWa cls="w-5 h-5" />
-                </div>
-                <div className="text-[10px] font-bold text-gray-400 uppercase tracking-[0.2em] mb-1">
-                  WhatsApp
-                </div>
-                <div className="font-black text-[#111] text-base">Мессеж</div>
-              </a>
-            )}
-            {company?.address && (
-              <div className="bg-white rounded-sm p-6 text-center border border-zinc-200">
-                <div className="w-12 h-12 bg-[#111] rounded-sm flex items-center justify-center text-white mx-auto mb-3">
-                  <IcPin cls="w-5 h-5" />
-                </div>
-                <div className="text-[10px] font-bold text-gray-400 uppercase tracking-[0.2em] mb-1">
-                  Байршил
-                </div>
-                <div className="font-bold text-[#111] text-sm">
-                  {company.address}
-                </div>
+
+          <div className="space-y-3">
+            {[
+              company?.phone && {
+                href: `tel:${company.phone}`, label: "Утас", value: company.phone,
+                icon: <IcPhone cls="w-5 h-5" />, bg: "bg-brand", ext: false,
+              },
+              company?.phone && {
+                href: `https://wa.me/976${company.phone.replace(/\D/g, "")}`, label: "WhatsApp", value: "Мессеж бичих",
+                icon: <IcWa cls="w-5 h-5" />, bg: "bg-[#25d366]", ext: true,
+              },
+              company?.address && {
+                href: `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(company.address)}`,
+                label: "Байршил", value: company.address,
+                icon: <IcPin cls="w-5 h-5" />, bg: "bg-[#111]", ext: true,
+              },
+            ].filter(Boolean).map((c) => {
+              const it = c as { href: string; label: string; value: string; icon: React.ReactNode; bg: string; ext: boolean };
+              return (
+                <a key={it.label} href={it.href}
+                  {...(it.ext ? { target: "_blank", rel: "noreferrer" } : {})}
+                  className="group flex items-center gap-4 bg-white border border-zinc-200 border-l-4 border-l-zinc-300 hover:border-l-brand p-4 sm:p-5 transition-all hover:shadow-md">
+                  <div className={`w-12 h-12 ${it.bg} rounded-sm flex items-center justify-center text-white shrink-0`}>
+                    {it.icon}
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <div className="text-[10px] font-black text-gray-400 uppercase tracking-[0.2em] mb-0.5">{it.label}</div>
+                    <div className="font-black text-[#111] text-base sm:text-lg truncate">{it.value}</div>
+                  </div>
+                  <svg className="w-5 h-5 text-zinc-300 group-hover:text-brand group-hover:translate-x-1 transition-all shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2}><path d="M5 12h14M13 6l6 6-6 6" /></svg>
+                </a>
+              );
+            })}
+            {!company?.phone && !company?.address && (
+              <div className="bg-white border border-zinc-200 p-6 text-sm text-gray-400">
+                Холбоо барих мэдээлэл удахгүй нэмэгдэнэ.
               </div>
             )}
           </div>
