@@ -36,7 +36,7 @@ export default function SalesPage() {
   }, []);
 
   return (
-    <div className="px-4 sm:px-6 py-4 sm:py-6 max-w-5xl space-y-4 sm:space-y-5">
+    <div className="px-4 sm:px-6 py-4 sm:py-6 max-w-[1500px] mx-auto w-full space-y-4 sm:space-y-5">
 
       {/* Header */}
       <div>

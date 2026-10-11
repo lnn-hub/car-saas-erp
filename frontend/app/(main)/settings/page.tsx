@@ -108,7 +108,7 @@ export default function SettingsPage() {
   const previewUrl = mFile ? URL.createObjectURL(mFile) : editing && editing !== 'new' ? photoSrc(editing.photo_url) : null;
 
   return (
-    <div className="px-4 sm:px-6 py-4 sm:py-6 max-w-3xl space-y-5">
+    <div className="px-4 sm:px-6 py-4 sm:py-6 max-w-3xl mx-auto space-y-5">
       <div>
         <h1 className="text-base sm:text-lg font-bold text-[#09090b]">Тохиргоо</h1>
         <p className="text-xs sm:text-sm text-[#71717a] mt-0.5">Вэбсайтад харагдах мэдээлэл, манай баг</p>

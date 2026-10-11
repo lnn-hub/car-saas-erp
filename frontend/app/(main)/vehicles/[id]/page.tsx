@@ -205,7 +205,7 @@ function VehicleDetailContent() {
   const colorHex = COLORS.find((c) => c.value === vehicle.color)?.hex;
 
   return (
-    <div className="px-4 sm:px-8 py-5 sm:py-7 max-w-2xl space-y-5">
+    <div className="px-4 sm:px-8 py-5 sm:py-7 max-w-2xl mx-auto space-y-5">
       <button
         onClick={() => router.back()}
         className="flex items-center gap-1.5 text-[#a1a1aa] hover:text-[#09090b] text-sm transition-colors"

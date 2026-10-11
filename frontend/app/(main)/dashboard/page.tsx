@@ -56,7 +56,7 @@ export default function DashboardPage() {
   const greeting = hour < 12 ? 'Өглөөний мэнд' : hour < 17 ? 'Өдрийн мэнд' : 'Оройн мэнд';
 
   return (
-    <div className="px-4 sm:px-6 py-4 sm:py-6 space-y-4 sm:space-y-5 max-w-5xl">
+    <div className="px-4 sm:px-6 py-4 sm:py-6 space-y-4 sm:space-y-5 max-w-[1500px] mx-auto w-full">
 
       {/* Banner */}
       <div className="relative bg-[#111] text-white overflow-hidden rounded-sm border-l-4 border-brand px-5 sm:px-8 py-6 sm:py-8">
@@ -132,7 +132,7 @@ export default function DashboardPage() {
       </div>
 
       {/* Bottom: recent + quick actions */}
-      <div className="grid grid-cols-1 lg:grid-cols-[1fr_220px] gap-4">
+      <div className="grid grid-cols-1 lg:grid-cols-[1fr_280px] gap-4">
         {/* Recent vehicles */}
         <div className="bg-white rounded-xl border border-[#e4e4e7] overflow-hidden shadow-sm">
           <div className="px-5 py-3.5 border-b border-[#e4e4e7] flex items-center justify-between">
