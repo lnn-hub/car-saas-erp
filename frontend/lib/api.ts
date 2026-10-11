@@ -23,7 +23,7 @@ export function invalidateCache(prefix?: string) {
   for (const k of cache.keys()) if (k.startsWith(prefix)) cache.delete(k);
 }
 
-async function request(path: string, options: RequestInit = {}, useCache = false) {
+async function request(path: string, options: RequestInit = {}, useCache = false, _retry = 0): Promise<unknown> {
   const token = getToken();
   const cacheKey = path + (token || '');
 
@@ -32,19 +32,28 @@ async function request(path: string, options: RequestInit = {}, useCache = false
     if (cached) return cached;
   }
 
-  const res = await fetch(`${BASE}${path}`, {
-    ...options,
-    headers: {
-      'Content-Type': 'application/json',
-      ...(token ? { Authorization: `Bearer ${token}` } : {}),
-      ...options.headers,
-    },
-  });
-  const data = await res.json();
-  if (!res.ok) throw new Error(data.error || 'Алдаа гарлаа');
-
-  if (useCache) setCached(cacheKey, data);
-  return data;
+  try {
+    const res = await fetch(`${BASE}${path}`, {
+      ...options,
+      headers: {
+        'Content-Type': 'application/json',
+        ...(token ? { Authorization: `Bearer ${token}` } : {}),
+        ...options.headers,
+      },
+    });
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.error || 'Алдаа гарлаа');
+    if (useCache) setCached(cacheKey, data);
+    return data;
+  } catch (err) {
+    // Сүлжээний алдаа (Render cold start) бол 3 удаа retry хийнэ
+    const isNetworkErr = err instanceof TypeError && err.message.includes('fetch');
+    if (isNetworkErr && _retry < 3) {
+      await new Promise(r => setTimeout(r, 2000 * (_retry + 1)));
+      return request(path, options, useCache, _retry + 1);
+    }
+    throw err;
+  }
 }
 
 // Render free tier-ийн cold start-аас сэргийлж warm-up ping хийх
