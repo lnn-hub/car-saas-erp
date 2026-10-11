@@ -2,7 +2,7 @@
 import { useEffect, useState, Suspense } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import Link from 'next/link';
-import { Company } from '@/lib/site';
+import { BACKEND as API, Company } from '@/lib/site';
 import { useCompany } from '@/lib/useSiteData';
 import { SiteHeader } from '@/components/site/SiteHeader';
 import { SiteFooter } from '@/components/site/SiteFooter';
@@ -19,6 +19,11 @@ interface Vehicle {
 
 const FUEL:  Record<string,string> = { PETROL:'Бензин', DIESEL:'Дизель', HYBRID:'Хибрид', ELECTRIC:'Цахилгаан' };
 const TRANS: Record<string,string> = { AUTO:'Автомат', MANUAL:'Механик' };
+
+interface Other {
+  id: string; brand: string; model: string; year: number;
+  mileage: number; fuel_type: string; total_cost: string | null; main_image: string | null;
+}
 
 function fmtPrice(n: string|number|null) {
   if (!n || Number(n) === 0) return null;
@@ -51,6 +56,8 @@ function VehicleContent() {
   const siteCompany        = useCompany();
   const [v, setV]          = useState<Vehicle|null>(null);
   const [imgIdx, setIdx]   = useState(0);
+  const [others, setOthers]  = useState<Other[]>([]);
+  const [copied, setCopied]  = useState(false);
   const [loading, setLoad] = useState(true);
 
   useEffect(() => {
@@ -72,6 +79,10 @@ function VehicleContent() {
       }
     }
     fetch(`${BACKEND}/health`).catch(() => {});
+    fetch(`${API}/api/public/vehicles`)
+      .then(r => r.json())
+      .then(d => { if (!cancelled) setOthers((d.vehicles || []).filter((x: Other) => x.id !== id).slice(0, 4)); })
+      .catch(() => {});
     load();
     return () => { cancelled = true; document.title = 'AutoDealer'; };
   }, [id]);
@@ -132,6 +143,17 @@ function VehicleContent() {
     { label:'Үйлдвэрлэсэн',   value: v.manufactured_date ? v.manufactured_date.slice(0,7) : null },
     { label:'Он',              value: String(v.year) },
   ].filter(s => s.value);
+
+  const descLines = (v.description || '').split('\n').map(l => l.trim());
+  const features  = descLines.filter(l => l.startsWith('•')).map(l => l.replace(/^•\s*/, ''));
+  const credit    = descLines.find(l => l.startsWith('Зургийн эх сурвалж'));
+  const intro     = descLines.filter(l => l && !l.startsWith('•') && !l.startsWith('Зургийн эх сурвалж')).join('\n\n');
+  const waHref    = v.company?.phone
+    ? `https://wa.me/976${v.company.phone.replace(/\D/g, '')}?text=${encodeURIComponent(`Сайн байна уу, ${v.year} оны ${v.brand} ${v.model} машины талаар лавлах гэсэн юм.`)}`
+    : '';
+  async function copyLink() {
+    try { await navigator.clipboard.writeText(window.location.href); setCopied(true); setTimeout(() => setCopied(false), 2000); } catch {}
+  }
 
   return (
     <div className="min-h-screen bg-[#f2f2f2] pb-[76px] lg:pb-0" style={{fontFamily:"'Inter','Segoe UI',sans-serif"}}>
@@ -279,15 +301,35 @@ function VehicleContent() {
             </div>
 
             {/* Description */}
-            {v.description && (
+            {intro && (
               <div className="bg-white rounded-xl overflow-hidden shadow-sm">
                 <div className="flex items-center gap-3 px-5 py-4 border-b border-gray-100">
                   <div className="w-1 h-5 bg-brand rounded-full" />
-                  <h2 className="font-extrabold text-[#111] text-sm uppercase tracking-wider">Нэмэлт мэдээлэл</h2>
+                  <h2 className="font-extrabold text-[#111] text-sm uppercase tracking-wider">Машины тухай</h2>
                 </div>
-                <p className="px-5 py-5 text-sm text-gray-600 leading-relaxed">{v.description}</p>
+                <p className="px-5 py-5 text-sm sm:text-base text-gray-600 leading-relaxed whitespace-pre-line">{intro}</p>
               </div>
             )}
+
+            {/* Features */}
+            {features.length > 0 && (
+              <div className="bg-white rounded-xl overflow-hidden shadow-sm">
+                <div className="flex items-center gap-3 px-5 py-4 border-b border-gray-100">
+                  <div className="w-1 h-5 bg-brand rounded-full" />
+                  <h2 className="font-extrabold text-[#111] text-sm uppercase tracking-wider">Онцлох тоноглол</h2>
+                </div>
+                <ul className="grid sm:grid-cols-2 gap-x-6 gap-y-3 p-5">
+                  {features.map((f) => (
+                    <li key={f} className="flex items-start gap-3 text-sm text-gray-700">
+                      <span className="mt-0.5 w-5 h-5 shrink-0 bg-brand-soft text-brand rounded-sm flex items-center justify-center">{Ic.check}</span>
+                      <span>{f}</span>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            )}
+
+            {credit && <p className="text-[11px] text-gray-400 px-1">{credit}</p>}
           </div>
 
           {/* RIGHT sidebar */}
@@ -306,7 +348,7 @@ function VehicleContent() {
 
                 {/* Price */}
                 {price ? (
-                  <div className="bg-gradient-to-r from-brand to-[#e00] rounded-xl p-4 mb-4 text-white">
+                  <div className="bg-gradient-to-r from-brand-dark to-brand rounded-sm p-4 mb-4 text-white">
                     <div className="text-[10px] uppercase tracking-widest opacity-80 mb-0.5">Борлуулах үнэ</div>
                     <div className="text-2xl font-black leading-tight">{price}</div>
                   </div>
@@ -339,7 +381,7 @@ function VehicleContent() {
                       {Ic.phone}
                       <span>{v.company.phone} — Залгах</span>
                     </a>
-                    <a href={`https://wa.me/976${v.company.phone.replace(/\D/g,'')}`}
+                    <a href={waHref}
                       target="_blank" rel="noreferrer"
                       className="flex items-center justify-center gap-2.5 w-full bg-[#25d366] hover:bg-[#1ebe5d] text-white font-extrabold py-4 rounded-xl transition-colors text-sm">
                       {Ic.wa}
@@ -368,6 +410,13 @@ function VehicleContent() {
               )}
             </div>
 
+            {/* Share */}
+            <button onClick={copyLink}
+              className="w-full flex items-center justify-center gap-2 bg-white border border-zinc-200 hover:border-brand hover:text-brand text-[#111] text-[11px] font-black uppercase tracking-[0.15em] py-3.5 rounded-sm transition-colors">
+              <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2}><path d="M10 13a5 5 0 007.07 0l3-3a5 5 0 00-7.07-7.07l-1.5 1.5"/><path d="M14 11a5 5 0 00-7.07 0l-3 3a5 5 0 007.07 7.07l1.5-1.5"/></svg>
+              {copied ? 'Хуулагдлаа' : 'Холбоос хуулах'}
+            </button>
+
             {/* Back */}
             <Link href="/"
               className="flex items-center justify-center gap-2 w-full bg-white rounded-xl shadow-sm py-3 text-sm text-gray-400 hover:text-brand hover:shadow-md transition-all font-semibold">
@@ -376,6 +425,40 @@ function VehicleContent() {
           </div>
         </div>
       </main>
+
+      {/* ── Similar vehicles ── */}
+      {others.length > 0 && (
+        <section className="bg-white border-t border-zinc-200 py-12 sm:py-16 px-4">
+          <div className="max-w-7xl mx-auto">
+            <div className="flex items-end justify-between gap-4 mb-8">
+              <div>
+                <div className="text-[10px] font-black text-brand uppercase tracking-[0.25em] mb-2">Бусад машинууд</div>
+                <h2 className="text-2xl sm:text-3xl font-black text-[#111]">Танд таалагдаж магадгүй</h2>
+              </div>
+              <Link href="/#cars" className="text-[11px] font-black uppercase tracking-[0.15em] text-brand hover:text-brand-dark whitespace-nowrap">Бүгдийг үзэх →</Link>
+            </div>
+            <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-5">
+              {others.map((o) => {
+                const src = o.main_image ? imgSrc(o.main_image) : null;
+                const pr = fmtPrice(o.total_cost);
+                return (
+                  <Link key={o.id} href={`/vehicle/${o.id}`}
+                    className="group bg-white border border-zinc-200 hover:border-brand/40 hover:shadow-xl transition-all duration-300 overflow-hidden rounded-sm">
+                    <div className="aspect-[4/3] bg-zinc-100 overflow-hidden">
+                      {src && <img src={src} alt={`${o.brand} ${o.model}`} loading="lazy" className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />}
+                    </div>
+                    <div className="p-3 sm:p-4">
+                      <div className="text-[10px] font-black text-brand uppercase tracking-[0.18em]">{o.brand}</div>
+                      <div className="font-black text-[#111] text-sm sm:text-base leading-tight">{o.model} <span className="text-gray-400 font-bold">{o.year}</span></div>
+                      <div className="mt-2 text-sm font-black text-[#111]">{pr || 'Тохиролцоно'}</div>
+                    </div>
+                  </Link>
+                );
+              })}
+            </div>
+          </div>
+        </section>
+      )}
 
       <SiteFooter company={company} />
 
@@ -386,7 +469,7 @@ function VehicleContent() {
             className="flex-1 flex items-center justify-center gap-2 bg-brand active:bg-brand-dark text-white font-extrabold py-3.5 rounded-xl text-sm shadow-sm">
             {Ic.phone} Залгах
           </a>
-          <a href={`https://wa.me/976${v.company.phone.replace(/\D/g,'')}`}
+          <a href={waHref}
             target="_blank" rel="noreferrer"
             className="flex-1 flex items-center justify-center gap-2 bg-[#25d366] active:bg-[#1ebe5d] text-white font-extrabold py-3.5 rounded-xl text-sm shadow-sm">
             {Ic.wa} WhatsApp
