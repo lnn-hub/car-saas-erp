@@ -59,16 +59,12 @@ const PAYMENT_TYPES = [
   { value: "LEASING", label: "Лизинг", icon: "" },
 ];
 
-const BASE = (process.env.NEXT_PUBLIC_API_URL || "http://localhost:4000") + "/api";
 const inp =
   "w-full bg-white border border-[#e4e4e7] rounded-md px-3 py-2 text-sm text-[#09090b] placeholder-[#a1a1aa] focus:outline-none focus:border-[#09090b] transition-colors";
 
 function fmt(n: number) {
   if (n >= 1_000_000) return (n / 1_000_000).toFixed(1) + "сая₮";
   return n.toLocaleString("mn-MN") + "₮";
-}
-function tok() {
-  return localStorage.getItem("token") || "";
 }
 
 function VehicleDetailContent() {
@@ -118,11 +114,7 @@ function VehicleDetailContent() {
     }
     searchRef.current = setTimeout(async () => {
       try {
-        const r = await fetch(
-          `${BASE}/customers?q=${encodeURIComponent(custQuery)}`,
-          { headers: { Authorization: `Bearer ${tok()}` } },
-        );
-        const d = await r.json();
+        const d = await api.searchCustomers(custQuery);
         setCustResults(Array.isArray(d) ? d.slice(0, 6) : []);
       } catch {}
     }, 300);
@@ -165,16 +157,7 @@ function VehicleDetailContent() {
       if (selCustomer) {
         customerId = selCustomer.id;
       } else {
-        // Шинэ хэрэглэгч үүсгэх
-        const r = await fetch(`${BASE}/customers`, {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${tok()}`,
-          },
-          body: JSON.stringify({ name: newCustName, phone: newCustPhone }),
-        });
-        const c = await r.json();
+        const c = await api.createCustomer({ name: newCustName, phone: newCustPhone });
         customerId = c.id;
       }
 
@@ -211,7 +194,7 @@ function VehicleDetailContent() {
 
   if (!vehicle)
     return (
-      <div className="px-8 py-7 text-[#a1a1aa] text-sm">Ачааллаж байна...</div>
+      <div className="px-4 sm:px-8 py-5 sm:py-7 text-[#a1a1aa] text-sm">Ачааллаж байна...</div>
     );
 
   const totalCost = vehicle.costs.reduce((s, c) => s + Number(c.amount), 0);
@@ -222,7 +205,7 @@ function VehicleDetailContent() {
   const colorHex = COLORS.find((c) => c.value === vehicle.color)?.hex;
 
   return (
-    <div className="px-8 py-7 max-w-2xl space-y-5">
+    <div className="px-4 sm:px-8 py-5 sm:py-7 max-w-2xl space-y-5">
       <button
         onClick={() => router.back()}
         className="flex items-center gap-1.5 text-[#a1a1aa] hover:text-[#09090b] text-sm transition-colors"
@@ -287,7 +270,7 @@ function VehicleDetailContent() {
             Мэдээлэл
           </span>
         </div>
-        <div className="p-4 grid grid-cols-3 gap-x-6 gap-y-4">
+        <div className="p-4 grid grid-cols-2 sm:grid-cols-3 gap-x-6 gap-y-4">
           {[
             ["VIN код", vehicle.vin],
             ["Гүйлт", vehicle.mileage.toLocaleString() + " км"],
@@ -734,7 +717,7 @@ export default function VehicleDetailPage() {
   return (
     <Suspense
       fallback={
-        <div className="px-8 py-7 text-[#a1a1aa] text-sm">
+        <div className="px-4 sm:px-8 py-5 sm:py-7 text-[#a1a1aa] text-sm">
           Ачааллаж байна...
         </div>
       }

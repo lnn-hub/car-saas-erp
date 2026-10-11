@@ -132,7 +132,7 @@ export default function NewVehiclePage() {
   // ── Step 2: Зураг оруулах ──
   if (step === 'images') {
     return (
-      <div className="px-8 py-7 max-w-2xl">
+      <div className="px-4 sm:px-8 py-5 sm:py-7 max-w-2xl">
         <h1 className="text-lg font-semibold text-[#09090b] mb-1">Зураг оруулах</h1>
         <p className="text-sm text-[#a1a1aa] mb-6">Машины зурагнуудыг оруулна уу. Эхний зураг үндсэн зураг болно.</p>
 
@@ -206,7 +206,7 @@ export default function NewVehiclePage() {
 
   // ── Step 1: Машины мэдээлэл ──
   return (
-    <div className="px-8 py-7 max-w-2xl">
+    <div className="px-4 sm:px-8 py-5 sm:py-7 max-w-2xl">
       <button onClick={() => router.back()}
         className="flex items-center gap-1.5 text-[#a1a1aa] hover:text-[#09090b] text-sm transition-colors mb-6">
         <IconArrowLeft className="w-4 h-4" /> Буцах

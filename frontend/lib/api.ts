@@ -105,4 +105,9 @@ export const api = {
     invalidateCache('/sales');
     return request('/sales', { method: 'POST', body: JSON.stringify(data) });
   },
+
+  searchCustomers: (q: string) =>
+    request(`/customers?q=${encodeURIComponent(q)}`),
+  createCustomer: (data: { name: string; phone: string }) =>
+    request('/customers', { method: 'POST', body: JSON.stringify(data) }),
 };
