@@ -10,9 +10,8 @@ function IcMoney()   { return <svg className="w-4 h-4" viewBox="0 0 24 24" fill=
 function IcPeople()  { return <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.8}><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87"/><path d="M16 3.13a4 4 0 010 7.75"/></svg>; }
 function IcChart()   { return <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.8}><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/><line x1="2" y1="20" x2="22" y2="20"/></svg>; }
 function IcFinance() { return <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.8}><path d="M12 2v20M17 5H9.5a3.5 3.5 0 000 7h5a3.5 3.5 0 010 7H6"/></svg>; }
-function IcStar()    { return <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.8}><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>; }
-function IcGlobe()   { return <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.8}><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 014 10 15.3 15.3 0 01-4 10 15.3 15.3 0 01-4-10 15.3 15.3 0 014-10z"/></svg>; }
 function IcSettings(){ return <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.8}><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83-2.83l.06-.06A1.65 1.65 0 004.68 15a1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 012.83-2.83l.06.06A1.65 1.65 0 009 4.68a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 2.83l-.06.06A1.65 1.65 0 0019.4 9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z"/></svg>; }
+function IcGlobe()   { return <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.8}><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 014 10 15.3 15.3 0 01-4 10 15.3 15.3 0 01-4-10 15.3 15.3 0 014-10z"/></svg>; }
 
 const NAV = [
   { href: '/dashboard',    label: 'Нүүр хуудас',  Icon: IcHome },
@@ -25,16 +24,15 @@ const NAV = [
 ];
 
 const NAV_BOTTOM = [
-  { href: '/settings',     label: 'Тохиргоо',      Icon: IcSettings },
-  { href: '/billing',      label: 'Subscription',  Icon: IcStar },
+  { href: '/settings', label: 'Тохиргоо', Icon: IcSettings },
 ];
 
 export default function MainLayout({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
   const router   = useRouter();
-  const [userName, setUserName] = useState('');
-  const [userRole, setUserRole] = useState('');
-  const [slug, setSlug]         = useState('');
+  const [userName, setUserName]   = useState('');
+  const [userRole, setUserRole]   = useState('');
+  const [companyName, setCompany] = useState('');
 
   useEffect(() => {
     if (!localStorage.getItem('token')) { router.push('/login'); return; }
@@ -42,7 +40,7 @@ export default function MainLayout({ children }: { children: React.ReactNode }) 
     setUserName(u.name || ''); setUserRole(u.role || '');
     fetch('http://localhost:4000/api/settings', {
       headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
-    }).then(r => r.json()).then(d => setSlug(d.slug || '')).catch(() => {});
+    }).then(r => r.json()).then(d => setCompany(d.name || '')).catch(() => {});
   }, [router]);
 
   const isActive = (href: string) =>
@@ -53,15 +51,16 @@ export default function MainLayout({ children }: { children: React.ReactNode }) 
   return (
     <div className="min-h-screen bg-[#f6f6f7] flex">
       <aside className="w-56 shrink-0 bg-white border-r border-[#e4e4e7] flex flex-col fixed h-full shadow-sm">
-        {/* Logo */}
+
+        {/* Компанийн нэр */}
         <div className="px-5 py-5 border-b border-[#e4e4e7]">
           <div className="flex items-center gap-3">
             <div className="w-8 h-8 bg-[#09090b] rounded-lg flex items-center justify-center shrink-0">
-              <span className="text-white text-sm font-bold">A</span>
+              <span className="text-white text-sm font-bold">{companyName?.[0] || 'A'}</span>
             </div>
-            <div>
-              <div className="text-sm font-bold text-[#09090b] leading-none">AutoERP</div>
-              <div className="text-[10px] text-[#a1a1aa] mt-0.5">Дилерийн систем</div>
+            <div className="min-w-0">
+              <div className="text-sm font-bold text-[#09090b] leading-none truncate">{companyName || 'Удирдлага'}</div>
+              <div className="text-[10px] text-[#a1a1aa] mt-0.5">Удирдлагын систем</div>
             </div>
           </div>
         </div>
@@ -84,16 +83,14 @@ export default function MainLayout({ children }: { children: React.ReactNode }) 
           })}
         </nav>
 
-        {/* Манай сайт */}
-        {slug && (
-          <div className="px-3 pb-2">
-            <a href={`/s/${slug}`} target="_blank" rel="noreferrer"
-              className="flex items-center gap-3 px-3 py-2 rounded-xl text-sm text-[#16a34a] bg-[#f0fdf4] hover:bg-[#dcfce7] transition-colors">
-              <IcGlobe />
-              Манай сайт
-            </a>
-          </div>
-        )}
+        {/* Вэбсайт руу холбоос */}
+        <div className="px-3 pb-2">
+          <a href="/" target="_blank" rel="noreferrer"
+            className="flex items-center gap-3 px-3 py-2 rounded-xl text-sm text-[#16a34a] bg-[#f0fdf4] hover:bg-[#dcfce7] transition-colors">
+            <IcGlobe />
+            Вэбсайт үзэх
+          </a>
+        </div>
 
         {/* Bottom */}
         <div className="px-3 pb-3 space-y-0.5 border-t border-[#e4e4e7] pt-3">
@@ -112,7 +109,7 @@ export default function MainLayout({ children }: { children: React.ReactNode }) 
             );
           })}
 
-          {/* User */}
+          {/* Хэрэглэгч */}
           <div className="flex items-center gap-3 px-3 py-2.5 mt-1">
             <div className="w-8 h-8 rounded-full bg-[#09090b] flex items-center justify-center shrink-0">
               <span className="text-white text-xs font-semibold">{initials || '?'}</span>
