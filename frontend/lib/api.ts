@@ -47,10 +47,11 @@ async function request(path: string, options: RequestInit = {}, useCache = false
     if (useCache) setCached(cacheKey, data);
     return data;
   } catch (err) {
-    // Сүлжээний алдаа (Render cold start) бол 3 удаа retry хийнэ
-    const isNetworkErr = err instanceof TypeError && err.message.includes('fetch');
-    if (isNetworkErr && _retry < 3) {
-      await new Promise(r => setTimeout(r, 2000 * (_retry + 1)));
+    // Render cold start (~30s) — сүлжээний алдаа бол 5 удаа retry
+    const isNetworkErr = err instanceof TypeError;
+    const DELAYS = [3000, 5000, 8000, 12000, 15000];
+    if (isNetworkErr && _retry < DELAYS.length) {
+      await new Promise(r => setTimeout(r, DELAYS[_retry]));
       return request(path, options, useCache, _retry + 1);
     }
     throw err;
