@@ -3,7 +3,12 @@ const express = require('express');
 const cors = require('cors');
 
 const app = express();
-app.use(cors());
+app.use(cors({
+  origin: process.env.FRONTEND_URL
+    ? [process.env.FRONTEND_URL, 'http://localhost:3000']
+    : true,
+  credentials: true,
+}));
 app.use(express.json());
 
 app.use('/api/auth',      require('./routes/auth'));
@@ -16,6 +21,8 @@ app.use('/api/finance',   require('./routes/finance'));
 app.use('/api/billing',   require('./routes/billing'));
 app.use('/api/public',    require('./routes/public'));
 app.use('/api/settings',  require('./routes/settings'));
+app.use('/api/upload',    require('./routes/upload'));
+app.use('/uploads',       require('express').static(require('path').join(__dirname, '../uploads')));
 
 app.get('/health', (_, res) => res.json({ status: 'ok' }));
 

@@ -2,6 +2,7 @@
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
+import React from 'react';
 
 function IcHome()    { return <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.8}><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>; }
 function IcCar()     { return <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.8}><path d="M5 17H3a2 2 0 01-2-2v-4a2 2 0 012-2h16a2 2 0 012 2v4a2 2 0 01-2 2h-2"/><rect x="7" y="17" width="10" height="4" rx="2"/><path d="M5 11L7.5 5h9L19 11"/><circle cx="7.5" cy="17" r="1.5"/><circle cx="16.5" cy="17" r="1.5"/></svg>; }
@@ -28,6 +29,14 @@ const NAV_BOTTOM = [
 ];
 
 export default function MainLayout({ children }: { children: React.ReactNode }) {
+  return (
+    <React.Suspense fallback={<div className="min-h-screen bg-[#f6f6f7]" />}>
+      <MainLayoutInner>{children}</MainLayoutInner>
+    </React.Suspense>
+  );
+}
+
+function MainLayoutInner({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
   const router   = useRouter();
   const [userName, setUserName]   = useState('');

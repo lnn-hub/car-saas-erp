@@ -58,8 +58,8 @@ router.post('/', auth, async (req, res) => {
 
   try {
     const { rows } = await pool.query(
-      `INSERT INTO vehicles (company_id, vin, brand, model, year, mileage, color, fuel_type, transmission, engine_cc, description, arrived_at, manufactured_date, has_plates, created_by)
-       VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15) RETURNING *`,
+      `INSERT INTO vehicles (company_id, vin, brand, model, year, mileage, color, fuel_type, transmission, engine_cc, description, arrived_at, manufactured_date, has_plates, created_by, status)
+       VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15,'PUBLISHED') RETURNING *`,
       [req.user.company_id, vin, brand, model, year, mileage || 0, color, fuel_type || 'PETROL', transmission || 'AUTO',
        engine_cc, description, arrived_at || null, mfgDate, has_plates === true || has_plates === 'true', req.user.id]
     );
