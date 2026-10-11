@@ -12,8 +12,7 @@ export default function LoginPage() {
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
-    setLoading(true);
-    setError('');
+    setLoading(true); setError('');
     try {
       const res = await api.login(email, password);
       localStorage.setItem('token', res.token);
@@ -21,53 +20,33 @@ export default function LoginPage() {
       router.push('/dashboard');
     } catch (err: unknown) {
       setError(err instanceof Error ? err.message : 'Алдаа гарлаа');
-    } finally {
-      setLoading(false);
-    }
+    } finally { setLoading(false); }
   }
 
   return (
-    <div className="min-h-screen bg-[#0d0d0d] flex items-center justify-center px-4">
+    <div className="min-h-screen bg-white flex items-center justify-center px-4">
       <div className="w-full max-w-[360px]">
-        <div className="mb-10">
-          <div className="w-8 h-8 bg-white rounded-sm mb-6" />
-          <h1 className="text-[22px] font-semibold text-white tracking-tight">AutoERP нэвтрэх</h1>
-          <p className="text-sm text-[#666] mt-1">Машин борлуулалтын удирдлагын систем</p>
+        <div className="mb-8">
+          <div className="w-8 h-8 bg-[#09090b] rounded-sm mb-6" />
+          <h1 className="text-xl font-semibold text-[#09090b] tracking-tight">AutoERP</h1>
+          <p className="text-sm text-[#71717a] mt-1">Машин борлуулалтын удирдлагын систем</p>
         </div>
-
         <form onSubmit={handleSubmit} className="space-y-3">
           <div>
-            <label className="text-xs text-[#888] block mb-1.5">И-мэйл хаяг</label>
-            <input
-              type="email"
-              value={email}
-              onChange={e => setEmail(e.target.value)}
-              className="w-full bg-[#1a1a1a] border border-[#2a2a2a] rounded-md px-3 py-2.5 text-sm text-white placeholder-[#444] focus:outline-none focus:border-[#444] transition-colors"
-              required
-            />
+            <label className="text-xs font-medium text-[#3f3f46] block mb-1.5">И-мэйл</label>
+            <input type="email" value={email} onChange={e => setEmail(e.target.value)}
+              className="w-full bg-white border border-[#e4e4e7] rounded-md px-3 py-2 text-sm text-[#09090b] placeholder-[#a1a1aa] focus:outline-none focus:border-[#09090b] transition-colors"
+              required />
           </div>
           <div>
-            <label className="text-xs text-[#888] block mb-1.5">Нууц үг</label>
-            <input
-              type="password"
-              value={password}
-              onChange={e => setPassword(e.target.value)}
-              className="w-full bg-[#1a1a1a] border border-[#2a2a2a] rounded-md px-3 py-2.5 text-sm text-white placeholder-[#444] focus:outline-none focus:border-[#444] transition-colors"
-              required
-            />
+            <label className="text-xs font-medium text-[#3f3f46] block mb-1.5">Нууц үг</label>
+            <input type="password" value={password} onChange={e => setPassword(e.target.value)}
+              className="w-full bg-white border border-[#e4e4e7] rounded-md px-3 py-2 text-sm text-[#09090b] focus:outline-none focus:border-[#09090b] transition-colors"
+              required />
           </div>
-
-          {error && (
-            <div className="bg-red-500/10 border border-red-500/20 rounded-md px-3 py-2 text-xs text-red-400">
-              {error}
-            </div>
-          )}
-
-          <button
-            type="submit"
-            disabled={loading}
-            className="w-full bg-white hover:bg-[#e8e8e8] disabled:opacity-40 text-black font-medium py-2.5 rounded-md text-sm transition-colors mt-1"
-          >
+          {error && <div className="bg-red-50 border border-red-200 rounded-md px-3 py-2 text-xs text-red-600">{error}</div>}
+          <button type="submit" disabled={loading}
+            className="w-full bg-[#09090b] hover:bg-[#27272a] disabled:opacity-40 text-white font-medium py-2 rounded-md text-sm transition-colors mt-1">
             {loading ? 'Нэвтэрж байна...' : 'Нэвтрэх'}
           </button>
         </form>

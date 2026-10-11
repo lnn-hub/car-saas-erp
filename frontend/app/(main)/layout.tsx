@@ -2,29 +2,18 @@
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
-import { IconDashboard, IconCar, IconPlus, IconSales, IconLogout } from '@/components/icons';
 
-function IconUsers({ className = 'w-4 h-4' }) {
-  return <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.5}>
-    <path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/>
-    <circle cx="9" cy="7" r="4"/>
-    <path d="M23 21v-2a4 4 0 00-3-3.87M16 3.13a4 4 0 010 7.75"/>
-  </svg>;
-}
-function IconReport({ className = 'w-4 h-4' }) {
-  return <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.5}>
-    <path d="M9 17H5a2 2 0 00-2 2v2h18v-2a2 2 0 00-2-2h-4"/>
-    <path d="M9 11V7m3 10V3m3 14v-5"/>
-  </svg>;
+function Icon({ d, className = 'w-[15px] h-[15px]' }: { d: string; className?: string }) {
+  return <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.5}><path d={d} /></svg>;
 }
 
 const nav = [
-  { href: '/dashboard',    label: 'Нүүр хуудас', Icon: IconDashboard },
-  { href: '/vehicles',     label: 'Машинууд',    Icon: IconCar },
-  { href: '/vehicles/new', label: 'Машин нэмэх', Icon: IconPlus },
-  { href: '/sales',        label: 'Борлуулалт',  Icon: IconSales },
-  { href: '/customers',    label: 'Үйлчлүүлэгч', Icon: IconUsers },
-  { href: '/reports',      label: 'Тайлан',       Icon: IconReport },
+  { href: '/dashboard',    label: 'Нүүр хуудас', d: 'M3 3h7v7H3zM14 3h7v7h-7zM3 14h7v7H3zM14 14h7v7h-7z' },
+  { href: '/vehicles',     label: 'Машинууд',    d: 'M5 17H3a1 1 0 01-1-1v-4l2.5-5h13l2.5 5v4a1 1 0 01-1 1h-2M7.5 17a1.5 1.5 0 100 3 1.5 1.5 0 000-3zm9 0a1.5 1.5 0 100 3 1.5 1.5 0 000-3z' },
+  { href: '/vehicles/new', label: 'Машин нэмэх', d: 'M12 5v14M5 12h14' },
+  { href: '/sales',        label: 'Борлуулалт',  d: 'M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2' },
+  { href: '/customers',    label: 'Үйлчлүүлэгч', d: 'M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2M9 7a4 4 0 100 8 4 4 0 000-8zM23 21v-2a4 4 0 00-3-3.87M16 3.13a4 4 0 010 7.75' },
+  { href: '/reports',      label: 'Тайлан',       d: 'M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z' },
 ];
 
 export default function MainLayout({ children }: { children: React.ReactNode }) {
@@ -34,68 +23,52 @@ export default function MainLayout({ children }: { children: React.ReactNode }) 
   const [userRole, setUserRole] = useState('');
 
   useEffect(() => {
-    const token = localStorage.getItem('token');
-    if (!token) { router.push('/login'); return; }
-    const user = JSON.parse(localStorage.getItem('user') || '{}');
-    setUserName(user.name || '');
-    setUserRole(user.role || '');
+    if (!localStorage.getItem('token')) { router.push('/login'); return; }
+    const u = JSON.parse(localStorage.getItem('user') || '{}');
+    setUserName(u.name || ''); setUserRole(u.role || '');
   }, [router]);
 
-  function logout() {
-    localStorage.removeItem('token');
-    localStorage.removeItem('user');
-    router.push('/login');
-  }
-
-  function isActive(href: string) {
-    if (href === '/dashboard') return pathname === '/dashboard';
-    return pathname.startsWith(href);
-  }
+  const isActive = (href: string) => href === '/dashboard' ? pathname === href : pathname.startsWith(href);
 
   return (
-    <div className="min-h-screen bg-[#0d0d0d] flex">
-      <aside className="w-52 shrink-0 border-r border-[#1e1e1e] flex flex-col fixed h-full">
-        {/* Logo */}
-        <div className="px-5 py-5 border-b border-[#1e1e1e]">
+    <div className="min-h-screen bg-[#fafafa] flex">
+      <aside className="w-52 shrink-0 bg-white border-r border-[#e4e4e7] flex flex-col fixed h-full">
+        <div className="px-5 py-4 border-b border-[#e4e4e7]">
           <div className="flex items-center gap-2.5">
-            <div className="w-6 h-6 bg-white rounded-sm shrink-0" />
-            <span className="text-sm font-semibold text-white tracking-tight">AutoERP</span>
+            <div className="w-6 h-6 bg-[#09090b] rounded-sm shrink-0" />
+            <span className="text-sm font-semibold text-[#09090b]">AutoERP</span>
           </div>
         </div>
 
-        {/* Nav */}
-        <nav className="flex-1 px-2 py-3 space-y-0.5 overflow-y-auto">
-          {nav.map(({ href, label, Icon }) => {
+        <nav className="flex-1 px-2 py-2 space-y-0.5 overflow-y-auto">
+          {nav.map(({ href, label, d }) => {
             const active = isActive(href);
             return (
               <Link key={href} href={href}
                 className={`flex items-center gap-2.5 px-3 py-2 rounded-md text-sm transition-colors ${
-                  active ? 'bg-[#1e1e1e] text-white' : 'text-[#666] hover:text-[#ccc] hover:bg-[#161616]'
+                  active ? 'bg-[#f4f4f5] text-[#09090b] font-medium' : 'text-[#71717a] hover:text-[#09090b] hover:bg-[#f4f4f5]'
                 }`}>
-                <Icon className="w-[15px] h-[15px] shrink-0" />
+                <Icon d={d} />
                 {label}
               </Link>
             );
           })}
         </nav>
 
-        {/* User */}
-        <div className="px-2 py-3 border-t border-[#1e1e1e]">
+        <div className="px-2 py-2 border-t border-[#e4e4e7]">
           <div className="px-3 py-2 mb-0.5">
-            <div className="text-xs text-white font-medium truncate">{userName}</div>
-            <div className="text-[11px] text-[#555] mt-0.5">{userRole}</div>
+            <div className="text-xs font-medium text-[#09090b] truncate">{userName}</div>
+            <div className="text-[11px] text-[#a1a1aa] mt-0.5">{userRole}</div>
           </div>
-          <button onClick={logout}
-            className="w-full flex items-center gap-2.5 px-3 py-2 rounded-md text-sm text-[#666] hover:text-red-400 hover:bg-[#161616] transition-colors">
-            <IconLogout className="w-[15px] h-[15px] shrink-0" />
+          <button onClick={() => { localStorage.clear(); router.push('/login'); }}
+            className="w-full flex items-center gap-2.5 px-3 py-2 rounded-md text-sm text-[#71717a] hover:text-red-500 hover:bg-red-50 transition-colors">
+            <Icon d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4M16 17l5-5-5-5M21 12H9" />
             Гарах
           </button>
         </div>
       </aside>
 
-      <main className="flex-1 overflow-auto min-w-0 ml-52">
-        {children}
-      </main>
+      <main className="flex-1 ml-52 min-w-0 overflow-auto">{children}</main>
     </div>
   );
 }

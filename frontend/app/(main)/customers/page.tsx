@@ -27,34 +27,34 @@ export default function CustomersPage() {
   return (
     <div className="px-8 py-7">
       <div className="mb-6">
-        <h1 className="text-lg font-semibold text-white">Үйлчлүүлэгчид</h1>
-        <p className="text-sm text-[#555] mt-0.5">{customers.length} үйлчлүүлэгч нийт</p>
+        <h1 className="text-base font-semibold text-[#09090b]">Үйлчлүүлэгчид</h1>
+        <p className="text-xs text-[#a1a1aa] mt-0.5">{customers.length} үйлчлүүлэгч нийт</p>
       </div>
 
       {loading ? (
-        <div className="text-[#555] text-sm py-16 text-center">Ачааллаж байна...</div>
+        <div className="text-[#a1a1aa] text-sm py-16 text-center">Ачааллаж байна...</div>
       ) : (
-        <div className="bg-[#111] border border-[#1e1e1e] rounded-lg overflow-hidden">
+        <div className="bg-white border border-[#e4e4e7] rounded-lg overflow-hidden">
           <table className="w-full text-sm">
             <thead>
-              <tr className="border-b border-[#1e1e1e]">
+              <tr className="border-b border-[#e4e4e7]">
                 {['Нэр', 'Утас', 'Регистр', 'Хаяг', 'Огноо'].map((h, i) => (
-                  <th key={i} className="text-left py-2.5 px-5 text-[11px] font-medium text-[#555] uppercase tracking-wider">{h}</th>
+                  <th key={i} className="text-left py-2.5 px-5 text-[11px] font-medium text-[#a1a1aa] uppercase tracking-wider">{h}</th>
                 ))}
               </tr>
             </thead>
             <tbody>
               {customers.map((c, i) => (
-                <tr key={c.id} className={`hover:bg-[#161616] transition-colors ${i < customers.length - 1 ? 'border-b border-[#1a1a1a]' : ''}`}>
-                  <td className="px-5 py-3 text-white font-medium">{c.name}</td>
-                  <td className="px-5 py-3 text-[#888]">{c.phone || '—'}</td>
-                  <td className="px-5 py-3 text-[#888] tabular-nums">{c.register || '—'}</td>
-                  <td className="px-5 py-3 text-[#888]">{c.address || '—'}</td>
-                  <td className="px-5 py-3 text-[#555] text-xs tabular-nums">{fmtDate(c.created_at)}</td>
+                <tr key={c.id} className={`hover:bg-[#fafafa] transition-colors ${i < customers.length - 1 ? 'border-b border-[#f4f4f5]' : ''}`}>
+                  <td className="px-5 py-3 text-[#09090b] font-medium">{c.name}</td>
+                  <td className="px-5 py-3 text-[#71717a]">{c.phone || '—'}</td>
+                  <td className="px-5 py-3 text-[#71717a] tabular-nums">{c.register || '—'}</td>
+                  <td className="px-5 py-3 text-[#71717a]">{c.address || '—'}</td>
+                  <td className="px-5 py-3 text-[#a1a1aa] text-xs tabular-nums">{fmtDate(c.created_at)}</td>
                 </tr>
               ))}
               {customers.length === 0 && (
-                <tr><td colSpan={5} className="text-center text-[#444] text-sm py-16">Үйлчлүүлэгч байхгүй байна</td></tr>
+                <tr><td colSpan={5} className="text-center text-[#a1a1aa] text-sm py-16">Үйлчлүүлэгч байхгүй байна</td></tr>
               )}
             </tbody>
           </table>

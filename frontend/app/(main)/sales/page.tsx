@@ -30,8 +30,8 @@ export default function SalesPage() {
   return (
     <div className="px-8 py-7">
       <div className="mb-6">
-        <h1 className="text-lg font-semibold text-white">Борлуулалт</h1>
-        <p className="text-sm text-[#555] mt-0.5">{sales.length} борлуулалт нийт</p>
+        <h1 className="text-base font-semibold text-[#09090b]">Борлуулалт</h1>
+        <p className="text-xs text-[#a1a1aa] mt-0.5">{sales.length} борлуулалт нийт</p>
       </div>
 
       {/* Stats */}
@@ -41,46 +41,46 @@ export default function SalesPage() {
           { label: 'Нийт орлого',     value: summary ? fmt(summary.total_revenue) : '—' },
           { label: 'Цэвэр ашиг',      value: summary ? fmt(summary.total_profit) : '—' },
         ].map(c => (
-          <div key={c.label} className="bg-[#111] border border-[#1e1e1e] rounded-lg p-4">
-            <div className="text-xs text-[#555] mb-2">{c.label}</div>
-            <div className="text-xl font-semibold text-white tabular-nums">{c.value}</div>
+          <div key={c.label} className="bg-white border border-[#e4e4e7] rounded-lg px-5 py-4">
+            <div className="text-[11px] font-medium text-[#a1a1aa] uppercase tracking-wider mb-2">{c.label}</div>
+            <div className="text-xl font-semibold text-[#09090b] tabular-nums">{c.value}</div>
           </div>
         ))}
       </div>
 
       {/* Table */}
-      <div className="bg-[#111] border border-[#1e1e1e] rounded-lg overflow-hidden">
+      <div className="bg-white border border-[#e4e4e7] rounded-lg overflow-hidden">
         <table className="w-full text-sm">
           <thead>
-            <tr className="border-b border-[#1e1e1e]">
+            <tr className="border-b border-[#e4e4e7]">
               {['Машин', 'Үйлчлүүлэгч', 'Төлбөр', 'Зарагдсан үнэ', 'Цэвэр ашиг', 'Огноо'].map((h, i) => (
-                <th key={i} className={`py-2.5 px-5 text-[11px] font-medium text-[#555] uppercase tracking-wider ${['Зарагдсан үнэ', 'Цэвэр ашиг'].includes(h) ? 'text-right' : 'text-left'}`}>{h}</th>
+                <th key={i} className={`py-2.5 px-5 text-[11px] font-medium text-[#a1a1aa] uppercase tracking-wider ${['Зарагдсан үнэ', 'Цэвэр ашиг'].includes(h) ? 'text-right' : 'text-left'}`}>{h}</th>
               ))}
             </tr>
           </thead>
           <tbody>
             {sales.map((s, i) => (
-              <tr key={s.id} className={`hover:bg-[#161616] transition-colors ${i < sales.length - 1 ? 'border-b border-[#1a1a1a]' : ''}`}>
-                <td className="px-5 py-3 text-white">
+              <tr key={s.id} className={`hover:bg-[#fafafa] transition-colors ${i < sales.length - 1 ? 'border-b border-[#f4f4f5]' : ''}`}>
+                <td className="px-5 py-3 text-[#09090b]">
                   {s.brand} {s.model}
-                  <span className="text-[#555] ml-1.5">{s.year}</span>
+                  <span className="text-[#a1a1aa] ml-1.5">{s.year}</span>
                 </td>
                 <td className="px-5 py-3">
-                  <div className="text-white">{s.customer_name}</div>
-                  <div className="text-[#555] text-xs mt-0.5">{s.customer_phone}</div>
+                  <div className="text-[#09090b]">{s.customer_name}</div>
+                  <div className="text-[#a1a1aa] text-xs mt-0.5">{s.customer_phone}</div>
                 </td>
-                <td className="px-5 py-3 text-[#888]">{PAYMENT[s.payment_type]}</td>
-                <td className="px-5 py-3 text-right text-white tabular-nums">{fmt(s.sale_price)}</td>
+                <td className="px-5 py-3 text-[#71717a]">{PAYMENT[s.payment_type]}</td>
+                <td className="px-5 py-3 text-right text-[#09090b] tabular-nums">{fmt(s.sale_price)}</td>
                 <td className="px-5 py-3 text-right tabular-nums">
-                  <span className={Number(s.net_profit) >= 0 ? 'text-emerald-400' : 'text-red-400'}>
+                  <span className={Number(s.net_profit) >= 0 ? 'text-emerald-600' : 'text-red-500'}>
                     {Number(s.net_profit) >= 0 ? '+' : ''}{fmt(s.net_profit)}
                   </span>
                 </td>
-                <td className="px-5 py-3 text-[#555] text-xs">{fmtDate(s.sold_at)}</td>
+                <td className="px-5 py-3 text-[#a1a1aa] text-xs">{fmtDate(s.sold_at)}</td>
               </tr>
             ))}
             {sales.length === 0 && (
-              <tr><td colSpan={6} className="text-center text-[#444] text-sm py-16">Борлуулалт байхгүй байна</td></tr>
+              <tr><td colSpan={6} className="text-center text-[#a1a1aa] text-sm py-16">Борлуулалт байхгүй байна</td></tr>
             )}
           </tbody>
         </table>

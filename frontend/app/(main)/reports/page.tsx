@@ -30,20 +30,16 @@ const AGING_COLORS: Record<string, string> = {
   '0-30': 'bg-emerald-400', '31-60': 'bg-amber-400', '61-90': 'bg-orange-400', '90+': 'bg-red-400',
 };
 const AGING_TEXT: Record<string, string> = {
-  '0-30': 'text-emerald-400', '31-60': 'text-amber-400', '61-90': 'text-orange-400', '90+': 'text-red-400',
+  '0-30': 'text-emerald-600', '31-60': 'text-amber-600', '61-90': 'text-orange-600', '90+': 'text-red-500',
 };
-
-function IconDownload({ className = 'w-4 h-4' }) {
-  return <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.5}>
-    <path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4M7 10l5 5 5-5M12 15V3"/>
-  </svg>;
-}
 
 function ExportBtn({ onClick }: { onClick: () => void }) {
   return (
     <button onClick={onClick}
-      className="flex items-center gap-1.5 px-3 py-1.5 text-xs text-[#666] border border-[#222] rounded-md hover:border-[#333] hover:text-white transition-colors">
-      <IconDownload className="w-3.5 h-3.5" />
+      className="flex items-center gap-1.5 px-3 py-1.5 text-xs text-[#71717a] border border-[#e4e4e7] rounded-md hover:border-[#d4d4d8] hover:text-[#09090b] transition-colors">
+      <svg className="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.5}>
+        <path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4M7 10l5 5 5-5M12 15V3"/>
+      </svg>
       Excel татах
     </button>
   );
@@ -64,6 +60,11 @@ export default function ReportsPage() {
   }, []);
 
   const maxRevenue = Math.max(...monthly.map(m => Number(m.revenue)), 1);
+
+  function today() {
+    const d = new Date();
+    return `${d.getFullYear()}.${String(d.getMonth()+1).padStart(2,'0')}.${String(d.getDate()).padStart(2,'0')}`;
+  }
 
   function exportOverview() {
     if (!summary) return;
@@ -112,24 +113,19 @@ export default function ReportsPage() {
     })), `Марк_${today()}`, 'Брэнд');
   }
 
-  function today() {
-    const d = new Date();
-    return `${d.getFullYear()}.${String(d.getMonth()+1).padStart(2,'0')}.${String(d.getDate()).padStart(2,'0')}`;
-  }
-
   return (
     <div className="px-8 py-7">
       <div className="mb-6">
-        <h1 className="text-lg font-semibold text-white">Тайлан</h1>
-        <p className="text-sm text-[#555] mt-0.5">Борлуулалт, агуулах, ашгийн шинжилгээ</p>
+        <h1 className="text-base font-semibold text-[#09090b]">Тайлан</h1>
+        <p className="text-xs text-[#a1a1aa] mt-0.5">Борлуулалт, агуулах, ашгийн шинжилгээ</p>
       </div>
 
       {/* Tabs */}
-      <div className="flex gap-0 mb-6 border-b border-[#1e1e1e]">
+      <div className="flex gap-0 mb-6 border-b border-[#e4e4e7]">
         {(['overview', 'aging', 'monthly', 'brands'] as const).map(t => (
           <button key={t} onClick={() => setTab(t)}
             className={`px-4 py-2 text-sm transition-colors border-b-[1.5px] -mb-px ${
-              tab === t ? 'text-white border-white' : 'text-[#555] border-transparent hover:text-[#999]'
+              tab === t ? 'text-[#09090b] border-[#09090b]' : 'text-[#a1a1aa] border-transparent hover:text-[#71717a]'
             }`}>
             {{ overview: 'Ерөнхий', aging: 'Агуулахын нас', monthly: 'Сарын дүн', brands: 'Марк' }[t]}
           </button>
@@ -142,24 +138,24 @@ export default function ReportsPage() {
           <div className="flex justify-end"><ExportBtn onClick={exportOverview} /></div>
           <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
             {[
-              { label: 'Нийт борлуулалт',     value: `${fmtNum(summary?.total_sold)} машин` },
-              { label: 'Нийт орлого',          value: fmt(summary?.total_revenue) },
-              { label: 'Нийт цэвэр ашиг',      value: fmt(summary?.total_profit) },
-              { label: 'Дундаж ашиг / машин',  value: fmt(summary?.avg_profit) },
+              { label: 'Нийт борлуулалт',     value: `${fmtNum(summary?.total_sold ?? null)} машин` },
+              { label: 'Нийт орлого',          value: fmt(summary?.total_revenue ?? null) },
+              { label: 'Нийт цэвэр ашиг',      value: fmt(summary?.total_profit ?? null) },
+              { label: 'Дундаж ашиг / машин',  value: fmt(summary?.avg_profit ?? null) },
             ].map(c => (
-              <div key={c.label} className="bg-[#111] border border-[#1e1e1e] rounded-lg p-4">
-                <div className="text-xs text-[#555] mb-2">{c.label}</div>
-                <div className="text-xl font-semibold text-white tabular-nums">{c.value}</div>
+              <div key={c.label} className="bg-white border border-[#e4e4e7] rounded-lg px-5 py-4">
+                <div className="text-[11px] font-medium text-[#a1a1aa] uppercase tracking-wider mb-2">{c.label}</div>
+                <div className="text-xl font-semibold text-[#09090b] tabular-nums">{c.value}</div>
               </div>
             ))}
           </div>
 
           {/* Status counts */}
-          <div className="bg-[#111] border border-[#1e1e1e] rounded-lg overflow-hidden">
-            <div className="px-5 py-3.5 border-b border-[#1e1e1e]">
-              <span className="text-xs font-medium text-[#555] uppercase tracking-wider">Машины статусын тойм</span>
+          <div className="bg-white border border-[#e4e4e7] rounded-lg overflow-hidden">
+            <div className="px-5 py-3.5 border-b border-[#e4e4e7]">
+              <span className="text-xs font-medium text-[#a1a1aa] uppercase tracking-wider">Машины статусын тойм</span>
             </div>
-            <div className="grid grid-cols-4 divide-x divide-[#1e1e1e]">
+            <div className="grid grid-cols-4 divide-x divide-[#e4e4e7]">
               {[
                 { key: 'ARRIVED',   label: 'Ирсэн',        dot: 'bg-amber-400' },
                 { key: 'PUBLISHED', label: 'Нийтлэгдсэн',  dot: 'bg-blue-400' },
@@ -169,9 +165,9 @@ export default function ReportsPage() {
                 <div key={s.key} className="px-6 py-5">
                   <div className="flex items-center gap-2 mb-2">
                     <span className={`w-1.5 h-1.5 rounded-full ${s.dot}`} />
-                    <span className="text-xs text-[#555]">{s.label}</span>
+                    <span className="text-xs text-[#a1a1aa]">{s.label}</span>
                   </div>
-                  <div className="text-2xl font-semibold text-white tabular-nums">
+                  <div className="text-2xl font-semibold text-[#09090b] tabular-nums">
                     {summary?.status_counts?.[s.key] ?? 0}
                   </div>
                 </div>
@@ -179,14 +175,14 @@ export default function ReportsPage() {
             </div>
           </div>
 
-          {/* Funnel visual */}
-          <div className="bg-[#111] border border-[#1e1e1e] rounded-lg p-5">
-            <div className="text-xs font-medium text-[#555] uppercase tracking-wider mb-4">Борлуулалтын funnel</div>
+          {/* Funnel */}
+          <div className="bg-white border border-[#e4e4e7] rounded-lg p-5">
+            <div className="text-xs font-medium text-[#a1a1aa] uppercase tracking-wider mb-4">Борлуулалтын дамжлага</div>
             {[
-              { key: 'ARRIVED',   label: 'Ирсэн',        dot: 'bg-amber-400',   w: 100 },
-              { key: 'PUBLISHED', label: 'Нийтлэгдсэн',  dot: 'bg-blue-400',    w: 75 },
-              { key: 'RESERVED',  label: 'Захиалгатай',  dot: 'bg-violet-400',  w: 50 },
-              { key: 'SOLD',      label: 'Зарагдсан',    dot: 'bg-emerald-400', w: 25 },
+              { key: 'ARRIVED',   label: 'Ирсэн',        dot: 'bg-amber-400' },
+              { key: 'PUBLISHED', label: 'Нийтлэгдсэн',  dot: 'bg-blue-400' },
+              { key: 'RESERVED',  label: 'Захиалгатай',  dot: 'bg-violet-400' },
+              { key: 'SOLD',      label: 'Зарагдсан',    dot: 'bg-emerald-400' },
             ].map(s => {
               const total = summary?.total_vehicles || 1;
               const count = summary?.status_counts?.[s.key] ?? 0;
@@ -196,11 +192,11 @@ export default function ReportsPage() {
                   <div className="flex items-center justify-between mb-1.5">
                     <div className="flex items-center gap-2">
                       <span className={`w-1.5 h-1.5 rounded-full ${s.dot}`} />
-                      <span className="text-sm text-[#888]">{s.label}</span>
+                      <span className="text-sm text-[#71717a]">{s.label}</span>
                     </div>
-                    <span className="text-sm text-white tabular-nums">{count} <span className="text-[#555]">({pct}%)</span></span>
+                    <span className="text-sm text-[#09090b] tabular-nums">{count} <span className="text-[#a1a1aa]">({pct}%)</span></span>
                   </div>
-                  <div className="h-1.5 bg-[#1a1a1a] rounded-full overflow-hidden">
+                  <div className="h-1.5 bg-[#f4f4f5] rounded-full overflow-hidden">
                     <div className={`h-full ${s.dot} rounded-full transition-all`} style={{ width: `${pct}%` }} />
                   </div>
                 </div>
@@ -214,32 +210,30 @@ export default function ReportsPage() {
       {tab === 'aging' && aging && (
         <div className="space-y-4">
           <div className="flex justify-end"><ExportBtn onClick={exportAging} /></div>
-          {/* Bucket summary */}
           <div className="grid grid-cols-4 gap-3">
             {['0-30', '31-60', '61-90', '90+'].map(b => (
-              <div key={b} className="bg-[#111] border border-[#1e1e1e] rounded-lg p-4">
+              <div key={b} className="bg-white border border-[#e4e4e7] rounded-lg p-4">
                 <div className="flex items-center gap-2 mb-2">
                   <span className={`w-1.5 h-1.5 rounded-full ${AGING_COLORS[b]}`} />
-                  <span className="text-xs text-[#555]">{b} хоног</span>
+                  <span className="text-xs text-[#a1a1aa]">{b} хоног</span>
                 </div>
                 <div className={`text-2xl font-semibold tabular-nums ${AGING_TEXT[b]}`}>
                   {aging.buckets[b]?.length ?? 0}
                 </div>
-                <div className="text-xs text-[#555] mt-0.5">машин</div>
+                <div className="text-xs text-[#a1a1aa] mt-0.5">машин</div>
               </div>
             ))}
           </div>
 
-          {/* Aging table */}
-          <div className="bg-[#111] border border-[#1e1e1e] rounded-lg overflow-hidden">
-            <div className="px-5 py-3.5 border-b border-[#1e1e1e]">
-              <span className="text-xs font-medium text-[#555] uppercase tracking-wider">Агуулахад байгаа машинууд</span>
+          <div className="bg-white border border-[#e4e4e7] rounded-lg overflow-hidden">
+            <div className="px-5 py-3.5 border-b border-[#e4e4e7]">
+              <span className="text-xs font-medium text-[#a1a1aa] uppercase tracking-wider">Агуулахад байгаа машинууд</span>
             </div>
             <table className="w-full text-sm">
               <thead>
-                <tr className="border-b border-[#1e1e1e]">
+                <tr className="border-b border-[#e4e4e7]">
                   {['Машин', 'Статус', 'Хоног', 'Нийт өртөг'].map((h, i) => (
-                    <th key={i} className={`py-2.5 px-5 text-[11px] font-medium text-[#555] uppercase tracking-wider ${h === 'Нийт өртөг' ? 'text-right' : 'text-left'}`}>{h}</th>
+                    <th key={i} className={`py-2.5 px-5 text-[11px] font-medium text-[#a1a1aa] uppercase tracking-wider ${h === 'Нийт өртөг' ? 'text-right' : 'text-left'}`}>{h}</th>
                   ))}
                 </tr>
               </thead>
@@ -248,19 +242,19 @@ export default function ReportsPage() {
                   const d = Number(r.days_in_stock);
                   const bucket = d <= 30 ? '0-30' : d <= 60 ? '31-60' : d <= 90 ? '61-90' : '90+';
                   return (
-                    <tr key={r.id} className={`hover:bg-[#161616] transition-colors ${i < aging.rows.length - 1 ? 'border-b border-[#1a1a1a]' : ''}`}>
-                      <td className="px-5 py-3 text-white">{r.brand} {r.model} <span className="text-[#555]">{r.year}</span></td>
-                      <td className="px-5 py-3 text-[#888] text-xs">{r.status}</td>
+                    <tr key={r.id} className={`hover:bg-[#fafafa] transition-colors ${i < aging.rows.length - 1 ? 'border-b border-[#f4f4f5]' : ''}`}>
+                      <td className="px-5 py-3 text-[#09090b]">{r.brand} {r.model} <span className="text-[#a1a1aa]">{r.year}</span></td>
+                      <td className="px-5 py-3 text-[#71717a] text-xs">{r.status}</td>
                       <td className="px-5 py-3">
                         <span className={`text-sm font-medium tabular-nums ${AGING_TEXT[bucket]}`}>{d}</span>
-                        <span className="text-[#555] text-xs ml-1">хоног</span>
+                        <span className="text-[#a1a1aa] text-xs ml-1">хоног</span>
                       </td>
-                      <td className="px-5 py-3 text-right text-[#888] tabular-nums">{fmt(r.total_cost)}</td>
+                      <td className="px-5 py-3 text-right text-[#71717a] tabular-nums">{fmt(r.total_cost)}</td>
                     </tr>
                   );
                 })}
                 {aging.rows.length === 0 && (
-                  <tr><td colSpan={4} className="text-center text-[#444] text-sm py-12">Агуулахад машин байхгүй байна</td></tr>
+                  <tr><td colSpan={4} className="text-center text-[#a1a1aa] text-sm py-12">Агуулахад машин байхгүй байна</td></tr>
                 )}
               </tbody>
             </table>
@@ -272,24 +266,23 @@ export default function ReportsPage() {
       {tab === 'monthly' && (
         <div className="space-y-4">
           <div className="flex justify-end"><ExportBtn onClick={exportMonthly} /></div>
-          {/* Bar chart */}
-          <div className="bg-[#111] border border-[#1e1e1e] rounded-lg p-5">
-            <div className="text-xs font-medium text-[#555] uppercase tracking-wider mb-5">Сарын орлого</div>
+          <div className="bg-white border border-[#e4e4e7] rounded-lg p-5">
+            <div className="text-xs font-medium text-[#a1a1aa] uppercase tracking-wider mb-5">Сарын орлого</div>
             {monthly.length === 0 ? (
-              <div className="text-center text-[#444] text-sm py-8">Өгөгдөл байхгүй байна</div>
+              <div className="text-center text-[#a1a1aa] text-sm py-8">Өгөгдөл байхгүй байна</div>
             ) : (
               <div className="flex items-end gap-2 h-36">
                 {monthly.map(m => {
                   const pct = (Number(m.revenue) / maxRevenue) * 100;
                   return (
                     <div key={m.month} className="flex-1 flex flex-col items-center gap-1.5 group">
-                      <div className="text-[10px] text-[#555] tabular-nums opacity-0 group-hover:opacity-100 transition-opacity">
+                      <div className="text-[10px] text-[#a1a1aa] tabular-nums opacity-0 group-hover:opacity-100 transition-opacity">
                         {fmt(m.revenue)}
                       </div>
-                      <div className="w-full bg-[#1a1a1a] rounded-sm overflow-hidden" style={{ height: '100px' }}>
+                      <div className="w-full bg-[#f4f4f5] rounded-sm overflow-hidden" style={{ height: '100px' }}>
                         <div className="w-full bg-blue-500 rounded-sm transition-all" style={{ height: `${pct}%`, marginTop: `${100 - pct}%` }} />
                       </div>
-                      <div className="text-[10px] text-[#555] tabular-nums">{m.month.slice(5)}-р сар</div>
+                      <div className="text-[10px] text-[#a1a1aa] tabular-nums">{m.month.slice(5)}-р сар</div>
                     </div>
                   );
                 })}
@@ -297,31 +290,30 @@ export default function ReportsPage() {
             )}
           </div>
 
-          {/* Monthly table */}
-          <div className="bg-[#111] border border-[#1e1e1e] rounded-lg overflow-hidden">
+          <div className="bg-white border border-[#e4e4e7] rounded-lg overflow-hidden">
             <table className="w-full text-sm">
               <thead>
-                <tr className="border-b border-[#1e1e1e]">
+                <tr className="border-b border-[#e4e4e7]">
                   {['Сар', 'Зарагдсан', 'Орлого', 'Ашиг'].map((h, i) => (
-                    <th key={i} className={`py-2.5 px-5 text-[11px] font-medium text-[#555] uppercase tracking-wider ${i > 0 ? 'text-right' : 'text-left'}`}>{h}</th>
+                    <th key={i} className={`py-2.5 px-5 text-[11px] font-medium text-[#a1a1aa] uppercase tracking-wider ${i > 0 ? 'text-right' : 'text-left'}`}>{h}</th>
                   ))}
                 </tr>
               </thead>
               <tbody>
                 {[...monthly].reverse().map((m, i) => (
-                  <tr key={m.month} className={`hover:bg-[#161616] transition-colors ${i < monthly.length - 1 ? 'border-b border-[#1a1a1a]' : ''}`}>
-                    <td className="px-5 py-3 text-white tabular-nums">{m.month}</td>
-                    <td className="px-5 py-3 text-right text-[#888] tabular-nums">{fmtNum(m.sold_count)} машин</td>
-                    <td className="px-5 py-3 text-right text-[#888] tabular-nums">{fmt(m.revenue)}</td>
+                  <tr key={m.month} className={`hover:bg-[#fafafa] transition-colors ${i < monthly.length - 1 ? 'border-b border-[#f4f4f5]' : ''}`}>
+                    <td className="px-5 py-3 text-[#09090b] tabular-nums">{m.month}</td>
+                    <td className="px-5 py-3 text-right text-[#71717a] tabular-nums">{fmtNum(m.sold_count)} машин</td>
+                    <td className="px-5 py-3 text-right text-[#71717a] tabular-nums">{fmt(m.revenue)}</td>
                     <td className="px-5 py-3 text-right tabular-nums">
-                      <span className={Number(m.profit) >= 0 ? 'text-emerald-400' : 'text-red-400'}>
+                      <span className={Number(m.profit) >= 0 ? 'text-emerald-600' : 'text-red-500'}>
                         {Number(m.profit) >= 0 ? '+' : ''}{fmt(m.profit)}
                       </span>
                     </td>
                   </tr>
                 ))}
                 {monthly.length === 0 && (
-                  <tr><td colSpan={4} className="text-center text-[#444] text-sm py-12">Өгөгдөл байхгүй байна</td></tr>
+                  <tr><td colSpan={4} className="text-center text-[#a1a1aa] text-sm py-12">Өгөгдөл байхгүй байна</td></tr>
                 )}
               </tbody>
             </table>
@@ -332,41 +324,41 @@ export default function ReportsPage() {
       {/* BRANDS */}
       {tab === 'brands' && (
         <div className="space-y-4">
-        <div className="flex justify-end"><ExportBtn onClick={exportBrands} /></div>
-        <div className="bg-[#111] border border-[#1e1e1e] rounded-lg overflow-hidden">
-          <div className="px-5 py-3.5 border-b border-[#1e1e1e]">
-            <span className="text-xs font-medium text-[#555] uppercase tracking-wider">Марк тус бүрийн гүйцэтгэл</span>
-          </div>
-          <table className="w-full text-sm">
-            <thead>
-              <tr className="border-b border-[#1e1e1e]">
-                {['Марк', 'Зарагдсан', 'Нийт орлого', 'Дундаж ашиг', 'Зарагдах хугацаа'].map((h, i) => (
-                  <th key={i} className={`py-2.5 px-5 text-[11px] font-medium text-[#555] uppercase tracking-wider ${i > 0 ? 'text-right' : 'text-left'}`}>{h}</th>
-                ))}
-              </tr>
-            </thead>
-            <tbody>
-              {brands.map((b, i) => (
-                <tr key={b.brand} className={`hover:bg-[#161616] transition-colors ${i < brands.length - 1 ? 'border-b border-[#1a1a1a]' : ''}`}>
-                  <td className="px-5 py-3 text-white font-medium">{b.brand}</td>
-                  <td className="px-5 py-3 text-right text-[#888] tabular-nums">{fmtNum(b.sold_count)}</td>
-                  <td className="px-5 py-3 text-right text-[#888] tabular-nums">{fmt(b.revenue)}</td>
-                  <td className="px-5 py-3 text-right tabular-nums">
-                    <span className={Number(b.avg_profit) >= 0 ? 'text-emerald-400' : 'text-red-400'}>
-                      {fmt(b.avg_profit)}
-                    </span>
-                  </td>
-                  <td className="px-5 py-3 text-right text-[#888] tabular-nums">
-                    {b.avg_days_to_sell ? `${Math.round(Number(b.avg_days_to_sell))} хоног` : '—'}
-                  </td>
+          <div className="flex justify-end"><ExportBtn onClick={exportBrands} /></div>
+          <div className="bg-white border border-[#e4e4e7] rounded-lg overflow-hidden">
+            <div className="px-5 py-3.5 border-b border-[#e4e4e7]">
+              <span className="text-xs font-medium text-[#a1a1aa] uppercase tracking-wider">Марк тус бүрийн гүйцэтгэл</span>
+            </div>
+            <table className="w-full text-sm">
+              <thead>
+                <tr className="border-b border-[#e4e4e7]">
+                  {['Марк', 'Зарагдсан', 'Нийт орлого', 'Дундаж ашиг', 'Зарагдах хугацаа'].map((h, i) => (
+                    <th key={i} className={`py-2.5 px-5 text-[11px] font-medium text-[#a1a1aa] uppercase tracking-wider ${i > 0 ? 'text-right' : 'text-left'}`}>{h}</th>
+                  ))}
                 </tr>
-              ))}
-              {brands.length === 0 && (
-                <tr><td colSpan={5} className="text-center text-[#444] text-sm py-12">Өгөгдөл байхгүй байна</td></tr>
-              )}
-            </tbody>
-          </table>
-        </div>
+              </thead>
+              <tbody>
+                {brands.map((b, i) => (
+                  <tr key={b.brand} className={`hover:bg-[#fafafa] transition-colors ${i < brands.length - 1 ? 'border-b border-[#f4f4f5]' : ''}`}>
+                    <td className="px-5 py-3 text-[#09090b] font-medium">{b.brand}</td>
+                    <td className="px-5 py-3 text-right text-[#71717a] tabular-nums">{fmtNum(b.sold_count)}</td>
+                    <td className="px-5 py-3 text-right text-[#71717a] tabular-nums">{fmt(b.revenue)}</td>
+                    <td className="px-5 py-3 text-right tabular-nums">
+                      <span className={Number(b.avg_profit) >= 0 ? 'text-emerald-600' : 'text-red-500'}>
+                        {fmt(b.avg_profit)}
+                      </span>
+                    </td>
+                    <td className="px-5 py-3 text-right text-[#71717a] tabular-nums">
+                      {b.avg_days_to_sell ? `${Math.round(Number(b.avg_days_to_sell))} хоног` : '—'}
+                    </td>
+                  </tr>
+                ))}
+                {brands.length === 0 && (
+                  <tr><td colSpan={5} className="text-center text-[#a1a1aa] text-sm py-12">Өгөгдөл байхгүй байна</td></tr>
+                )}
+              </tbody>
+            </table>
+          </div>
         </div>
       )}
     </div>
