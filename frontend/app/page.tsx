@@ -1,6 +1,7 @@
 "use client";
 import { useEffect, useState, Suspense } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 
 const BACKEND = process.env.NEXT_PUBLIC_API_URL || "http://localhost:4000";
 const SLUG = process.env.NEXT_PUBLIC_COMPANY_SLUG || "mongol-auto";
@@ -154,6 +155,79 @@ function IcEngine() {
   );
 }
 
+function AdminModal({ onClose }: { onClose: () => void }) {
+  const router = useRouter();
+  const [email, setEmail]       = useState('');
+  const [password, setPassword] = useState('');
+  const [error, setError]       = useState('');
+  const [loading, setLoading]   = useState(false);
+
+  useEffect(() => {
+    // Аль хэдийн нэвтэрсэн бол шууд явна
+    if (typeof window !== 'undefined' && localStorage.getItem('token')) {
+      router.push('/dashboard');
+    }
+    const onKey = (e: KeyboardEvent) => { if (e.key === 'Escape') onClose(); };
+    window.addEventListener('keydown', onKey);
+    return () => window.removeEventListener('keydown', onKey);
+  }, [onClose, router]);
+
+  async function handleLogin(e: React.FormEvent) {
+    e.preventDefault();
+    setLoading(true); setError('');
+    try {
+      const res = await fetch(`${BACKEND}/api/auth/login`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, password }),
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || 'Алдаа гарлаа');
+      localStorage.setItem('token', data.token);
+      localStorage.setItem('user', JSON.stringify(data.user));
+      router.push('/dashboard');
+    } catch (err: unknown) {
+      setError(err instanceof Error ? err.message : 'Алдаа гарлаа');
+      setLoading(false);
+    }
+  }
+
+  return (
+    <div className="fixed inset-0 z-[100] flex items-center justify-center px-4"
+      onClick={e => { if (e.target === e.currentTarget) onClose(); }}>
+      <div className="absolute inset-0 bg-black/50 backdrop-blur-sm" />
+      <div className="relative bg-white rounded-2xl shadow-2xl w-full max-w-sm p-7 animate-[fadeUp_0.18s_ease]">
+        <button onClick={onClose}
+          className="absolute top-4 right-4 text-gray-300 hover:text-gray-500 transition-colors">
+          <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2}><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+        </button>
+        <div className="mb-6">
+          <div className="w-8 h-8 bg-[#09090b] rounded-lg mb-4 flex items-center justify-center">
+            <svg className="w-4 h-4 text-white" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2}><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg>
+          </div>
+          <h2 className="text-lg font-bold text-[#09090b]">Админ нэвтрэх</h2>
+          <p className="text-sm text-gray-400 mt-0.5">Удирдлагын систем</p>
+        </div>
+        <form onSubmit={handleLogin} className="space-y-3">
+          <input type="email" value={email} onChange={e => setEmail(e.target.value)}
+            placeholder="И-мэйл" required autoFocus
+            className="w-full border border-gray-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-[#09090b] transition-colors" />
+          <input type="password" value={password} onChange={e => setPassword(e.target.value)}
+            placeholder="Нууц үг" required
+            className="w-full border border-gray-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-[#09090b] transition-colors" />
+          {error && (
+            <div className="bg-red-50 border border-red-100 rounded-xl px-4 py-2.5 text-xs text-red-600">{error}</div>
+          )}
+          <button type="submit" disabled={loading}
+            className="w-full bg-[#09090b] hover:bg-[#27272a] disabled:opacity-40 text-white font-semibold py-3 rounded-xl text-sm transition-colors">
+            {loading ? 'Нэвтэрж байна...' : 'Нэвтрэх'}
+          </button>
+        </form>
+      </div>
+    </div>
+  );
+}
+
 function useClock() {
   const [now, setNow] = useState(new Date());
   useEffect(() => { const t = setInterval(() => setNow(new Date()), 1000); return () => clearInterval(t); }, []);
@@ -169,7 +243,8 @@ function HomeContent() {
   const [filterFuel, setFilterFuel] = useState("");
   const [filterTrans, setFilterTrans] = useState("");
   const [filterBrand, setBrand] = useState("");
-  const [menuOpen, setMenu] = useState(false);
+  const [menuOpen, setMenu]     = useState(false);
+  const [adminModal, setAdminModal] = useState(false);
   const clock = useClock();
 
   useEffect(() => {
@@ -205,6 +280,7 @@ function HomeContent() {
       className="min-h-screen bg-[#f5f5f5]"
       style={{ fontFamily: "'Inter','Segoe UI',sans-serif" }}
     >
+      {adminModal && <AdminModal onClose={() => setAdminModal(false)} />}
       {/* ━━━ NAVBAR ━━━ */}
       <header className="sticky top-0 z-50 bg-white shadow-sm">
         {/* Top bar */}
@@ -272,11 +348,11 @@ function HomeContent() {
                   <IcPhone /> Залгах
                 </a>
               )}
-              <Link href="/login"
-                className="hidden md:flex items-center gap-1.5 border border-gray-200 hover:border-[#c00] hover:text-[#c00] text-gray-500 text-xs font-semibold px-3 py-1.5 rounded transition-colors">
-                <svg className="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2}><path d="M15 3h4a2 2 0 012 2v14a2 2 0 01-2 2h-4M10 17l5-5-5-5M15 12H3"/></svg>
+              <button onClick={() => setAdminModal(true)}
+                className="hidden md:flex items-center gap-1.5 border border-gray-200 hover:border-[#09090b] hover:text-[#09090b] text-gray-500 text-xs font-semibold px-3 py-1.5 rounded transition-colors">
+                <svg className="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2}><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg>
                 Админ
-              </Link>
+              </button>
               <button
                 onClick={() => setMenu(!menuOpen)}
                 className="md:hidden w-9 h-9 flex items-center justify-center rounded hover:bg-gray-100"
@@ -318,10 +394,11 @@ function HomeContent() {
                 {l}
               </a>
             ))}
-            <Link href="/login" onClick={() => setMenu(false)}
-              className="block py-2 px-3 text-sm font-semibold text-[#c00] rounded hover:bg-[#fff0f0]">
-              Админ нэвтрэх →
-            </Link>
+            <button onClick={() => { setMenu(false); setAdminModal(true); }}
+              className="w-full text-left py-2 px-3 text-sm font-semibold text-[#09090b] rounded hover:bg-gray-50 flex items-center gap-2">
+              <svg className="w-4 h-4 text-gray-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2}><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg>
+              Админ нэвтрэх
+            </button>
           </div>
         )}
       </header>
