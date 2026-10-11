@@ -7,7 +7,7 @@ import { BRANDS_MODELS, COLORS, getWeekday } from '@/lib/vehicle-data';
 import { Combobox } from '@/components/Combobox';
 
 const BACKEND = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000';
-const inp = "w-full bg-white border border-[#e4e4e7] rounded-md px-3 py-2 text-sm text-[#09090b] placeholder-[#a1a1aa] focus:outline-none focus:border-[#09090b] transition-colors pr-8";
+const inp = "w-full bg-white border border-[#e4e4e7] rounded-md px-3 py-2 text-sm text-[#09090b] placeholder-[#a1a1aa] focus:outline-none focus:border-[#c00] transition-colors pr-8";
 
 const CURRENT_YEAR = new Date().getFullYear();
 const YEARS = Array.from({ length: CURRENT_YEAR - 1989 }, (_, i) => String(CURRENT_YEAR - i));
@@ -143,7 +143,7 @@ export default function NewVehiclePage() {
           onDrop={e => { e.preventDefault(); setDrag(false); addFiles(e.dataTransfer.files); }}
           onClick={() => fileInputRef.current?.click()}
           className={`border-2 border-dashed rounded-2xl p-10 text-center cursor-pointer transition-all mb-5 ${
-            dragOver ? 'border-[#09090b] bg-[#fafafa]' : 'border-[#e4e4e7] hover:border-[#d4d4d8] hover:bg-[#fafafa]'
+            dragOver ? 'border-[#c00] bg-[#fafafa]' : 'border-[#e4e4e7] hover:border-[#d4d4d8] hover:bg-[#fafafa]'
           }`}>
           <input ref={fileInputRef} type="file" multiple accept="image/*" className="hidden"
             onChange={e => addFiles(e.target.files)} />
@@ -159,7 +159,7 @@ export default function NewVehiclePage() {
               <div key={idx} className="relative aspect-[4/3] rounded-xl overflow-hidden border border-[#e4e4e7] group">
                 <img src={img.preview} alt="" className="w-full h-full object-cover" />
                 {idx === 0 && (
-                  <div className="absolute top-2 left-2 bg-[#09090b] text-white text-[10px] font-semibold px-2 py-0.5 rounded-full">
+                  <div className="absolute top-2 left-2 bg-[#c00] text-white text-[10px] font-semibold px-2 py-0.5 rounded-full">
                     Үндсэн
                   </div>
                 )}
@@ -194,7 +194,7 @@ export default function NewVehiclePage() {
           </button>
           <button type="button" onClick={uploadAll}
             disabled={images.some(i => i.uploading)}
-            className="flex-1 py-2.5 text-sm font-medium bg-[#09090b] hover:bg-[#27272a] disabled:opacity-60 text-white rounded-lg transition-colors">
+            className="flex-1 py-2.5 text-sm font-medium bg-[#c00] hover:bg-[#a00] disabled:opacity-60 text-white rounded-lg transition-colors">
             {images.some(i => i.uploading)
               ? `${uploadDone}/${images.filter(i => !i.url).length} upload хийгдэж байна...`
               : images.length > 0 ? `${images.length} зураг хадгалах` : 'Дуусгах'}
@@ -261,7 +261,7 @@ export default function NewVehiclePage() {
               <div className="grid grid-cols-2 gap-1.5">
                 {[['false','Дугааргүй'],['true','Дугаартай']].map(([v, l]) => (
                   <button key={v} type="button" onClick={() => set('has_plates', v === 'true')}
-                    className={`py-2 text-xs rounded-md border transition-colors ${String(form.has_plates) === v ? 'bg-[#09090b] text-white border-[#09090b]' : 'border-[#e4e4e7] text-[#71717a] hover:border-[#d4d4d8]'}`}>
+                    className={`py-2 text-xs rounded-md border transition-colors ${String(form.has_plates) === v ? 'bg-[#c00] text-white border-[#c00]' : 'border-[#e4e4e7] text-[#71717a] hover:border-[#d4d4d8]'}`}>
                     {l}
                   </button>
                 ))}
@@ -288,7 +288,7 @@ export default function NewVehiclePage() {
                     {COLORS.map(c => (
                       <button key={c.value} type="button" title={c.value}
                         onClick={() => set('color', c.value)}
-                        className={`w-5 h-5 rounded-full border-2 transition-all ${form.color === c.value ? 'border-[#09090b] scale-110' : 'border-transparent hover:border-[#d4d4d8]'}`}
+                        className={`w-5 h-5 rounded-full border-2 transition-all ${form.color === c.value ? 'border-[#c00] scale-110' : 'border-transparent hover:border-[#d4d4d8]'}`}
                         style={{ backgroundColor: c.hex, boxShadow: c.hex === '#ffffff' ? 'inset 0 0 0 1px #e4e4e7' : undefined }} />
                     ))}
                   </div>
@@ -300,7 +300,7 @@ export default function NewVehiclePage() {
               <div className="grid grid-cols-2 gap-1.5">
                 {[['PETROL','Бензин'],['DIESEL','Дизель'],['HYBRID','Хибрид'],['ELECTRIC','Цахилгаан']].map(([v,l]) => (
                   <button key={v} type="button" onClick={() => set('fuel_type', v)}
-                    className={`py-1.5 text-xs rounded-md border transition-colors ${form.fuel_type === v ? 'bg-[#09090b] text-white border-[#09090b]' : 'border-[#e4e4e7] text-[#71717a] hover:border-[#d4d4d8]'}`}>
+                    className={`py-1.5 text-xs rounded-md border transition-colors ${form.fuel_type === v ? 'bg-[#c00] text-white border-[#c00]' : 'border-[#e4e4e7] text-[#71717a] hover:border-[#d4d4d8]'}`}>
                     {l}
                   </button>
                 ))}
@@ -311,7 +311,7 @@ export default function NewVehiclePage() {
               <div className="grid grid-cols-2 gap-1.5">
                 {[['AUTO','Автомат'],['MANUAL','Механик']].map(([v,l]) => (
                   <button key={v} type="button" onClick={() => set('transmission', v)}
-                    className={`py-1.5 text-xs rounded-md border transition-colors ${form.transmission === v ? 'bg-[#09090b] text-white border-[#09090b]' : 'border-[#e4e4e7] text-[#71717a] hover:border-[#d4d4d8]'}`}>
+                    className={`py-1.5 text-xs rounded-md border transition-colors ${form.transmission === v ? 'bg-[#c00] text-white border-[#c00]' : 'border-[#e4e4e7] text-[#71717a] hover:border-[#d4d4d8]'}`}>
                     {l}
                   </button>
                 ))}
@@ -343,7 +343,7 @@ export default function NewVehiclePage() {
             Болих
           </button>
           <button type="submit" disabled={loading}
-            className="px-6 py-2 text-sm font-medium bg-[#09090b] hover:bg-[#27272a] disabled:opacity-40 text-white rounded-md transition-colors">
+            className="px-6 py-2 text-sm font-medium bg-[#c00] hover:bg-[#a00] disabled:opacity-40 text-white rounded-md transition-colors">
             {loading ? 'Хадгалж байна...' : 'Үргэлжлэх — зураг нэмэх →'}
           </button>
         </div>

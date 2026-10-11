@@ -3,7 +3,8 @@
 * { box-sizing: border-box; }
 
 body {
-  background: #fafafa;
+  font-family: 'Inter', 'Segoe UI', sans-serif;
+  background: #f5f5f5;
   color: #09090b;
   -webkit-font-smoothing: antialiased;
 }

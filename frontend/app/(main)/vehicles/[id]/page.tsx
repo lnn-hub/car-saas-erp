@@ -60,7 +60,7 @@ const PAYMENT_TYPES = [
 ];
 
 const inp =
-  "w-full bg-white border border-[#e4e4e7] rounded-md px-3 py-2 text-sm text-[#09090b] placeholder-[#a1a1aa] focus:outline-none focus:border-[#09090b] transition-colors";
+  "w-full bg-white border border-[#e4e4e7] rounded-md px-3 py-2 text-sm text-[#09090b] placeholder-[#a1a1aa] focus:outline-none focus:border-[#c00] transition-colors";
 
 function fmt(n: number) {
   if (n >= 1_000_000) return (n / 1_000_000).toFixed(1) + "сая₮";
@@ -241,7 +241,7 @@ function VehicleDetailContent() {
         {vehicle.status !== "SOLD" && (
           <button
             onClick={openSaleModal}
-            className="flex items-center gap-1.5 bg-[#09090b] hover:bg-[#27272a] text-white text-sm font-medium px-4 py-2 rounded-md transition-colors"
+            className="flex items-center gap-1.5 bg-[#c00] hover:bg-[#a00] text-white text-sm font-medium px-4 py-2 rounded-md transition-colors"
           >
             <svg
               className="w-3.5 h-3.5"
@@ -417,7 +417,7 @@ function VehicleDetailContent() {
             </div>
             <button
               type="submit"
-              className="px-3.5 py-1.5 text-sm bg-[#09090b] hover:bg-[#27272a] text-white rounded-md font-medium transition-colors"
+              className="px-3.5 py-1.5 text-sm bg-[#c00] hover:bg-[#a00] text-white rounded-md font-medium transition-colors"
             >
               Нэмэх
             </button>
@@ -463,7 +463,7 @@ function VehicleDetailContent() {
                     setShowSale(false);
                     router.push("/vehicles");
                   }}
-                  className="w-full bg-[#09090b] hover:bg-[#27272a] text-white font-medium py-2.5 rounded-md text-sm transition-colors"
+                  className="w-full bg-[#c00] hover:bg-[#a00] text-white font-medium py-2.5 rounded-md text-sm transition-colors"
                 >
                   Машинуудруу буцах
                 </button>
@@ -514,7 +514,7 @@ function VehicleDetailContent() {
                               setSelCustomer(null);
                               setCustQuery("");
                             }}
-                            className={`px-2 py-0.5 text-xs rounded transition-colors ${custMode === m ? "bg-[#09090b] text-white" : "text-[#71717a] hover:text-[#09090b]"}`}
+                            className={`px-2 py-0.5 text-xs rounded transition-colors ${custMode === m ? "bg-[#c00] text-white" : "text-[#71717a] hover:text-[#09090b]"}`}
                           >
                             {m === "search" ? "Хайх" : "Шинэ"}
                           </button>
@@ -676,7 +676,7 @@ function VehicleDetailContent() {
                           onClick={() => setPayType(p.value)}
                           className={`flex flex-col items-center py-2.5 rounded-lg border transition-colors ${
                             payType === p.value
-                              ? "border-[#09090b] bg-[#09090b] text-white"
+                              ? "border-[#c00] bg-[#c00] text-white"
                               : "border-[#e4e4e7] text-[#71717a] hover:border-[#d4d4d8] hover:text-[#09090b]"
                           }`}
                         >
@@ -698,7 +698,7 @@ function VehicleDetailContent() {
                     <button
                       type="submit"
                       disabled={saleLoading}
-                      className="flex-1 py-2.5 text-sm font-semibold bg-[#09090b] hover:bg-[#27272a] disabled:opacity-40 text-white rounded-md transition-colors"
+                      className="flex-1 py-2.5 text-sm font-semibold bg-[#c00] hover:bg-[#a00] disabled:opacity-40 text-white rounded-md transition-colors"
                     >
                       {saleLoading ? "Боловсруулж байна..." : "Зарах"}
                     </button>

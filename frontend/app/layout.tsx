@@ -2,8 +2,8 @@ import type { Metadata } from "next";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "AutoERP",
-  description: "Машин борлуулалтын удирдлагын систем",
+  title: "AutoDealer",
+  description: "Чанартай машин — шууд таны гарт",
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
