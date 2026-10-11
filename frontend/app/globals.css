@@ -1,10 +1,17 @@
 @import "tailwindcss";
 
 @theme {
-  --color-brand: #b4232c;
-  --color-brand-dark: #8f1b23;
-  --color-brand-light: #e5484d;
-  --color-brand-soft: #fbeeee;
+  --color-brand: #8b1e2d;
+  --color-brand-dark: #6d1523;
+  --color-brand-light: #b0394a;
+  --color-brand-soft: #f8eeef;
+  --color-ink: #111111;
+
+  --radius-sm: 0.125rem;
+  --radius-md: 0.1875rem;
+  --radius-lg: 0.25rem;
+  --radius-xl: 0.3125rem;
+  --radius-2xl: 0.375rem;
 }
 
 * { box-sizing: border-box; }

@@ -349,7 +349,7 @@ function HomeContent() {
                 <a
                   key={h}
                   href={h}
-                  className="px-4 py-2 text-sm font-semibold text-[#333] hover:text-brand transition-colors rounded-lg hover:bg-brand-soft"
+                  className="px-4 py-2 text-[11px] font-black uppercase tracking-[0.15em] text-[#333] hover:text-brand transition-colors border-b-2 border-transparent hover:border-brand"
                 >
                   {l}
                 </a>
@@ -360,7 +360,7 @@ function HomeContent() {
               {company?.phone && (
                 <a
                   href={`tel:${company.phone}`}
-                  className="hidden lg:flex items-center gap-2 bg-brand hover:bg-brand-dark text-white text-sm font-bold px-5 py-2.5 rounded transition-colors"
+                  className="hidden lg:flex items-center gap-2 bg-brand hover:bg-[#111] text-white text-[11px] font-black uppercase tracking-[0.15em] px-5 py-3 rounded-sm transition-colors"
                 >
                   <IcPhone /> Залгах
                 </a>
@@ -426,7 +426,7 @@ function HomeContent() {
           className="absolute inset-0"
           style={{
             backgroundImage:
-              "linear-gradient(135deg,#1a0000 0%,#111 50%,#0a1a0a 100%)",
+              "linear-gradient(135deg,#2a0a10 0%,#111 55%,#0d0d0d 100%)",
           }}
         />
         <div
@@ -436,9 +436,12 @@ function HomeContent() {
               "repeating-linear-gradient(0deg,transparent,transparent 39px,rgba(255,255,255,0.5) 39px,rgba(255,255,255,0.5) 40px),repeating-linear-gradient(90deg,transparent,transparent 39px,rgba(255,255,255,0.5) 39px,rgba(255,255,255,0.5) 40px)",
           }}
         />
+        <div className="pointer-events-none select-none absolute top-6 left-1/2 -translate-x-1/2 text-[72px] sm:text-[200px] font-black uppercase tracking-tighter text-white/[0.03] whitespace-nowrap">
+          {cname}
+        </div>
         <div className="relative max-w-7xl mx-auto px-4 py-12 sm:py-28">
           <div className="max-w-2xl">
-            <div className="inline-flex items-center gap-2 bg-brand/20 border border-brand/30 text-red-300 text-xs font-bold px-3 py-1.5 rounded-full mb-4 sm:mb-6 tracking-widest uppercase">
+            <div className="inline-flex items-center gap-2 bg-white/5 border border-white/15 text-white/80 text-[10px] font-black px-3 py-1.5 rounded-sm mb-4 sm:mb-6 tracking-[0.2em] uppercase">
               <span className={`w-1.5 h-1.5 bg-red-400 rounded-full ${(loading || retrying) ? 'animate-pulse' : ''}`} />
               {retrying
                 ? "Сервер асаж байна, түр хүлээнэ үү..."
@@ -458,14 +461,14 @@ function HomeContent() {
             <div className="flex flex-wrap gap-3">
               <a
                 href="#cars"
-                className="bg-brand active:bg-brand-dark text-white font-bold px-6 sm:px-8 py-3 sm:py-3.5 rounded transition-colors text-sm"
+                className="bg-brand hover:bg-white hover:text-[#111] text-white font-black uppercase tracking-[0.15em] px-6 sm:px-8 py-3.5 rounded-sm transition-colors text-[11px]"
               >
                 Машинуудыг үзэх
               </a>
               {company?.phone && (
                 <a
                   href={`tel:${company.phone}`}
-                  className="border border-white/20 active:border-white/50 text-white font-semibold px-6 sm:px-8 py-3 sm:py-3.5 rounded transition-colors text-sm"
+                  className="border border-white/25 hover:border-white text-white font-bold uppercase tracking-[0.15em] px-6 sm:px-8 py-3.5 rounded-sm transition-colors text-[11px]"
                 >
                   <span className="flex items-center gap-2">
                     <IcPhone cls="w-3.5 h-3.5" />
@@ -659,7 +662,7 @@ function HomeContent() {
                   <Link
                     key={v.id}
                     href={`/vehicle/${v.id}`}
-                    className="group bg-white rounded-xl overflow-hidden shadow-sm hover:shadow-xl transition-all duration-300 flex flex-col border border-transparent hover:border-brand/20 active:scale-[0.98]"
+                    className="group bg-white rounded-sm overflow-hidden shadow-sm hover:shadow-xl transition-all duration-300 flex flex-col border border-zinc-200 hover:border-brand/40"
                   >
                     {/* Image */}
                     <div className="relative aspect-[4/3] sm:aspect-[16/10] bg-gray-100 overflow-hidden">
@@ -692,11 +695,11 @@ function HomeContent() {
                         </div>
                       )}
                       {/* Year badge */}
-                      <div className="absolute top-2 left-2 bg-[#111]/80 backdrop-blur-sm text-white text-[10px] sm:text-[11px] font-bold px-2 py-0.5 rounded">
+                      <div className="absolute top-2 left-2 bg-[#111]/85 text-white text-[10px] sm:text-[11px] font-black tracking-wider px-2 py-0.5 rounded-sm">
                         {v.year}
                       </div>
                       {v.has_plates && (
-                        <div className="absolute top-2 right-2 bg-brand text-white text-[9px] sm:text-[10px] font-bold px-1.5 py-0.5 rounded uppercase tracking-wide">
+                        <div className="absolute top-2 right-2 bg-brand text-white text-[9px] sm:text-[10px] font-black px-1.5 py-0.5 rounded-sm uppercase tracking-widest">
                           Дугаартай
                         </div>
                       )}
@@ -708,7 +711,7 @@ function HomeContent() {
                     <div className="p-3 sm:p-4 flex flex-col flex-1">
                       {/* Name */}
                       <div className="mb-2 sm:mb-3">
-                        <div className="text-[10px] sm:text-[11px] font-bold text-brand uppercase tracking-wider mb-0.5">
+                        <div className="text-[10px] sm:text-[11px] font-black text-brand uppercase tracking-[0.18em] mb-0.5">
                           {v.brand}
                         </div>
                         <h3 className="font-extrabold text-[#111] text-[13px] sm:text-[15px] leading-tight">
@@ -755,7 +758,7 @@ function HomeContent() {
                             <div className="hidden sm:block text-[10px] text-gray-400 uppercase tracking-wide">
                               Үнэ
                             </div>
-                            <div className="text-[13px] sm:text-[15px] font-black text-brand leading-tight">
+                            <div className="text-[13px] sm:text-[16px] font-black text-[#111] leading-tight">
                               {price}
                             </div>
                           </div>
@@ -764,7 +767,7 @@ function HomeContent() {
                             Тохиролцоно
                           </div>
                         )}
-                        <span className="shrink-0 bg-brand text-white text-[10px] sm:text-xs font-bold px-2 sm:px-3 py-1.5 sm:py-2 rounded transition-colors whitespace-nowrap">
+                        <span className="shrink-0 bg-[#111] group-hover:bg-brand text-white text-[9px] sm:text-[10px] font-black uppercase tracking-widest px-2.5 sm:px-3.5 py-2 rounded-sm transition-colors whitespace-nowrap">
                           Үзэх →
                         </span>
                       </div>
@@ -785,10 +788,10 @@ function HomeContent() {
         <div className="max-w-7xl mx-auto">
           <div className="flex flex-col md:flex-row gap-12 items-center">
             <div className="flex-1">
-              <div className="text-[11px] font-bold text-brand uppercase tracking-widest mb-3">
+              <div className="text-[10px] font-black text-brand uppercase tracking-[0.25em] mb-3">
                 Бидний тухай
               </div>
-              <h2 className="text-3xl font-black text-[#111] mb-4 leading-tight">
+              <h2 className="text-3xl sm:text-4xl font-black text-[#111] mb-4 leading-tight border-l-4 border-brand pl-4">
                 Яагаад бидэнд
                 <br />
                 хандах вэ?
@@ -799,7 +802,7 @@ function HomeContent() {
               </p>
               <a
                 href="#contact"
-                className="inline-flex items-center gap-2 bg-brand hover:bg-brand-dark text-white text-sm font-bold px-6 py-3 rounded transition-colors"
+                className="inline-flex items-center gap-2 bg-[#111] hover:bg-brand text-white text-[11px] font-black uppercase tracking-[0.15em] px-7 py-3.5 rounded-sm transition-colors"
               >
                 Холбогдох
               </a>
@@ -820,7 +823,7 @@ function HomeContent() {
               ].map(({ n, l, sub }) => (
                 <div
                   key={l}
-                  className="bg-[#f9f9f9] rounded-xl p-5 text-center border border-gray-100"
+                  className="bg-[#f9f9f9] rounded-sm p-5 text-center border border-zinc-200 border-t-2 border-t-brand"
                 >
                   <div className="text-3xl font-black text-brand mb-1">
                     {n}
@@ -841,10 +844,10 @@ function HomeContent() {
       >
         <div className="max-w-7xl mx-auto">
           <div className="text-center mb-10">
-            <div className="text-[11px] font-bold text-brand uppercase tracking-widest mb-2">
+            <div className="text-[10px] font-black text-brand uppercase tracking-[0.25em] mb-2">
               Холбоо барих
             </div>
-            <h2 className="text-3xl font-black text-[#111]">
+            <h2 className="text-3xl sm:text-4xl font-black text-[#111]">
               Бидэнтэй холбогдоорой
             </h2>
           </div>
@@ -852,12 +855,12 @@ function HomeContent() {
             {company?.phone && (
               <a
                 href={`tel:${company.phone}`}
-                className="bg-white rounded-xl p-6 text-center border border-gray-200 hover:border-brand hover:shadow-md transition-all group"
+                className="bg-white rounded-sm p-6 text-center border border-zinc-200 hover:border-brand hover:shadow-md transition-all group"
               >
-                <div className="w-12 h-12 bg-brand rounded-xl flex items-center justify-center text-white mx-auto mb-3 group-hover:scale-110 transition-transform">
+                <div className="w-12 h-12 bg-brand rounded-sm flex items-center justify-center text-white mx-auto mb-3 group-hover:scale-110 transition-transform">
                   <IcPhone cls="w-5 h-5" />
                 </div>
-                <div className="text-[11px] text-gray-400 uppercase tracking-wide mb-1">
+                <div className="text-[10px] font-bold text-gray-400 uppercase tracking-[0.2em] mb-1">
                   Утас
                 </div>
                 <div className="font-black text-[#111] text-base">
@@ -870,23 +873,23 @@ function HomeContent() {
                 href={`https://wa.me/976${company.phone.replace(/\D/g, "")}`}
                 target="_blank"
                 rel="noreferrer"
-                className="bg-white rounded-xl p-6 text-center border border-gray-200 hover:border-[#25d366] hover:shadow-md transition-all group"
+                className="bg-white rounded-sm p-6 text-center border border-zinc-200 hover:border-[#25d366] hover:shadow-md transition-all group"
               >
-                <div className="w-12 h-12 bg-[#25d366] rounded-xl flex items-center justify-center text-white mx-auto mb-3 group-hover:scale-110 transition-transform">
+                <div className="w-12 h-12 bg-[#25d366] rounded-sm flex items-center justify-center text-white mx-auto mb-3 group-hover:scale-110 transition-transform">
                   <IcWa cls="w-5 h-5" />
                 </div>
-                <div className="text-[11px] text-gray-400 uppercase tracking-wide mb-1">
+                <div className="text-[10px] font-bold text-gray-400 uppercase tracking-[0.2em] mb-1">
                   WhatsApp
                 </div>
                 <div className="font-black text-[#111] text-base">Мессеж</div>
               </a>
             )}
             {company?.address && (
-              <div className="bg-white rounded-xl p-6 text-center border border-gray-200">
-                <div className="w-12 h-12 bg-[#111] rounded-xl flex items-center justify-center text-white mx-auto mb-3">
+              <div className="bg-white rounded-sm p-6 text-center border border-zinc-200">
+                <div className="w-12 h-12 bg-[#111] rounded-sm flex items-center justify-center text-white mx-auto mb-3">
                   <IcPin cls="w-5 h-5" />
                 </div>
-                <div className="text-[11px] text-gray-400 uppercase tracking-wide mb-1">
+                <div className="text-[10px] font-bold text-gray-400 uppercase tracking-[0.2em] mb-1">
                   Байршил
                 </div>
                 <div className="font-bold text-[#111] text-sm">
@@ -898,8 +901,28 @@ function HomeContent() {
         </div>
       </section>
 
+      {/* ━━━ CTA BANNER ━━━ */}
+      {company?.phone && (
+        <section className="bg-[#111] relative overflow-hidden">
+          <div className="pointer-events-none select-none absolute -top-6 left-1/2 -translate-x-1/2 text-[90px] sm:text-[220px] font-black uppercase tracking-tighter text-white/[0.03] whitespace-nowrap">
+            {cname}
+          </div>
+          <div className="relative max-w-7xl mx-auto px-4 py-10 sm:py-14 flex flex-col md:flex-row items-center justify-between gap-6 border-l-4 border-brand">
+            <div className="text-center md:text-left">
+              <div className="text-[10px] font-black text-brand-light uppercase tracking-[0.25em] mb-2">Захиалга өгөх</div>
+              <h3 className="text-2xl sm:text-3xl font-black text-white leading-tight">Хүссэн машинаа хайж олоогүй юу?</h3>
+              <p className="text-sm text-gray-400 mt-2">Бидэнтэй холбогдоорой — таны сонголтод тохирох машиныг олж өгнө.</p>
+            </div>
+            <a href={`tel:${company.phone}`}
+              className="shrink-0 flex items-center gap-2 bg-brand hover:bg-white hover:text-[#111] text-white text-[11px] font-black uppercase tracking-[0.2em] px-8 py-4 rounded-sm transition-colors">
+              <IcPhone cls="w-4 h-4" /> {company.phone}
+            </a>
+          </div>
+        </section>
+      )}
+
       {/* ━━━ FOOTER ━━━ */}
-      <footer className="bg-[#111] text-gray-500">
+      <footer className="bg-[#0b0b0b] text-gray-500 border-t border-white/10">
         <div className="max-w-7xl mx-auto px-4 py-8">
           <div className="flex flex-col sm:flex-row items-center justify-between gap-5 mb-6">
             <div className="flex items-center gap-2.5">
