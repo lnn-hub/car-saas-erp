@@ -261,7 +261,7 @@ export default function ReportsPage() {
   const maxRevenue = Math.max(...monthly.map(m => Number(m.revenue)), 1);
 
   return (
-    <div className="px-6 py-6 space-y-4">
+    <div className="px-4 sm:px-6 py-4 sm:py-6 space-y-4">
       {/* Header */}
       <div>
         <h1 className="text-base font-semibold text-[#09090b]">Тайлан</h1>

@@ -25,7 +25,7 @@ export default function CustomersPage() {
   }, []);
 
   return (
-    <div className="px-8 py-7">
+    <div className="px-4 sm:px-8 py-5 sm:py-7">
       <div className="mb-6">
         <h1 className="text-base font-semibold text-[#09090b]">Үйлчлүүлэгчид</h1>
         <p className="text-xs text-[#a1a1aa] mt-0.5">{customers.length} үйлчлүүлэгч нийт</p>

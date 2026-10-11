@@ -37,10 +37,10 @@ export default function SettingsPage() {
     } finally { setSaving(false); }
   }
 
-  if (loading) return <div className="px-8 py-7 text-sm text-[#a1a1aa]">Ачааллаж байна...</div>;
+  if (loading) return <div className="px-4 sm:px-8 py-5 sm:py-7 text-sm text-[#a1a1aa]">Ачааллаж байна...</div>;
 
   return (
-    <div className="px-8 py-7 max-w-xl">
+    <div className="px-4 sm:px-8 py-5 sm:py-7 max-w-xl">
       <h1 className="text-lg font-semibold text-[#09090b] mb-6">Тохиргоо</h1>
 
       <form onSubmit={handleSubmit} className="space-y-4">

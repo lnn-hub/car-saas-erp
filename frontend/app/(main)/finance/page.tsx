@@ -177,7 +177,7 @@ export default function FinancePage() {
   const maxFlow = Math.max(...cashflow.map(r => Math.max(r.inflow, r.outflow)), 1);
 
   return (
-    <div className="px-6 py-6 space-y-4">
+    <div className="px-4 sm:px-6 py-4 sm:py-6 space-y-4">
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>

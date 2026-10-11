@@ -56,30 +56,31 @@ export default function DashboardPage() {
   const greeting = hour < 12 ? 'Өглөөний мэнд' : hour < 17 ? 'Өдрийн мэнд' : 'Оройн мэнд';
 
   return (
-    <div className="px-6 py-6 space-y-5 max-w-5xl">
+    <div className="px-4 sm:px-6 py-4 sm:py-6 space-y-4 sm:space-y-5 max-w-5xl">
 
       {/* Greeting */}
-      <div className="flex items-center justify-between">
+      <div className="flex items-center justify-between gap-3">
         <div>
-          <h1 className="text-lg font-bold text-[#09090b]">{greeting}{userName ? `, ${userName.split(' ')[0]}` : ''}!</h1>
-          <p className="text-sm text-[#71717a] mt-0.5">Өнөөдрийн борлуулалт, агуулахын байдал</p>
+          <h1 className="text-base sm:text-lg font-bold text-[#09090b]">{greeting}{userName ? `, ${userName.split(' ')[0]}` : ''}!</h1>
+          <p className="text-xs sm:text-sm text-[#71717a] mt-0.5 hidden sm:block">Өнөөдрийн борлуулалт, агуулахын байдал</p>
         </div>
         <Link href="/vehicles/new"
-          className="flex items-center gap-2 bg-[#09090b] hover:bg-[#27272a] text-white font-semibold px-4 py-2.5 rounded-xl transition-colors text-sm shadow-sm">
+          className="flex items-center gap-2 bg-[#09090b] hover:bg-[#27272a] text-white font-semibold px-3 sm:px-4 py-2 sm:py-2.5 rounded-xl transition-colors text-sm shadow-sm shrink-0">
           <svg className="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2.5}><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
-          Машин нэмэх
+          <span className="hidden sm:inline">Машин нэмэх</span>
+          <span className="sm:hidden">Нэмэх</span>
         </Link>
       </div>
 
       {/* KPI cards */}
-      <div className="grid grid-cols-4 gap-3">
+      <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 sm:gap-3">
         {[
           { label: 'Нийт борлуулалт', value: `${summary?.total_sold ?? 0}`, unit: 'машин',        color: 'bg-blue-50 border-blue-100',    textColor: 'text-blue-700',    icon: <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.8}><path d="M5 17H3a2 2 0 01-2-2v-4a2 2 0 012-2h16a2 2 0 012 2v4a2 2 0 01-2 2h-2"/><rect x="7" y="17" width="10" height="4" rx="2"/><path d="M5 11L7.5 5h9L19 11"/></svg> },
           { label: 'Нийт орлого',     value: fmt(summary?.total_revenue ?? 0), unit: '',           color: 'bg-emerald-50 border-emerald-100', textColor: 'text-emerald-700', icon: <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.8}><rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg> },
           { label: 'Цэвэр ашиг',      value: fmt(summary?.total_profit ?? 0),  unit: '',           color: 'bg-violet-50 border-violet-100',   textColor: 'text-violet-700',  icon: <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.8}><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/></svg> },
           { label: 'Агуулахын үнэ',   value: fmt(totalCost),                   unit: `${inStock} машин`, color: 'bg-amber-50 border-amber-100', textColor: 'text-amber-700',   icon: <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.8}><path d="M21 16V8a2 2 0 00-1-1.73l-7-4a2 2 0 00-2 0l-7 4A2 2 0 003 8v8a2 2 0 001 1.73l7 4a2 2 0 002 0l7-4A2 2 0 0021 16z"/></svg> },
         ].map(c => (
-          <div key={c.label} className={`rounded-xl border px-5 py-4 ${c.color}`}>
+          <div key={c.label} className={`rounded-xl border px-3 sm:px-5 py-3 sm:py-4 ${c.color}`}>
             <div className="flex items-center justify-between mb-3">
               <span className="text-xs font-medium text-[#71717a]">{c.label}</span>
               <span className={c.textColor}>{c.icon}</span>
@@ -95,7 +96,7 @@ export default function DashboardPage() {
         <div className="px-5 py-3.5 border-b border-[#e4e4e7]">
           <span className="text-sm font-semibold text-[#09090b]">Агуулахын байдал</span>
         </div>
-        <div className="grid grid-cols-4 divide-x divide-[#f4f4f5]">
+        <div className="grid grid-cols-2 sm:grid-cols-4 divide-x divide-y sm:divide-y-0 divide-[#f4f4f5]">
           {Object.entries(STATUS).map(([key, val]) => (
             <Link key={key} href={`/vehicles?status=${key}`}
               className="px-5 py-4 hover:bg-[#fafafa] transition-colors">
@@ -125,7 +126,7 @@ export default function DashboardPage() {
       </div>
 
       {/* Bottom: recent + quick actions */}
-      <div className="grid grid-cols-[1fr_220px] gap-4">
+      <div className="grid grid-cols-1 lg:grid-cols-[1fr_220px] gap-4">
         {/* Recent vehicles */}
         <div className="bg-white rounded-xl border border-[#e4e4e7] overflow-hidden shadow-sm">
           <div className="px-5 py-3.5 border-b border-[#e4e4e7] flex items-center justify-between">
