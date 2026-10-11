@@ -11,7 +11,7 @@ cd backend && npm run dev &
 BACKEND_PID=$!
 
 echo "🌐 Frontend эхлүүлж байна (port 3000)..."
-cd ../frontend && npm run dev &
+cd ../frontend && node_modules/.bin/next dev --turbopack &
 FRONTEND_PID=$!
 
 echo ""
