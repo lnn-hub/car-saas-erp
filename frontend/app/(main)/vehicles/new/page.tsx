@@ -8,11 +8,11 @@ const inp = "w-full bg-[#0d0d0d] border border-[#222] rounded-md px-3 py-2 text-
 
 export default function NewVehiclePage() {
   const router = useRouter();
-  const [form, setForm] = useState({
+  const [form, setForm] = useState(() => ({
     vin: '', brand: '', model: '', year: new Date().getFullYear(),
     mileage: 0, color: '', fuel_type: 'PETROL', transmission: 'AUTO',
     engine_cc: '', description: '',
-  });
+  }));
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
 
