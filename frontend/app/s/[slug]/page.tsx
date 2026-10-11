@@ -1,6 +1,5 @@
 'use client';
-export const dynamic = 'force-dynamic';
-import { useEffect, useState } from 'react';
+import { useEffect, useState, Suspense } from 'react';
 import { useParams } from 'next/navigation';
 import Link from 'next/link';
 
@@ -30,6 +29,18 @@ function fmt(n: string | number | null) {
 }
 
 export default function ShowcasePage() {
+  return (
+    <Suspense fallback={
+      <div className="min-h-screen bg-[#f6f6f7] flex items-center justify-center">
+        <div className="text-sm text-[#a1a1aa]">Ачааллаж байна...</div>
+      </div>
+    }>
+      <ShowcaseContent />
+    </Suspense>
+  );
+}
+
+function ShowcaseContent() {
   const params = useParams();
   const slug = params.slug as string;
   const [company, setCompany]   = useState<Company | null>(null);

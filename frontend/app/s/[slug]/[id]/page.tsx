@@ -1,6 +1,5 @@
 'use client';
-export const dynamic = 'force-dynamic';
-import { useEffect, useState } from 'react';
+import { useEffect, useState, Suspense } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 
 const BACKEND = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000';
@@ -27,6 +26,18 @@ function fmt(n: string | number | null) {
 }
 
 export default function VehicleDetailPage() {
+  return (
+    <Suspense fallback={
+      <div className="min-h-screen bg-[#f6f6f7] flex items-center justify-center">
+        <div className="text-sm text-[#a1a1aa]">Ачааллаж байна...</div>
+      </div>
+    }>
+      <VehicleDetailContent />
+    </Suspense>
+  );
+}
+
+function VehicleDetailContent() {
   const params = useParams();
   const slug = params.slug as string;
   const id = params.id as string;
