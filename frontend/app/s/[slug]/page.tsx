@@ -29,7 +29,8 @@ function fmt(n: string | number | null) {
 }
 
 export default function ShowcasePage() {
-  const { slug } = useParams<{ slug: string }>();
+  const params = useParams();
+  const slug = params.slug as string;
   const [company, setCompany]   = useState<Company | null>(null);
   const [vehicles, setVehicles] = useState<Vehicle[]>([]);
   const [loading, setLoading]   = useState(true);

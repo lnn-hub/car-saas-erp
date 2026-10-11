@@ -26,7 +26,9 @@ function fmt(n: string | number | null) {
 }
 
 export default function VehicleDetailPage() {
-  const { slug, id } = useParams<{ slug: string; id: string }>();
+  const params = useParams();
+  const slug = params.slug as string;
+  const id = params.id as string;
   const router = useRouter();
   const [vehicle, setVehicle] = useState<Vehicle | null>(null);
   const [imgIdx, setImgIdx]   = useState(0);
