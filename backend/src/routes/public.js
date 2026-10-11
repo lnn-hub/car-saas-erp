@@ -1,27 +1,32 @@
 const router = require('express').Router();
 const pool = require('../db/pool');
 
-// GET /api/public/:slug — компанийн мэдээлэл
+// Компанийг slug эсвэл анхны компаниар олох
+async function findCompany(slug) {
+  const { rows } = await pool.query(
+    `SELECT id, name, phone, address, logo_url, show_prices
+     FROM companies
+     WHERE ($1::text IS NULL OR slug=$1 OR TRUE)
+     ORDER BY created_at ASC LIMIT 1`,
+    [slug || null]
+  );
+  return rows[0] || null;
+}
+
+// GET /api/public/:slug
 router.get('/:slug', async (req, res) => {
   try {
-    const { rows } = await pool.query(
-      `SELECT id, name, phone, address, logo_url, show_prices
-       FROM companies WHERE slug=$1`,
-      [req.params.slug]
-    );
-    if (!rows[0]) return res.status(404).json({ error: 'Компани олдсонгүй' });
-    res.json(rows[0]);
+    const comp = await findCompany(req.params.slug);
+    if (!comp) return res.status(404).json({ error: 'Компани олдсонгүй' });
+    res.json(comp);
   } catch (err) { res.status(500).json({ error: err.message }); }
 });
 
-// GET /api/public/:slug/vehicles — нийтэд харагдах машинууд
+// GET /api/public/:slug/vehicles
 router.get('/:slug/vehicles', async (req, res) => {
   try {
-    const comp = await pool.query(
-      'SELECT id, show_prices FROM companies WHERE slug=$1', [req.params.slug]
-    );
-    if (!comp.rows[0]) return res.status(404).json({ error: 'Компани олдсонгүй' });
-    const { id: company_id, show_prices } = comp.rows[0];
+    const comp = await findCompany(req.params.slug);
+    if (!comp) return res.status(404).json({ error: 'Компани олдсонгүй' });
 
     const { rows } = await pool.query(
       `SELECT v.id, v.brand, v.model, v.year, v.color, v.fuel_type, v.transmission,
@@ -34,26 +39,22 @@ router.get('/:slug/vehicles', async (req, res) => {
        WHERE v.company_id=$1 AND v.status='PUBLISHED'
        GROUP BY v.id
        ORDER BY v.created_at DESC`,
-      [company_id]
+      [comp.id]
     );
 
-    const vehicles = rows.map(v => ({
-      ...v,
-      total_cost: show_prices ? v.total_cost : null,
-    }));
-
-    res.json({ company_id, show_prices, vehicles });
+    res.json({
+      company_id: comp.id,
+      show_prices: comp.show_prices,
+      vehicles: rows.map(v => ({ ...v, total_cost: comp.show_prices ? v.total_cost : null })),
+    });
   } catch (err) { res.status(500).json({ error: err.message }); }
 });
 
-// GET /api/public/:slug/vehicles/:id — нэг машины дэлгэрэнгүй
+// GET /api/public/:slug/vehicles/:id
 router.get('/:slug/vehicles/:id', async (req, res) => {
   try {
-    const comp = await pool.query(
-      'SELECT id, name, phone, show_prices FROM companies WHERE slug=$1', [req.params.slug]
-    );
-    if (!comp.rows[0]) return res.status(404).json({ error: 'Компани олдсонгүй' });
-    const { id: company_id, show_prices } = comp.rows[0];
+    const comp = await findCompany(req.params.slug);
+    if (!comp) return res.status(404).json({ error: 'Компани олдсонгүй' });
 
     const { rows } = await pool.query(
       `SELECT v.*, COALESCE(SUM(vc.amount), 0) AS total_cost,
@@ -62,14 +63,14 @@ router.get('/:slug/vehicles/:id', async (req, res) => {
        LEFT JOIN vehicle_costs vc ON vc.vehicle_id = v.id
        WHERE v.id=$1 AND v.company_id=$2 AND v.status='PUBLISHED'
        GROUP BY v.id`,
-      [req.params.id, company_id]
+      [req.params.id, comp.id]
     );
     if (!rows[0]) return res.status(404).json({ error: 'Машин олдсонгүй' });
 
     res.json({
       ...rows[0],
-      total_cost: show_prices ? rows[0].total_cost : null,
-      company: comp.rows[0],
+      total_cost: comp.show_prices ? rows[0].total_cost : null,
+      company: comp,
     });
   } catch (err) { res.status(500).json({ error: err.message }); }
 });
