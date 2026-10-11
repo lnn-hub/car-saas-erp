@@ -48,15 +48,20 @@ router.get('/:id', auth, async (req, res) => {
 
 // POST /api/vehicles — машин нэмэх
 router.post('/', auth, async (req, res) => {
-  const { vin, brand, model, year, mileage, color, fuel_type, transmission, engine_cc, description } = req.body;
+  const { vin, brand, model, year, mileage, color, fuel_type, transmission, engine_cc, description,
+          arrived_at, manufactured_date, has_plates } = req.body;
   if (!vin || !brand || !model || !year)
-    return res.status(400).json({ error: 'VIN, марк, загвар, он заавал шаардлагатай' });
+    return res.status(400).json({ error: 'VIN, марк, загвар,он заавал шаардлагатай' });
+
+  // manufactured_date comes as YYYY-MM from month input — append -01 for full date
+  const mfgDate = manufactured_date ? manufactured_date + '-01' : null;
 
   try {
     const { rows } = await pool.query(
-      `INSERT INTO vehicles (company_id, vin, brand, model, year, mileage, color, fuel_type, transmission, engine_cc, description, created_by)
-       VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12) RETURNING *`,
-      [req.user.company_id, vin, brand, model, year, mileage || 0, color, fuel_type || 'PETROL', transmission || 'AUTO', engine_cc, description, req.user.id]
+      `INSERT INTO vehicles (company_id, vin, brand, model, year, mileage, color, fuel_type, transmission, engine_cc, description, arrived_at, manufactured_date, has_plates, created_by)
+       VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15) RETURNING *`,
+      [req.user.company_id, vin, brand, model, year, mileage || 0, color, fuel_type || 'PETROL', transmission || 'AUTO',
+       engine_cc, description, arrived_at || null, mfgDate, has_plates === true || has_plates === 'true', req.user.id]
     );
     res.status(201).json(rows[0]);
   } catch (err) {

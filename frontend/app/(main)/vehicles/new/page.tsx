@@ -16,6 +16,7 @@ export default function NewVehiclePage() {
     vin: '', brand: '', model: '', year: 0,
     mileage: 0, color: '', fuel_type: 'PETROL', transmission: 'AUTO',
     engine_cc: '', description: '', arrived_at: '',
+    manufactured_date: '', has_plates: false,
   });
   const [models, setModels] = useState<string[]>([]);
   const [error, setError]   = useState('');
@@ -26,7 +27,7 @@ export default function NewVehiclePage() {
     setForm(prev => ({ ...prev, year: CURRENT_YEAR, arrived_at: today }));
   }, []);
 
-  function set(field: string, value: string | number) {
+  function set(field: string, value: string | number | boolean) {
     setForm(prev => ({ ...prev, [field]: value }));
     if (field === 'brand') {
       setModels(BRANDS_MODELS[value as string] || []);
@@ -97,7 +98,7 @@ export default function NewVehiclePage() {
             </Field>
 
             {/* Arrived at */}
-            <Field label="Ирсэн огноо">
+            <Field label="Орж ирсэн огноо">
               <div className="relative">
                 <input type="date" value={form.arrived_at} onChange={e => set('arrived_at', e.target.value)}
                   className={inp} />
@@ -106,6 +107,24 @@ export default function NewVehiclePage() {
                     {weekday}
                   </span>
                 )}
+              </div>
+            </Field>
+
+            {/* Manufactured date — month/year */}
+            <Field label="Үйлдвэрлэсэн огноо">
+              <input type="month" value={form.manufactured_date} onChange={e => set('manufactured_date', e.target.value)}
+                className={inp} />
+            </Field>
+
+            {/* Has plates */}
+            <Field label="Улсын дугаар">
+              <div className="grid grid-cols-2 gap-1.5">
+                {([['false','Дугааргүй'],['true','Дугаартай']] as [string, string][]).map(([v, l]) => (
+                  <button key={v} type="button" onClick={() => set('has_plates', v === 'true')}
+                    className={`py-1.5 text-xs rounded-md border transition-colors ${String(form.has_plates) === v ? 'bg-[#09090b] text-white border-[#09090b]' : 'border-[#e4e4e7] text-[#71717a] hover:border-[#d4d4d8] hover:text-[#09090b]'}`}>
+                    {l}
+                  </button>
+                ))}
               </div>
             </Field>
           </div>

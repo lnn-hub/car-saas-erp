@@ -1,16 +1,23 @@
 'use client';
-import { useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { api } from '@/lib/api';
 
 interface Summary { total_sold: string; total_revenue: string; total_profit: string; avg_profit: string; }
 interface Vehicle { id: string; brand: string; model: string; year: number; status: string; total_cost: string; created_at: string; }
 
-const STATUS: Record<string, { label: string; dot: string; text: string }> = {
-  ARRIVED:   { label: 'Ирсэн',        dot: 'bg-amber-400',   text: 'text-amber-600' },
-  PUBLISHED: { label: 'Нийтлэгдсэн',  dot: 'bg-blue-400',    text: 'text-blue-600' },
-  RESERVED:  { label: 'Захиалгатай',  dot: 'bg-violet-400',  text: 'text-violet-600' },
-  SOLD:      { label: 'Зарагдсан',    dot: 'bg-emerald-400', text: 'text-emerald-600' },
+const STATUS: Record<string, { label: string; bg: string; text: string; dot: string }> = {
+  ARRIVED:   { label: 'Ирсэн',       bg: 'bg-amber-50',   text: 'text-amber-700',   dot: 'bg-amber-400' },
+  PUBLISHED: { label: 'Зарагдах',    bg: 'bg-blue-50',    text: 'text-blue-700',    dot: 'bg-blue-400' },
+  RESERVED:  { label: 'Захиалга',    bg: 'bg-violet-50',  text: 'text-violet-700',  dot: 'bg-violet-400' },
+  SOLD:      { label: 'Зарагдсан',   bg: 'bg-emerald-50', text: 'text-emerald-700', dot: 'bg-emerald-400' },
+};
+
+const STATUS_ICONS: Record<string, React.ReactNode> = {
+  ARRIVED:   <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.8}><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg>,
+  PUBLISHED: <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.8}><path d="M20.59 13.41l-7.17 7.17a2 2 0 01-2.83 0L2 12V2h10l8.59 8.59a2 2 0 010 2.82z"/><line x1="7" y1="7" x2="7.01" y2="7"/></svg>,
+  RESERVED:  <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.8}><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg>,
+  SOLD:      <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.8}><polyline points="20 6 9 17 4 12"/></svg>,
 };
 
 function fmt(n: string | number | null) {
@@ -22,34 +29,43 @@ function fmt(n: string | number | null) {
 }
 function fmtDate(d: string) {
   const dt = new Date(d);
-  return `${String(dt.getMonth()+1).padStart(2,'0')}.${String(dt.getDate()).padStart(2,'0')}`;
+  const days = ['Ням','Даваа','Мягмар','Лхагва','Пүрэв','Баасан','Бямба'];
+  return `${days[dt.getDay()]} ${String(dt.getMonth()+1).padStart(2,'0')}.${String(dt.getDate()).padStart(2,'0')}`;
 }
 
 export default function DashboardPage() {
-  const [summary, setSummary] = useState<Summary | null>(null);
+  const [summary, setSummary]   = useState<Summary | null>(null);
   const [vehicles, setVehicles] = useState<Vehicle[]>([]);
+  const [userName, setUserName] = useState('');
 
   useEffect(() => {
     api.getSummary().then(setSummary).catch(console.error);
     api.getVehicles().then(setVehicles).catch(console.error);
+    const u = JSON.parse(localStorage.getItem('user') || '{}');
+    setUserName(u.name || '');
   }, []);
 
   const counts = { ARRIVED: 0, PUBLISHED: 0, RESERVED: 0, SOLD: 0 };
   vehicles.forEach(v => { if (v.status in counts) counts[v.status as keyof typeof counts]++; });
-  const inStock = vehicles.filter(v => v.status !== 'SOLD').length;
-  const totalCost = vehicles.reduce((s, v) => s + Number(v.total_cost), 0);
-  const brands = [...new Set(vehicles.map(v => v.brand))].length;
+  const inStock    = vehicles.filter(v => v.status !== 'SOLD').length;
+  const totalCost  = vehicles.reduce((s, v) => s + Number(v.total_cost), 0);
+  const recent     = vehicles.slice(0, 6);
+
+  const hour = new Date().getHours();
+  const greeting = hour < 12 ? 'Өглөөний мэнд' : hour < 17 ? 'Өдрийн мэнд' : 'Оройн мэнд';
 
   return (
-    <div className="px-6 py-6 space-y-4">
+    <div className="px-6 py-6 space-y-5 max-w-5xl">
+
+      {/* Greeting */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-base font-semibold text-[#09090b]">Нүүр хуудас</h1>
-          <p className="text-xs text-[#71717a] mt-0.5">Борлуулалт, агуулахын ерөнхий байдал</p>
+          <h1 className="text-lg font-bold text-[#09090b]">{greeting}{userName ? `, ${userName.split(' ')[0]}` : ''}!</h1>
+          <p className="text-sm text-[#71717a] mt-0.5">Өнөөдрийн борлуулалт, агуулахын байдал</p>
         </div>
         <Link href="/vehicles/new"
-          className="flex items-center gap-1.5 bg-[#09090b] hover:bg-[#27272a] text-white text-sm font-medium px-3 py-1.5 rounded-md transition-colors">
-          <svg className="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2}><path d="M12 5v14M5 12h14"/></svg>
+          className="flex items-center gap-2 bg-[#09090b] hover:bg-[#27272a] text-white font-semibold px-4 py-2.5 rounded-xl transition-colors text-sm shadow-sm">
+          <svg className="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2.5}><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
           Машин нэмэх
         </Link>
       </div>
@@ -57,33 +73,44 @@ export default function DashboardPage() {
       {/* KPI cards */}
       <div className="grid grid-cols-4 gap-3">
         {[
-          { label: 'Нийт борлуулалт',    value: `${summary?.total_sold ?? 0} машин`,  sub: 'нийт зарагдсан' },
-          { label: 'Нийт орлого',         value: fmt(summary?.total_revenue ?? 0),     sub: null },
-          { label: 'Цэвэр ашиг',          value: fmt(summary?.total_profit ?? 0),      sub: `нэгж дундаж ${fmt(summary?.avg_profit ?? 0)}` },
-          { label: 'Агуулахын нийт үнэ',  value: fmt(totalCost),                       sub: `${inStock} машин` },
+          { label: 'Нийт борлуулалт', value: `${summary?.total_sold ?? 0}`, unit: 'машин',        color: 'bg-blue-50 border-blue-100',    textColor: 'text-blue-700',    icon: <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.8}><path d="M5 17H3a2 2 0 01-2-2v-4a2 2 0 012-2h16a2 2 0 012 2v4a2 2 0 01-2 2h-2"/><rect x="7" y="17" width="10" height="4" rx="2"/><path d="M5 11L7.5 5h9L19 11"/></svg> },
+          { label: 'Нийт орлого',     value: fmt(summary?.total_revenue ?? 0), unit: '',           color: 'bg-emerald-50 border-emerald-100', textColor: 'text-emerald-700', icon: <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.8}><rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg> },
+          { label: 'Цэвэр ашиг',      value: fmt(summary?.total_profit ?? 0),  unit: '',           color: 'bg-violet-50 border-violet-100',   textColor: 'text-violet-700',  icon: <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.8}><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/></svg> },
+          { label: 'Агуулахын үнэ',   value: fmt(totalCost),                   unit: `${inStock} машин`, color: 'bg-amber-50 border-amber-100', textColor: 'text-amber-700',   icon: <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.8}><path d="M21 16V8a2 2 0 00-1-1.73l-7-4a2 2 0 00-2 0l-7 4A2 2 0 003 8v8a2 2 0 001 1.73l7 4a2 2 0 002 0l7-4A2 2 0 0021 16z"/></svg> },
         ].map(c => (
-          <div key={c.label} className="bg-white border border-[#e4e4e7] rounded-lg px-5 py-4">
-            <div className="text-[11px] font-medium text-[#a1a1aa] uppercase tracking-wider mb-3">{c.label}</div>
-            <div className="text-2xl font-semibold text-[#09090b] tabular-nums leading-none">{c.value}</div>
-            {c.sub && <div className="text-xs text-[#a1a1aa] mt-1.5">{c.sub}</div>}
+          <div key={c.label} className={`rounded-xl border px-5 py-4 ${c.color}`}>
+            <div className="flex items-center justify-between mb-3">
+              <span className="text-xs font-medium text-[#71717a]">{c.label}</span>
+              <span className={c.textColor}>{c.icon}</span>
+            </div>
+            <div className={`text-2xl font-bold tabular-nums leading-none ${c.textColor}`}>{c.value}</div>
+            {c.unit && <div className="text-xs text-[#71717a] mt-1.5">{c.unit}</div>}
           </div>
         ))}
       </div>
 
-      {/* Status summary */}
-      <div className="bg-white border border-[#e4e4e7] rounded-lg overflow-hidden">
-        <div className="grid grid-cols-4 divide-x divide-[#e4e4e7]">
+      {/* Status overview */}
+      <div className="bg-white rounded-xl border border-[#e4e4e7] overflow-hidden shadow-sm">
+        <div className="px-5 py-3.5 border-b border-[#e4e4e7]">
+          <span className="text-sm font-semibold text-[#09090b]">Агуулахын байдал</span>
+        </div>
+        <div className="grid grid-cols-4 divide-x divide-[#f4f4f5]">
           {Object.entries(STATUS).map(([key, val]) => (
-            <div key={key} className="px-5 py-4">
-              <div className="flex items-center gap-2 mb-2">
-                <span className={`w-1.5 h-1.5 rounded-full ${val.dot}`} />
-                <span className="text-xs text-[#a1a1aa]">{val.label}</span>
+            <Link key={key} href={`/vehicles?status=${key}`}
+              className="px-5 py-4 hover:bg-[#fafafa] transition-colors">
+              <div className="flex items-center gap-2 mb-2.5">
+                <span className="text-[#a1a1aa]">{STATUS_ICONS[key]}</span>
+                <span className="text-xs text-[#71717a]">{val.label}</span>
               </div>
-              <div className="text-xl font-semibold text-[#09090b] tabular-nums">{counts[key as keyof typeof counts]}</div>
-            </div>
+              <div className="text-2xl font-bold text-[#09090b] tabular-nums">{counts[key as keyof typeof counts]}</div>
+              <div className={`inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-medium mt-1.5 ${val.bg} ${val.text}`}>
+                {key === 'SOLD' ? 'зарагдсан' : 'агуулахад'}
+              </div>
+            </Link>
           ))}
         </div>
-        <div className="flex h-1">
+        {/* Progress bar */}
+        <div className="flex h-1.5">
           {[
             { key: 'ARRIVED',   color: 'bg-amber-400' },
             { key: 'PUBLISHED', color: 'bg-blue-400' },
@@ -91,68 +118,84 @@ export default function DashboardPage() {
             { key: 'SOLD',      color: 'bg-emerald-400' },
           ].map(({ key, color }) => {
             const pct = vehicles.length ? (counts[key as keyof typeof counts] / vehicles.length) * 100 : 0;
-            return <div key={key} className={color} style={{ width: `${pct}%` }} />;
+            return <div key={key} className={`${color} transition-all`} style={{ width: `${pct}%` }} />;
           })}
         </div>
       </div>
 
-      {/* Bottom grid */}
-      <div className="grid grid-cols-[1fr_260px] gap-4">
-        {/* Recent vehicles — div-based, no table */}
-        <div className="bg-white border border-[#e4e4e7] rounded-lg overflow-hidden">
-          <div className="px-5 py-3 border-b border-[#e4e4e7] flex items-center justify-between">
-            <span className="text-xs font-medium text-[#71717a] uppercase tracking-wider">Сүүлд нэмэгдсэн</span>
-            <Link href="/vehicles" className="text-xs text-[#a1a1aa] hover:text-[#09090b] transition-colors">Бүгд харах</Link>
+      {/* Bottom: recent + quick actions */}
+      <div className="grid grid-cols-[1fr_220px] gap-4">
+        {/* Recent vehicles */}
+        <div className="bg-white rounded-xl border border-[#e4e4e7] overflow-hidden shadow-sm">
+          <div className="px-5 py-3.5 border-b border-[#e4e4e7] flex items-center justify-between">
+            <span className="text-sm font-semibold text-[#09090b]">Сүүлд нэмэгдсэн</span>
+            <Link href="/vehicles" className="text-xs text-[#a1a1aa] hover:text-[#09090b] transition-colors font-medium">
+              Бүгд →
+            </Link>
           </div>
-          <div>
-            {vehicles.slice(0, 8).map((v, i) => (
+          <div className="divide-y divide-[#f4f4f5]">
+            {recent.map(v => (
               <Link key={v.id} href={`/vehicles/${v.id}`}
-                className={`flex items-center gap-4 px-5 py-2.5 hover:bg-[#fafafa] transition-colors ${i > 0 ? 'border-t border-[#f4f4f5]' : ''}`}>
-                <div className="flex-1 min-w-0">
-                  <span className="text-sm text-[#09090b] font-medium">{v.brand} {v.model}</span>
-                  <span className="text-sm text-[#a1a1aa] ml-2">{v.year}</span>
+                className="flex items-center gap-4 px-5 py-3 hover:bg-[#fafafa] transition-colors group">
+                {/* Car avatar */}
+                <div className="w-9 h-9 rounded-lg bg-[#f4f4f5] flex items-center justify-center shrink-0 text-[#a1a1aa]">
+                  <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.8}><path d="M5 17H3a2 2 0 01-2-2v-4a2 2 0 012-2h16a2 2 0 012 2v4a2 2 0 01-2 2h-2"/><rect x="7" y="17" width="10" height="4" rx="2"/><path d="M5 11L7.5 5h9L19 11"/></svg>
                 </div>
-                <span className="flex items-center gap-1.5 shrink-0">
-                  <span className={`w-1.5 h-1.5 rounded-full ${STATUS[v.status]?.dot}`} />
-                  <span className={`text-xs ${STATUS[v.status]?.text}`}>{STATUS[v.status]?.label}</span>
+                <div className="flex-1 min-w-0">
+                  <div className="text-sm font-semibold text-[#09090b]">{v.brand} {v.model} <span className="text-[#a1a1aa] font-normal">{v.year}</span></div>
+                  <div className="text-xs text-[#a1a1aa]">{fmtDate(v.created_at)}</div>
+                </div>
+                <span className={`flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium ${STATUS[v.status]?.bg} ${STATUS[v.status]?.text}`}>
+                  <span className={`w-1 h-1 rounded-full ${STATUS[v.status]?.dot}`} />
+                  {STATUS[v.status]?.label}
                 </span>
-                <span className="text-xs text-[#a1a1aa] tabular-nums w-10 text-right shrink-0">{fmtDate(v.created_at)}</span>
               </Link>
             ))}
+            {recent.length === 0 && (
+              <div className="text-center text-[#a1a1aa] text-sm py-10">
+                Машин байхгүй байна
+              </div>
+            )}
           </div>
         </div>
 
-        {/* Sidebar */}
+        {/* Quick actions */}
         <div className="space-y-3">
-          <div className="bg-white border border-[#e4e4e7] rounded-lg p-4">
-            <div className="text-[11px] font-medium text-[#a1a1aa] uppercase tracking-wider mb-3">Дундаж үзүүлэлт</div>
-            <div className="space-y-2.5">
+          <div className="bg-white rounded-xl border border-[#e4e4e7] p-4 shadow-sm">
+            <div className="text-xs font-semibold text-[#a1a1aa] uppercase tracking-wider mb-3">Хурдан үйлдэл</div>
+            <div className="space-y-1.5">
               {[
-                ['Нэг машины дундаж ашиг', fmt(summary?.avg_profit ?? 0)],
-                ['Агуулахад байгаа', `${inStock} машин`],
-                ['Нийт марк', `${brands}`],
-              ].map(([k, v]) => (
-                <div key={k} className="flex items-center justify-between">
-                  <span className="text-xs text-[#71717a]">{k}</span>
-                  <span className="text-sm font-medium text-[#09090b] tabular-nums">{v}</span>
-                </div>
+                { href: '/vehicles/new', label: 'Машин нэмэх',  primary: true },
+                { href: '/vehicles',     label: 'Агуулах',       primary: false },
+                { href: '/sales',        label: 'Борлуулалт',    primary: false },
+                { href: '/customers',    label: 'Үйлчлүүлэгч',  primary: false },
+                { href: '/reports',      label: 'Тайлан',        primary: false },
+              ].map(({ href, label, primary }) => (
+                <Link key={href} href={href}
+                  className={`flex items-center justify-between w-full px-3 py-2 rounded-lg text-sm transition-colors ${
+                    primary
+                      ? 'bg-[#09090b] text-white font-medium hover:bg-[#27272a]'
+                      : 'text-[#52525b] hover:bg-[#f4f4f5] hover:text-[#09090b]'
+                  }`}>
+                  {label}
+                  {!primary && <svg className="w-3 h-3 text-[#d4d4d8]" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2}><path d="M9 18l6-6-6-6"/></svg>}
+                </Link>
               ))}
             </div>
           </div>
-          <div className="bg-white border border-[#e4e4e7] rounded-lg p-4">
-            <div className="text-[11px] font-medium text-[#a1a1aa] uppercase tracking-wider mb-3">Хурдан холбоос</div>
-            <div className="space-y-0.5">
+
+          {/* Mini stat */}
+          <div className="bg-white rounded-xl border border-[#e4e4e7] p-4 shadow-sm">
+            <div className="text-xs font-semibold text-[#a1a1aa] uppercase tracking-wider mb-3">Нэгж дундаж</div>
+            <div className="space-y-2.5">
               {[
-                ['/vehicles/new', 'Машин нэмэх'],
-                ['/vehicles',     'Бүх машин'],
-                ['/sales',        'Борлуулалт'],
-                ['/reports',      'Тайлан'],
-              ].map(([href, label]) => (
-                <Link key={href} href={href}
-                  className="flex items-center justify-between px-2 py-1.5 rounded-md text-sm text-[#71717a] hover:text-[#09090b] hover:bg-[#f4f4f5] transition-colors">
-                  {label}
-                  <svg className="w-3 h-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2}><path d="M9 18l6-6-6-6"/></svg>
-                </Link>
+                { label: 'Нэг машины ашиг', value: fmt(summary?.avg_profit ?? 0) },
+                { label: 'Агуулахад',        value: `${inStock} машин` },
+              ].map(({ label, value }) => (
+                <div key={label} className="flex items-center justify-between">
+                  <span className="text-xs text-[#71717a]">{label}</span>
+                  <span className="text-sm font-bold text-[#09090b] tabular-nums">{value}</span>
+                </div>
               ))}
             </div>
           </div>
