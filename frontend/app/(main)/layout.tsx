@@ -49,6 +49,7 @@ function MainLayoutInner({ children }: { children: React.ReactNode }) {
   const [userName, setUserName]   = useState('');
   const [userRole, setUserRole]   = useState('');
   const [companyName, setCompany] = useState('');
+  const [logoUrl, setLogoUrl]   = useState<string | null>(null);
   const [drawerOpen, setDrawer]   = useState(false);
 
   useEffect(() => {
@@ -58,7 +59,7 @@ function MainLayoutInner({ children }: { children: React.ReactNode }) {
     setUserName(u.name || ''); setUserRole(u.role || '');
     fetch(`${BACKEND}/api/settings`, {
       headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
-    }).then(r => r.json()).then(d => setCompany(d.name || '')).catch(() => {});
+    }).then(r => r.json()).then(d => { setCompany(d.name || ''); setLogoUrl(d.logo_url || null); }).catch(() => {});
   }, [router]);
 
   // Drawer хаах хуудас солигдоход
@@ -76,9 +77,15 @@ function MainLayoutInner({ children }: { children: React.ReactNode }) {
       {/* Компани */}
       <div className="px-5 py-5 border-b border-white/10">
         <div className="flex items-center gap-3">
-          <div className="w-10 h-10 bg-brand rounded-sm flex items-center justify-center shrink-0">
-            <span className="text-white text-base font-black">{companyName?.[0] || 'A'}</span>
-          </div>
+          {logoUrl ? (
+            <div className="w-10 h-10 bg-white rounded-sm flex items-center justify-center shrink-0 overflow-hidden p-1">
+              <img src={logoUrl.startsWith('http') ? logoUrl : `${BACKEND}${logoUrl}`} alt="" className="max-w-full max-h-full object-contain" />
+            </div>
+          ) : (
+            <div className="w-10 h-10 bg-brand rounded-sm flex items-center justify-center shrink-0">
+              <span className="text-white text-base font-black">{companyName?.[0] || 'A'}</span>
+            </div>
+          )}
           <div className="min-w-0">
             <div className="text-sm font-black text-white leading-tight truncate">{companyName || 'Удирдлага'}</div>
             <div className="text-[9px] font-bold text-white/40 uppercase tracking-[0.2em] mt-1">Админ самбар</div>

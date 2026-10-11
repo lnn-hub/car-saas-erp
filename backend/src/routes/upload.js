@@ -129,6 +129,28 @@ router.post('/team/:id', auth, upload.single('photo'), async (req, res) => {
   } catch (err) { res.status(500).json({ error: err.message }); }
 });
 
+// POST /api/upload/logo  (компанийн лого)
+router.post('/logo', auth, upload.single('logo'), async (req, res) => {
+  try {
+    if (!req.file) return res.status(400).json({ error: 'Зураг сонгоно уу' });
+    const { rows } = await pool.query('SELECT logo_url FROM companies WHERE id=$1', [req.user.company_id]);
+    const url = await saveImage(req.file.buffer, 'logo');
+    if (rows[0]?.logo_url) await deleteImage(rows[0].logo_url);
+    await pool.query('UPDATE companies SET logo_url=$1 WHERE id=$2', [url, req.user.company_id]);
+    res.json({ logo_url: url });
+  } catch (err) { res.status(500).json({ error: err.message }); }
+});
+
+// DELETE /api/upload/logo
+router.delete('/logo', auth, async (req, res) => {
+  try {
+    const { rows } = await pool.query('SELECT logo_url FROM companies WHERE id=$1', [req.user.company_id]);
+    if (rows[0]?.logo_url) await deleteImage(rows[0].logo_url);
+    await pool.query('UPDATE companies SET logo_url=NULL WHERE id=$1', [req.user.company_id]);
+    res.json({ ok: true });
+  } catch (err) { res.status(500).json({ error: err.message }); }
+});
+
 // DELETE /api/upload/image/:imageId
 router.delete('/image/:imageId', auth, async (req, res) => {
   try {

@@ -45,6 +45,26 @@ export default function SettingsPage() {
   const [mError, setMError]   = useState('');
   const fileRef = useRef<HTMLInputElement>(null);
 
+  const [logo, setLogo]       = useState<string | null>(null);
+  const [logoBusy, setLogoBusy] = useState(false);
+  const [logoErr, setLogoErr]   = useState('');
+  const logoRef = useRef<HTMLInputElement>(null);
+
+  async function pickLogo(file: File | undefined) {
+    if (!file) return;
+    setLogoBusy(true); setLogoErr('');
+    try { const r = await api.uploadLogo(file); setLogo(r.logo_url); }
+    catch (err: unknown) { setLogoErr(err instanceof Error ? err.message : 'Алдаа гарлаа'); }
+    finally { setLogoBusy(false); if (logoRef.current) logoRef.current.value = ''; }
+  }
+  async function dropLogo() {
+    if (!confirm('Логог устгах уу?')) return;
+    setLogoBusy(true); setLogoErr('');
+    try { await api.deleteLogo(); setLogo(null); }
+    catch (err: unknown) { setLogoErr(err instanceof Error ? err.message : 'Алдаа гарлаа'); }
+    finally { setLogoBusy(false); }
+  }
+
   const [seed, setSeed] = useState<{ running: boolean; done: number; total: number; message: string; error: string | null } | null>(null);
   const [seedErr, setSeedErr] = useState('');
 
@@ -71,6 +91,7 @@ export default function SettingsPage() {
         name: d.name || '', phone: d.phone || '', address: d.address || '',
         email: d.email || '', working_hours: d.working_hours || '', show_prices: d.show_prices !== false,
       });
+      setLogo(d.logo_url || null);
     }).finally(() => setLoading(false));
     loadTeam();
   }, []);
@@ -131,6 +152,31 @@ export default function SettingsPage() {
         <h1 className="text-base sm:text-lg font-bold text-[#09090b]">Тохиргоо</h1>
         <p className="text-xs sm:text-sm text-[#71717a] mt-0.5">Вэбсайтад харагдах мэдээлэл, манай баг</p>
       </div>
+
+      <Section title="Компанийн лого" hint="Header дээр харагдана">
+        <div className="p-5 flex items-center gap-5">
+          <div className="w-28 h-20 rounded-md border border-dashed border-[#d4d4d8] bg-[#fafafa] flex items-center justify-center overflow-hidden shrink-0">
+            {logo
+              ? <img src={photoSrc(logo)!} alt="Лого" className="max-w-full max-h-full object-contain" />
+              : <span className="text-[11px] text-[#a1a1aa]">Лого байхгүй</span>}
+          </div>
+          <div className="space-y-2">
+            <input ref={logoRef} type="file" accept="image/*" className="hidden" onChange={e => pickLogo(e.target.files?.[0])} />
+            <div className="flex gap-2">
+              <button type="button" onClick={() => logoRef.current?.click()} disabled={logoBusy}
+                className="text-xs font-black uppercase tracking-widest border border-[#e4e4e7] hover:border-brand hover:text-brand rounded-md px-4 py-2 transition-colors disabled:opacity-40">
+                {logoBusy ? 'Хүлээнэ үү...' : logo ? 'Лого солих' : 'Лого оруулах'}
+              </button>
+              {logo && (
+                <button type="button" onClick={dropLogo} disabled={logoBusy}
+                  className="text-xs font-bold text-[#a1a1aa] hover:text-red-600 px-2 disabled:opacity-40">Устгах</button>
+              )}
+            </div>
+            <div className="text-[11px] text-[#a1a1aa]">PNG (тунгалаг дэвсгэртэй) эсвэл JPG. Хэвтээ хэлбэртэй лого сайн харагдана.</div>
+            {logoErr && <div className="text-xs text-red-600">{logoErr}</div>}
+          </div>
+        </div>
+      </Section>
 
       <form onSubmit={handleSubmit} className="space-y-5">
         <Section title="Холбоо барих мэдээлэл" hint="Нүүр хуудсанд харагдана">

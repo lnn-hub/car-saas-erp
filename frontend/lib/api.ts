@@ -136,6 +136,24 @@ export const api = {
     return request(`/upload/image/${imageId}`, { method: 'DELETE' });
   },
 
+  uploadLogo: async (file: File) => {
+    const fd = new FormData();
+    fd.append('logo', file);
+    const res = await fetch(`${BACKEND}/api/upload/logo`, {
+      method: 'POST',
+      headers: { Authorization: `Bearer ${getToken() || ''}` },
+      body: fd,
+    });
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.error || 'Upload алдаа');
+    invalidateCache('/settings');
+    return data as { logo_url: string };
+  },
+  deleteLogo: () => {
+    invalidateCache('/settings');
+    return request('/upload/logo', { method: 'DELETE' });
+  },
+
   startDemoSeed: () => request('/admin/demo-seed', { method: 'POST' }),
   demoSeedStatus: () => request('/admin/demo-seed'),
 

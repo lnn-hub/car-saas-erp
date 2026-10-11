@@ -98,27 +98,62 @@ function IcEngine() {
   );
 }
 
+const PRICE_RANGES: { key: string; label: string; min: number; max: number }[] = [
+  { key: "lt50", label: "50 саяас бага", min: 0, max: 50_000_000 },
+  { key: "50_100", label: "50 - 100 сая", min: 50_000_000, max: 100_000_000 },
+  { key: "100_200", label: "100 - 200 сая", min: 100_000_000, max: 200_000_000 },
+  { key: "gt200", label: "200 саяас дээш", min: 200_000_000, max: Infinity },
+];
+const SORTS: { key: string; label: string }[] = [
+  { key: "", label: "Эрэмбэ: Шинэ" },
+  { key: "price_asc", label: "Үнэ: багаас их" },
+  { key: "price_desc", label: "Үнэ: ихээс бага" },
+  { key: "year_desc", label: "Он: шинэ нь эхэнд" },
+  { key: "km_asc", label: "Гүйлт: бага нь эхэнд" },
+];
+
 function HomeContent() {
   const { company, vehicles, loading, retrying } = useSiteData();
   const [search, setSearch] = useState("");
   const [filterFuel, setFilterFuel] = useState("");
   const [filterTrans, setFilterTrans] = useState("");
   const [filterBrand, setBrand] = useState("");
+  const [filterPrice, setPrice] = useState("");
+  const [sortBy, setSort] = useState("");
 
   const uniqueBrands = [...new Set(vehicles.map((v) => v.brand))].sort();
   const fuelsInUse = [...new Set(vehicles.map((v) => v.fuel_type))];
 
-  const filtered = vehicles.filter((v) => {
-    const q = search.toLowerCase();
-    return (
-      (!q || `${v.brand} ${v.model} ${v.year}`.toLowerCase().includes(q)) &&
-      (!filterFuel || v.fuel_type === filterFuel) &&
-      (!filterTrans || v.transmission === filterTrans) &&
-      (!filterBrand || v.brand === filterBrand)
-    );
-  });
+  const hasPrices = vehicles.some((v) => Number(v.total_cost) > 0);
+  const range = PRICE_RANGES.find((r) => r.key === filterPrice);
+  const priceOf = (v: (typeof vehicles)[number]) => Number(v.total_cost) || 0;
 
-  const hasFilter = search || filterFuel || filterTrans || filterBrand;
+  const filtered = vehicles
+    .filter((v) => {
+      const q = search.toLowerCase();
+      return (
+        (!q || `${v.brand} ${v.model} ${v.year}`.toLowerCase().includes(q)) &&
+        (!filterFuel || v.fuel_type === filterFuel) &&
+        (!filterTrans || v.transmission === filterTrans) &&
+        (!filterBrand || v.brand === filterBrand) &&
+        (!range || (priceOf(v) > 0 && priceOf(v) >= range.min && priceOf(v) < range.max))
+      );
+    })
+    .sort((a, b) => {
+      if (sortBy === "price_asc" || sortBy === "price_desc") {
+        const dir = sortBy === "price_asc" ? 1 : -1;
+        // үнэгүй машин үргэлж төгсгөлд
+        if (!priceOf(a) && !priceOf(b)) return 0;
+        if (!priceOf(a)) return 1;
+        if (!priceOf(b)) return -1;
+        return (priceOf(a) - priceOf(b)) * dir;
+      }
+      if (sortBy === "year_desc") return b.year - a.year;
+      if (sortBy === "km_asc") return (a.mileage || 0) - (b.mileage || 0);
+      return 0;
+    });
+
+  const hasFilter = search || filterFuel || filterTrans || filterBrand || filterPrice;
   const cname = company?.name || "AutoDealer";
 
   return (
@@ -258,6 +293,31 @@ function HomeContent() {
                 </option>
               ))}
             </select>
+            {hasPrices && (
+              <select
+                value={filterPrice}
+                onChange={(e) => setPrice(e.target.value)}
+                className="shrink-0 px-3 py-1.5 border border-gray-200 rounded-full text-xs text-gray-600 focus:outline-none focus:border-brand bg-white transition-colors font-semibold"
+              >
+                <option value="">Бүх үнэ</option>
+                {PRICE_RANGES.map((r) => (
+                  <option key={r.key} value={r.key}>
+                    {r.label}
+                  </option>
+                ))}
+              </select>
+            )}
+            <select
+              value={sortBy}
+              onChange={(e) => setSort(e.target.value)}
+              className="shrink-0 px-3 py-1.5 border border-gray-200 rounded-full text-xs text-gray-600 focus:outline-none focus:border-brand bg-white transition-colors font-semibold"
+            >
+              {SORTS.filter((o) => hasPrices || !o.key.startsWith("price")).map((o) => (
+                <option key={o.key} value={o.key}>
+                  {o.label}
+                </option>
+              ))}
+            </select>
             <div className="w-px h-5 bg-gray-200 shrink-0" />
             {/* Fuel chips */}
             {fuelsInUse.map((k) => (
@@ -301,6 +361,7 @@ function HomeContent() {
                   setFilterFuel("");
                   setFilterTrans("");
                   setBrand("");
+                  setPrice("");
                 }}
                 className="shrink-0 ml-auto px-3 py-1.5 rounded-full text-xs text-gray-400 border border-gray-200"
               >
@@ -353,6 +414,7 @@ function HomeContent() {
                   setFilterFuel("");
                   setFilterTrans("");
                   setBrand("");
+                  setPrice("");
                 }}
                 className="text-sm text-brand hover:underline"
               >
