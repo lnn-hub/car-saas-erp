@@ -3,11 +3,19 @@ const pool = require('../db/pool');
 const auth = require('../middleware/auth');
 
 router.get('/', auth, async (req, res) => {
-  const { rows } = await pool.query(
-    'SELECT * FROM customers WHERE company_id = $1 ORDER BY created_at DESC',
-    [req.user.company_id]
-  );
-  res.json(rows);
+  const { q } = req.query;
+  let query, params;
+  if (q) {
+    query  = `SELECT id, name, phone, email FROM customers WHERE company_id=$1 AND (name ILIKE $2 OR phone ILIKE $2) ORDER BY name LIMIT 20`;
+    params = [req.user.company_id, `%${q}%`];
+  } else {
+    query  = 'SELECT * FROM customers WHERE company_id=$1 ORDER BY created_at DESC';
+    params = [req.user.company_id];
+  }
+  try {
+    const { rows } = await pool.query(query, params);
+    res.json(rows);
+  } catch (err) { res.status(500).json({ error: err.message }); }
 });
 
 router.post('/', auth, async (req, res) => {

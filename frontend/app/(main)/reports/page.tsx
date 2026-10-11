@@ -66,14 +66,21 @@ interface DetailRow {
   total_cost: string; sale_price: string; net_profit: string;
   payment_type: string;
 }
+interface ActivityData {
+  registrations: { id: string; name: string; role: string; registered_count: string }[];
+  sales:         { id: string; name: string; role: string; sold_count: string; revenue: string; profit: string }[];
+  monthly_reg:   { month: string; name: string; count: string }[];
+  monthly_sales: { month: string; name: string; count: string; revenue: string }[];
+}
 
 const PAYMENT: Record<string,string> = { CASH:'Бэлэн', LOAN:'Зээл', LEASING:'Лизинг' };
 const AGING_COLORS: Record<string,string> = { '0-30':'bg-emerald-400','31-60':'bg-amber-400','61-90':'bg-orange-400','90+':'bg-red-400' };
 const AGING_TEXT:   Record<string,string> = { '0-30':'text-emerald-600','31-60':'text-amber-600','61-90':'text-orange-600','90+':'text-red-500' };
 
-type TabKey = 'overview' | 'detail' | 'daily' | 'monthly' | 'salesperson' | 'brands' | 'aging';
+type TabKey = 'overview' | 'detail' | 'daily' | 'monthly' | 'salesperson' | 'brands' | 'aging' | 'activity';
 const TABS: { key: TabKey; label: string }[] = [
   { key: 'overview',    label: 'Ерөнхий' },
+  { key: 'activity',   label: 'Үйл ажиллагаа' },
   { key: 'detail',      label: 'Дэлгэрэнгүй' },
   { key: 'daily',       label: 'Өдөр' },
   { key: 'monthly',     label: 'Сар' },
@@ -125,6 +132,7 @@ export default function ReportsPage() {
   const [salesperson, setSalesperson] = useState<PersonRow[]>([]);
   const [aging,       setAging]       = useState<{ rows: AgingRow[]; buckets: Record<string,AgingRow[]> } | null>(null);
   const [detail,      setDetail]      = useState<DetailRow[]>([]);
+  const [activity,    setActivity]    = useState<ActivityData | null>(null);
   const [loading, setLoading] = useState(false);
 
   // Init dates from preset
@@ -153,6 +161,7 @@ export default function ReportsPage() {
         get('/brands' + qs).then(setBrands).catch(console.error),
         get('/salesperson' + qs).then(setSalesperson).catch(console.error),
         get('/sales-detail' + qs).then(setDetail).catch(console.error),
+        get('/activity' + qs).then(setActivity).catch(console.error),
       ]);
     } finally { setLoading(false); }
   }, []);
@@ -723,6 +732,161 @@ export default function ReportsPage() {
                 {aging.rows.length === 0 && <tr><td colSpan={4} className="text-center text-[#a1a1aa] text-sm py-12">Агуулахад машин байхгүй байна</td></tr>}
               </tbody>
             </table>
+          </div>
+        </div>
+      )}
+
+      {/* ── ҮЙЛАЖИЛЛАГАА ── */}
+      {tab === 'activity' && (
+        <div className="space-y-5">
+          {/* Хэн хэдэн машин бүртгэсэн vs зарсан */}
+          <div className="grid grid-cols-2 gap-4">
+            {/* Бүртгэлт */}
+            <div className="bg-white border border-[#e4e4e7] rounded-lg overflow-hidden">
+              <div className="px-5 py-3 border-b border-[#e4e4e7] bg-[#fafafa] flex items-center gap-2">
+                <span className="w-1.5 h-1.5 rounded-full bg-blue-400" />
+                <span className="text-xs font-semibold text-[#09090b] uppercase tracking-wider">Машин бүртгэсэн</span>
+              </div>
+              <table className="w-full text-sm">
+                <thead><tr className="border-b border-[#e4e4e7]">
+                  <TH>Ажилтан</TH><TH right>Бүртгэсэн</TH>
+                </tr></thead>
+                <tbody>
+                  {(activity?.registrations || []).map((r, i) => (
+                    <tr key={r.id} className={`hover:bg-[#fafafa] ${i < (activity?.registrations.length||0)-1 ? 'border-b border-[#f4f4f5]' : ''}`}>
+                      <td className="px-5 py-3">
+                        <div className="flex items-center gap-2.5">
+                          <div className="w-7 h-7 rounded-full bg-blue-100 flex items-center justify-center text-xs font-semibold text-blue-600">
+                            {r.name.charAt(0)}
+                          </div>
+                          <div>
+                            <div className="text-sm text-[#09090b]">{r.name}</div>
+                            <div className="text-[10px] text-[#a1a1aa]">{r.role}</div>
+                          </div>
+                        </div>
+                      </td>
+                      <td className="px-5 py-3 text-right">
+                        <span className="text-sm font-semibold text-blue-600 tabular-nums">{r.registered_count}</span>
+                        <span className="text-[10px] text-[#a1a1aa] ml-1">машин</span>
+                      </td>
+                    </tr>
+                  ))}
+                  {!(activity?.registrations?.length) && (
+                    <tr><td colSpan={2} className="text-center text-[#a1a1aa] text-sm py-8">Бүртгэл байхгүй байна</td></tr>
+                  )}
+                </tbody>
+              </table>
+            </div>
+
+            {/* Борлуулалт */}
+            <div className="bg-white border border-[#e4e4e7] rounded-lg overflow-hidden">
+              <div className="px-5 py-3 border-b border-[#e4e4e7] bg-[#fafafa] flex items-center gap-2">
+                <span className="w-1.5 h-1.5 rounded-full bg-emerald-400" />
+                <span className="text-xs font-semibold text-[#09090b] uppercase tracking-wider">Машин зарсан</span>
+              </div>
+              <table className="w-full text-sm">
+                <thead><tr className="border-b border-[#e4e4e7]">
+                  <TH>Ажилтан</TH><TH right>Зарсан</TH><TH right>Орлого</TH><TH right>Ашиг</TH>
+                </tr></thead>
+                <tbody>
+                  {(activity?.sales || []).map((r, i) => (
+                    <tr key={r.id} className={`hover:bg-[#fafafa] ${i < (activity?.sales.length||0)-1 ? 'border-b border-[#f4f4f5]' : ''}`}>
+                      <td className="px-5 py-3">
+                        <div className="flex items-center gap-2.5">
+                          <div className="w-7 h-7 rounded-full bg-emerald-100 flex items-center justify-center text-xs font-semibold text-emerald-600">
+                            {r.name.charAt(0)}
+                          </div>
+                          <div>
+                            <div className="text-sm text-[#09090b]">{r.name}</div>
+                            <div className="text-[10px] text-[#a1a1aa]">{r.role}</div>
+                          </div>
+                        </div>
+                      </td>
+                      <td className="px-5 py-3 text-right">
+                        <span className="text-sm font-semibold text-[#09090b] tabular-nums">{r.sold_count}</span>
+                      </td>
+                      <td className="px-5 py-3 text-right text-emerald-600 tabular-nums text-xs">{fmt(r.revenue)}</td>
+                      <td className="px-5 py-3 text-right tabular-nums text-xs">
+                        <span className={Number(r.profit)>=0 ? 'text-emerald-600' : 'text-red-500'}>{fmt(r.profit)}</span>
+                      </td>
+                    </tr>
+                  ))}
+                  {!(activity?.sales?.length) && (
+                    <tr><td colSpan={4} className="text-center text-[#a1a1aa] text-sm py-8">Борлуулалт байхгүй байна</td></tr>
+                  )}
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          {/* Сар бүрийн дэлгэрэнгүй бүртгэл */}
+          <div className="grid grid-cols-2 gap-4">
+            {/* Сар бүр бүртгэсэн */}
+            <div className="bg-white border border-[#e4e4e7] rounded-lg overflow-hidden">
+              <div className="px-5 py-3 border-b border-[#e4e4e7] bg-[#fafafa]">
+                <span className="text-xs font-semibold text-[#09090b] uppercase tracking-wider">Сар бүрийн бүртгэл</span>
+              </div>
+              <table className="w-full text-sm">
+                <thead><tr className="border-b border-[#e4e4e7]">
+                  <TH>Сар</TH><TH>Ажилтан</TH><TH right>Тоо</TH>
+                </tr></thead>
+                <tbody>
+                  {(activity?.monthly_reg || []).map((r, i) => (
+                    <tr key={i} className={`hover:bg-[#fafafa] ${i < (activity?.monthly_reg.length||0)-1 ? 'border-b border-[#f4f4f5]' : ''}`}>
+                      <td className="px-5 py-3 text-[#71717a] tabular-nums text-xs whitespace-nowrap">{r.month}</td>
+                      <td className="px-5 py-3 text-[#09090b] text-sm">{r.name}</td>
+                      <td className="px-5 py-3 text-right text-blue-600 font-semibold tabular-nums">{r.count}</td>
+                    </tr>
+                  ))}
+                  {!(activity?.monthly_reg?.length) && (
+                    <tr><td colSpan={3} className="text-center text-[#a1a1aa] text-sm py-8">Өгөгдөл байхгүй байна</td></tr>
+                  )}
+                </tbody>
+              </table>
+            </div>
+
+            {/* Сар бүр зарсан */}
+            <div className="bg-white border border-[#e4e4e7] rounded-lg overflow-hidden">
+              <div className="px-5 py-3 border-b border-[#e4e4e7] bg-[#fafafa]">
+                <span className="text-xs font-semibold text-[#09090b] uppercase tracking-wider">Сар бүрийн борлуулалт</span>
+              </div>
+              <table className="w-full text-sm">
+                <thead><tr className="border-b border-[#e4e4e7]">
+                  <TH>Сар</TH><TH>Ажилтан</TH><TH right>Тоо</TH><TH right>Орлого</TH>
+                </tr></thead>
+                <tbody>
+                  {(activity?.monthly_sales || []).map((r, i) => (
+                    <tr key={i} className={`hover:bg-[#fafafa] ${i < (activity?.monthly_sales.length||0)-1 ? 'border-b border-[#f4f4f5]' : ''}`}>
+                      <td className="px-5 py-3 text-[#71717a] tabular-nums text-xs whitespace-nowrap">{r.month}</td>
+                      <td className="px-5 py-3 text-[#09090b] text-sm">{r.name}</td>
+                      <td className="px-5 py-3 text-right text-[#09090b] font-semibold tabular-nums">{r.count}</td>
+                      <td className="px-5 py-3 text-right text-emerald-600 tabular-nums text-xs">{fmt(r.revenue)}</td>
+                    </tr>
+                  ))}
+                  {!(activity?.monthly_sales?.length) && (
+                    <tr><td colSpan={4} className="text-center text-[#a1a1aa] text-sm py-8">Өгөгдөл байхгүй байна</td></tr>
+                  )}
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          {/* Excel export */}
+          <div className="flex justify-end">
+            <ExportBtn onClick={() => {
+              if (!activity) return;
+              const rows = [
+                ...activity.sales.map(r => ({
+                  'Төрөл': 'Борлуулалт', 'Ажилтан': r.name, 'Үүрэг': r.role,
+                  'Тоо': r.sold_count, 'Орлого': r.revenue, 'Ашиг': r.profit,
+                })),
+                ...activity.registrations.map(r => ({
+                  'Төрөл': 'Бүртгэл', 'Ажилтан': r.name, 'Үүрэг': r.role,
+                  'Тоо': r.registered_count, 'Орлого': '—', 'Ашиг': '—',
+                })),
+              ];
+              exportToExcel(rows, `Үйл_ажиллагаа_${from}_${to}`, 'Үйл ажиллагаа');
+            }} label="Excel татах" />
           </div>
         </div>
       )}
