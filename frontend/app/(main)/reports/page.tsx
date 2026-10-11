@@ -1,5 +1,6 @@
 'use client';
 import { useEffect, useState } from 'react';
+import { exportToExcel } from '@/lib/excel';
 
 const API = 'http://localhost:4000/api/reports';
 function token() { return typeof window !== 'undefined' ? localStorage.getItem('token') || '' : ''; }
@@ -32,6 +33,22 @@ const AGING_TEXT: Record<string, string> = {
   '0-30': 'text-emerald-400', '31-60': 'text-amber-400', '61-90': 'text-orange-400', '90+': 'text-red-400',
 };
 
+function IconDownload({ className = 'w-4 h-4' }) {
+  return <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.5}>
+    <path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4M7 10l5 5 5-5M12 15V3"/>
+  </svg>;
+}
+
+function ExportBtn({ onClick }: { onClick: () => void }) {
+  return (
+    <button onClick={onClick}
+      className="flex items-center gap-1.5 px-3 py-1.5 text-xs text-[#666] border border-[#222] rounded-md hover:border-[#333] hover:text-white transition-colors">
+      <IconDownload className="w-3.5 h-3.5" />
+      Excel татах
+    </button>
+  );
+}
+
 export default function ReportsPage() {
   const [summary, setSummary] = useState<Summary | null>(null);
   const [aging, setAging] = useState<{ rows: AgingRow[]; buckets: Record<string, AgingRow[]> } | null>(null);
@@ -47,6 +64,58 @@ export default function ReportsPage() {
   }, []);
 
   const maxRevenue = Math.max(...monthly.map(m => Number(m.revenue)), 1);
+
+  function exportOverview() {
+    if (!summary) return;
+    exportToExcel([
+      { 'Үзүүлэлт': 'Нийт борлуулалт (машин)',      'Утга': summary.total_sold },
+      { 'Үзүүлэлт': 'Нийт орлого (₮)',               'Утга': summary.total_revenue },
+      { 'Үзүүлэлт': 'Нийт цэвэр ашиг (₮)',           'Утга': summary.total_profit },
+      { 'Үзүүлэлт': 'Дундаж зарагдсан үнэ (₮)',      'Утга': summary.avg_sale_price },
+      { 'Үзүүлэлт': 'Дундаж ашиг нэг машинаас (₮)',  'Утга': summary.avg_profit },
+      { 'Үзүүлэлт': 'Нийт машин (агуулах)',           'Утга': summary.total_vehicles },
+      ...Object.entries(summary.status_counts || {}).map(([k, v]) => ({
+        'Үзүүлэлт': `Статус: ${k}`, 'Утга': v,
+      })),
+    ], `Ерөнхий_тайлан_${today()}`, 'Ерөнхий');
+  }
+
+  function exportAging() {
+    if (!aging) return;
+    exportToExcel(aging.rows.map(r => ({
+      'Марк':        r.brand,
+      'Загвар':      r.model,
+      'Он':          r.year,
+      'Статус':      r.status,
+      'Хоног':       r.days_in_stock,
+      'Бүлэг':       Number(r.days_in_stock) <= 30 ? '0-30' : Number(r.days_in_stock) <= 60 ? '31-60' : Number(r.days_in_stock) <= 90 ? '61-90' : '90+',
+      'Нийт өртөг':  r.total_cost,
+    })), `Агуулахын_нас_${today()}`, 'Aging');
+  }
+
+  function exportMonthly() {
+    exportToExcel(monthly.map(m => ({
+      'Сар':          m.month,
+      'Зарагдсан':    m.sold_count,
+      'Орлого (₮)':  m.revenue,
+      'Ашиг (₮)':    m.profit,
+    })), `Сарын_дүн_${today()}`, 'Сарын тайлан');
+  }
+
+  function exportBrands() {
+    exportToExcel(brands.map(b => ({
+      'Марк':                    b.brand,
+      'Зарагдсан':               b.sold_count,
+      'Нийт орлого (₮)':        b.revenue,
+      'Дундаж ашиг (₮)':        b.avg_profit,
+      'Дундаж зарагдах хоног':   b.avg_days_to_sell ? Math.round(Number(b.avg_days_to_sell)) : '—',
+    })), `Марк_${today()}`, 'Брэнд');
+  }
+
+  function today() {
+    const d = new Date();
+    return `${d.getFullYear()}.${String(d.getMonth()+1).padStart(2,'0')}.${String(d.getDate()).padStart(2,'0')}`;
+  }
 
   return (
     <div className="px-8 py-7">
@@ -70,6 +139,7 @@ export default function ReportsPage() {
       {/* OVERVIEW */}
       {tab === 'overview' && (
         <div className="space-y-4">
+          <div className="flex justify-end"><ExportBtn onClick={exportOverview} /></div>
           <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
             {[
               { label: 'Нийт борлуулалт',     value: `${fmtNum(summary?.total_sold)} машин` },
@@ -143,6 +213,7 @@ export default function ReportsPage() {
       {/* AGING */}
       {tab === 'aging' && aging && (
         <div className="space-y-4">
+          <div className="flex justify-end"><ExportBtn onClick={exportAging} /></div>
           {/* Bucket summary */}
           <div className="grid grid-cols-4 gap-3">
             {['0-30', '31-60', '61-90', '90+'].map(b => (
@@ -200,6 +271,7 @@ export default function ReportsPage() {
       {/* MONTHLY */}
       {tab === 'monthly' && (
         <div className="space-y-4">
+          <div className="flex justify-end"><ExportBtn onClick={exportMonthly} /></div>
           {/* Bar chart */}
           <div className="bg-[#111] border border-[#1e1e1e] rounded-lg p-5">
             <div className="text-xs font-medium text-[#555] uppercase tracking-wider mb-5">Сарын орлого</div>
@@ -259,6 +331,8 @@ export default function ReportsPage() {
 
       {/* BRANDS */}
       {tab === 'brands' && (
+        <div className="space-y-4">
+        <div className="flex justify-end"><ExportBtn onClick={exportBrands} /></div>
         <div className="bg-[#111] border border-[#1e1e1e] rounded-lg overflow-hidden">
           <div className="px-5 py-3.5 border-b border-[#1e1e1e]">
             <span className="text-xs font-medium text-[#555] uppercase tracking-wider">Марк тус бүрийн гүйцэтгэл</span>
@@ -292,6 +366,7 @@ export default function ReportsPage() {
               )}
             </tbody>
           </table>
+        </div>
         </div>
       )}
     </div>
