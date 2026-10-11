@@ -5,6 +5,9 @@ import { api } from "@/lib/api";
 import { IconArrowLeft } from "@/components/icons";
 import { COLORS } from "@/lib/vehicle-data";
 
+const FILES = process.env.NEXT_PUBLIC_API_URL || "http://localhost:4000";
+const fileSrc = (u: string) => (u.startsWith("http") ? u : `${FILES}${u}`);
+
 interface Cost {
   id: string;
   cost_type: string;
@@ -29,6 +32,10 @@ interface Vehicle {
   transmission: string;
   status: string;
   description: string;
+  engine_cc: number | null;
+  has_plates: boolean;
+  manufactured_date: string | null;
+  images: { id: string; url: string; is_main: boolean }[];
   costs: Cost[];
 }
 
@@ -79,6 +86,14 @@ function VehicleDetailContent() {
   });
   const [showSale, setShowSale] = useState(false);
   const [msg, setMsg] = useState("");
+  const [photoBusy, setPhotoBusy] = useState("");
+  const [editOpen, setEditOpen] = useState(false);
+  const [editBusy, setEditBusy] = useState(false);
+  const [edit, setEdit] = useState({
+    brand: "", model: "", year: "", mileage: "", color: "", fuel_type: "PETROL",
+    transmission: "AUTO", engine_l: "", manufactured_date: "", has_plates: false, description: "",
+  });
+  const photoRef = useRef<HTMLInputElement>(null);
   const [saleSuccess, setSaleSuccess] = useState(false);
 
   // Sale form state
@@ -178,6 +193,65 @@ function VehicleDetailContent() {
     }
   }
 
+  async function addPhotos(files: FileList | null) {
+    if (!files || !files.length) return;
+    const list = Array.from(files);
+    let failed = 0;
+    for (const [i, f] of list.entries()) {
+      setPhotoBusy(`Зураг оруулж байна ${i + 1}/${list.length}...`);
+      try { await api.uploadVehicleImage(id, f); } catch { failed++; }
+    }
+    setPhotoBusy("");
+    if (photoRef.current) photoRef.current.value = "";
+    setMsg(failed ? `${failed} зураг оруулж чадсангүй` : "Зураг нэмэгдлээ");
+    load();
+  }
+  async function makeMain(imageId: string) {
+    try { await api.setMainImage(imageId); setMsg("Үндсэн зураг солигдлоо"); load(); }
+    catch (err: unknown) { setMsg(err instanceof Error ? err.message : "Алдаа"); }
+  }
+  async function removePhoto(imageId: string) {
+    if (!confirm("Энэ зургийг устгах уу?")) return;
+    try { await api.deleteVehicleImage(imageId); setMsg("Зураг устгагдлаа"); load(); }
+    catch (err: unknown) { setMsg(err instanceof Error ? err.message : "Алдаа"); }
+  }
+  function openEdit() {
+    if (!vehicle) return;
+    setEdit({
+      brand: vehicle.brand, model: vehicle.model, year: String(vehicle.year), mileage: String(vehicle.mileage ?? 0),
+      color: vehicle.color || "", fuel_type: vehicle.fuel_type, transmission: vehicle.transmission,
+      engine_l: vehicle.engine_cc ? String(Number(vehicle.engine_cc) / 1000) : "",
+      manufactured_date: vehicle.manufactured_date ? vehicle.manufactured_date.slice(0, 10) : "",
+      has_plates: !!vehicle.has_plates, description: vehicle.description || "",
+    });
+    setEditOpen(true);
+  }
+  async function saveEdit(e: React.FormEvent) {
+    e.preventDefault();
+    setEditBusy(true);
+    try {
+      await api.updateVehicle(id, {
+        brand: edit.brand.trim(), model: edit.model.trim(), year: Number(edit.year),
+        mileage: Number(edit.mileage) || 0, color: edit.color, fuel_type: edit.fuel_type,
+        transmission: edit.transmission,
+        engine_cc: edit.engine_l ? Math.round(Number(edit.engine_l) * 1000) : null,
+        manufactured_date: edit.manufactured_date || null, has_plates: edit.has_plates,
+        description: edit.description,
+      });
+      setEditOpen(false);
+      setMsg("Мэдээлэл хадгалагдлаа");
+      load();
+    } catch (err: unknown) {
+      setMsg(err instanceof Error ? err.message : "Алдаа");
+    } finally { setEditBusy(false); }
+  }
+  async function removeVehicle() {
+    if (!vehicle) return;
+    if (!confirm(`"${vehicle.brand} ${vehicle.model} ${vehicle.year}"-г бүр мөсөн устгах уу? Энэ үйлдлийг буцаах боломжгүй.`)) return;
+    try { await api.deleteVehicle(id); router.push("/vehicles"); }
+    catch (err: unknown) { setMsg(err instanceof Error ? err.message : "Алдаа"); }
+  }
+
   function openSaleModal() {
     setShowSale(true);
     setSaleSuccess(false);
@@ -263,6 +337,45 @@ function VehicleDetailContent() {
         </div>
       )}
 
+      {/* Gallery */}
+      <div className="bg-white border border-[#e4e4e7] rounded-lg overflow-hidden">
+        <div className="px-4 py-3 border-b border-[#e4e4e7] flex items-center justify-between gap-3">
+          <span className="text-xs font-medium text-[#a1a1aa] uppercase tracking-wider">
+            Зураг ({vehicle.images?.length || 0})
+          </span>
+          <div>
+            <input ref={photoRef} type="file" accept="image/*" multiple className="hidden"
+              onChange={(e) => addPhotos(e.target.files)} />
+            <button type="button" onClick={() => photoRef.current?.click()} disabled={!!photoBusy}
+              className="text-xs font-black uppercase tracking-widest text-brand hover:text-brand-dark disabled:opacity-40">
+              {photoBusy || "+ Зураг нэмэх"}
+            </button>
+          </div>
+        </div>
+        {vehicle.images?.length ? (
+          <div className="p-3 grid grid-cols-2 sm:grid-cols-3 gap-3">
+            {vehicle.images.map((img) => (
+              <div key={img.id} className="group relative aspect-[4/3] rounded-md overflow-hidden border border-[#e4e4e7] bg-[#f4f4f5]">
+                <img src={fileSrc(img.url)} alt="" className="w-full h-full object-cover" loading="lazy" />
+                {img.is_main && (
+                  <span className="absolute top-2 left-2 bg-brand text-white text-[10px] font-black uppercase tracking-wider px-2 py-0.5 rounded-sm">Үндсэн</span>
+                )}
+                <div className="absolute inset-x-0 bottom-0 flex gap-1 p-1.5 bg-gradient-to-t from-black/70 to-transparent opacity-100 sm:opacity-0 sm:group-hover:opacity-100 transition-opacity">
+                  {!img.is_main && (
+                    <button type="button" onClick={() => makeMain(img.id)}
+                      className="flex-1 bg-white/90 hover:bg-white text-[#111] text-[10px] font-bold py-1 rounded-sm">Үндсэн болгох</button>
+                  )}
+                  <button type="button" onClick={() => removePhoto(img.id)}
+                    className="bg-white/90 hover:bg-red-600 hover:text-white text-red-600 text-[10px] font-bold px-2.5 py-1 rounded-sm">Устгах</button>
+                </div>
+              </div>
+            ))}
+          </div>
+        ) : (
+          <div className="text-center text-[#a1a1aa] text-sm py-10">Зураг оруулаагүй байна</div>
+        )}
+      </div>
+
       {/* Info grid */}
       <div className="bg-white border border-[#e4e4e7] rounded-lg overflow-hidden">
         <div className="px-4 py-3 border-b border-[#e4e4e7]">
@@ -290,6 +403,52 @@ function VehicleDetailContent() {
             </div>
           ))}
         </div>
+      </div>
+
+      {/* Edit info */}
+      <div className="bg-white border border-[#e4e4e7] rounded-lg overflow-hidden">
+        <div className="px-4 py-3 border-b border-[#e4e4e7] flex items-center justify-between">
+          <span className="text-xs font-medium text-[#a1a1aa] uppercase tracking-wider">Мэдээлэл засах</span>
+          {!editOpen && (
+            <button type="button" onClick={openEdit}
+              className="text-xs font-black uppercase tracking-widest text-brand hover:text-brand-dark">Засах</button>
+          )}
+        </div>
+        {editOpen && (
+          <form onSubmit={saveEdit} className="p-4 grid grid-cols-2 gap-3">
+            <input value={edit.brand} onChange={(e) => setEdit((p) => ({ ...p, brand: e.target.value }))} placeholder="Марк" className={inp} required />
+            <input value={edit.model} onChange={(e) => setEdit((p) => ({ ...p, model: e.target.value }))} placeholder="Загвар" className={inp} required />
+            <input type="number" value={edit.year} onChange={(e) => setEdit((p) => ({ ...p, year: e.target.value }))} placeholder="Он" className={inp} required />
+            <input type="number" value={edit.mileage} onChange={(e) => setEdit((p) => ({ ...p, mileage: e.target.value }))} placeholder="Гүйлт (км)" className={inp} />
+            <select value={edit.color} onChange={(e) => setEdit((p) => ({ ...p, color: e.target.value }))} className={inp}>
+              <option value="">Өнгө</option>
+              {COLORS.map((c) => <option key={c.value} value={c.value}>{c.value}</option>)}
+            </select>
+            <input type="number" step="0.1" value={edit.engine_l} onChange={(e) => setEdit((p) => ({ ...p, engine_l: e.target.value }))} placeholder="Хөдөлгүүр (литр)" className={inp} />
+            <select value={edit.fuel_type} onChange={(e) => setEdit((p) => ({ ...p, fuel_type: e.target.value }))} className={inp}>
+              {Object.entries(FUEL_LABELS).map(([k, v]) => <option key={k} value={k}>{v}</option>)}
+            </select>
+            <select value={edit.transmission} onChange={(e) => setEdit((p) => ({ ...p, transmission: e.target.value }))} className={inp}>
+              <option value="AUTO">Автомат</option>
+              <option value="MANUAL">Механик</option>
+            </select>
+            <input type="date" value={edit.manufactured_date} onChange={(e) => setEdit((p) => ({ ...p, manufactured_date: e.target.value }))} className={inp} />
+            <label className="flex items-center gap-2 text-sm text-[#52525b]">
+              <input type="checkbox" checked={edit.has_plates} onChange={(e) => setEdit((p) => ({ ...p, has_plates: e.target.checked }))} className="accent-[#8b1e2d]" />
+              Улсын дугаартай
+            </label>
+            <textarea value={edit.description} onChange={(e) => setEdit((p) => ({ ...p, description: e.target.value }))} rows={6}
+              placeholder={"Тайлбар. Онцлох тоноглолыг мөр бүрийн эхэнд • тэмдэгтэй бичнэ."} className={inp + " col-span-2 resize-y"} />
+            <div className="col-span-2 flex gap-2">
+              <button type="button" onClick={() => setEditOpen(false)}
+                className="flex-1 py-2.5 text-sm text-[#71717a] border border-[#e4e4e7] rounded-md hover:border-[#d4d4d8]">Болих</button>
+              <button type="submit" disabled={editBusy}
+                className="flex-1 py-2.5 text-xs font-black uppercase tracking-widest bg-brand hover:bg-brand-dark disabled:opacity-40 text-white rounded-md">
+                {editBusy ? "Хадгалж байна..." : "Хадгалах"}
+              </button>
+            </div>
+          </form>
+        )}
       </div>
 
       {/* Status change */}
@@ -423,6 +582,16 @@ function VehicleDetailContent() {
             </button>
           </form>
         )}
+      </div>
+
+      {/* Danger zone */}
+      <div className="bg-white border border-red-100 rounded-lg p-4 flex items-center justify-between gap-4">
+        <div>
+          <div className="text-sm font-bold text-[#09090b]">Машин устгах</div>
+          <div className="text-xs text-[#a1a1aa] mt-0.5">Зураг, зардлын хамт бүрмөсөн устна. Борлуулалттай машиныг устгах боломжгүй.</div>
+        </div>
+        <button type="button" onClick={removeVehicle}
+          className="shrink-0 text-xs font-black uppercase tracking-widest text-red-600 border border-red-200 hover:bg-red-600 hover:text-white hover:border-red-600 px-4 py-2 rounded-md transition-colors">Устгах</button>
       </div>
 
       {/* ── SALE MODAL ── */}

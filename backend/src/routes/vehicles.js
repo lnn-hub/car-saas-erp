@@ -70,6 +70,52 @@ router.post('/', auth, async (req, res) => {
   }
 });
 
+// PATCH /api/vehicles/:id — мэдээлэл засах
+const EDITABLE = ['brand', 'model', 'year', 'mileage', 'color', 'fuel_type', 'transmission',
+                  'engine_cc', 'description', 'has_plates', 'manufactured_date', 'arrived_at'];
+router.patch('/:id', auth, async (req, res) => {
+  const sets = [], vals = [];
+  for (const key of EDITABLE) {
+    if (req.body[key] === undefined) continue;
+    let v = req.body[key];
+    if (v === '') v = null;
+    if (['brand', 'model', 'year'].includes(key) && v === null)
+      return res.status(400).json({ error: 'Марк, загвар, он хоосон байж болохгүй' });
+    vals.push(v);
+    sets.push(`${key} = $${vals.length}`);
+  }
+  if (!sets.length) return res.status(400).json({ error: 'Өөрчлөх мэдээлэл алга' });
+  try {
+    vals.push(req.params.id, req.user.company_id);
+    const { rows } = await pool.query(
+      `UPDATE vehicles SET ${sets.join(', ')}, updated_at = NOW()
+       WHERE id = $${vals.length - 1} AND company_id = $${vals.length} RETURNING *`,
+      vals
+    );
+    if (!rows[0]) return res.status(404).json({ error: 'Машин олдсонгүй' });
+    res.json(rows[0]);
+  } catch (err) { res.status(500).json({ error: err.message }); }
+});
+
+// DELETE /api/vehicles/:id — борлуулалтгүй машиныг устгах
+router.delete('/:id', auth, async (req, res) => {
+  try {
+    const { rows } = await pool.query(
+      'SELECT id FROM vehicles WHERE id=$1 AND company_id=$2', [req.params.id, req.user.company_id]
+    );
+    if (!rows[0]) return res.status(404).json({ error: 'Машин олдсонгүй' });
+    const { rows: sold } = await pool.query('SELECT 1 FROM sales WHERE vehicle_id=$1 LIMIT 1', [req.params.id]);
+    if (sold[0]) return res.status(400).json({ error: 'Борлуулалтын түүхтэй машиныг устгах боломжгүй' });
+
+    const { rows: imgs } = await pool.query('SELECT url FROM vehicle_images WHERE vehicle_id=$1', [req.params.id]);
+    for (const img of imgs) {
+      try { await require('./upload').deleteImage(img.url); } catch (_) {}
+    }
+    await pool.query('DELETE FROM vehicles WHERE id=$1', [req.params.id]);
+    res.json({ ok: true });
+  } catch (err) { res.status(500).json({ error: err.message }); }
+});
+
 // PATCH /api/vehicles/:id/status — статус өөрчлөх
 router.patch('/:id/status', auth, async (req, res) => {
   const { status } = req.body;

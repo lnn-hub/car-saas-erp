@@ -172,4 +172,5 @@ router.patch('/image/:imageId/main', auth, async (req, res) => {
   } catch (err) { res.status(500).json({ error: err.message }); }
 });
 
+router.deleteImage = deleteImage;
 module.exports = router;

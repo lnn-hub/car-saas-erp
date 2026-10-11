@@ -106,6 +106,36 @@ export const api = {
     return request('/sales', { method: 'POST', body: JSON.stringify(data) });
   },
 
+  updateVehicle: (id: string, data: object) => {
+    invalidateCache('/vehicles');
+    return request(`/vehicles/${id}`, { method: 'PATCH', body: JSON.stringify(data) });
+  },
+  deleteVehicle: (id: string) => {
+    invalidateCache('/vehicles');
+    return request(`/vehicles/${id}`, { method: 'DELETE' });
+  },
+  uploadVehicleImage: async (id: string, file: File) => {
+    const fd = new FormData();
+    fd.append('images', file);
+    const res = await fetch(`${BACKEND}/api/upload/vehicle/${id}`, {
+      method: 'POST',
+      headers: { Authorization: `Bearer ${getToken() || ''}` },
+      body: fd,
+    });
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.error || 'Upload алдаа');
+    invalidateCache('/vehicles');
+    return data;
+  },
+  setMainImage: (imageId: string) => {
+    invalidateCache('/vehicles');
+    return request(`/upload/image/${imageId}/main`, { method: 'PATCH' });
+  },
+  deleteVehicleImage: (imageId: string) => {
+    invalidateCache('/vehicles');
+    return request(`/upload/image/${imageId}`, { method: 'DELETE' });
+  },
+
   startDemoSeed: () => request('/admin/demo-seed', { method: 'POST' }),
   demoSeedStatus: () => request('/admin/demo-seed'),
 
