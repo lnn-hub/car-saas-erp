@@ -65,8 +65,12 @@ export default function SettingsPage() {
     finally { setLogoBusy(false); }
   }
 
-  const [seed, setSeed] = useState<{ running: boolean; done: number; total: number; message: string; error: string | null } | null>(null);
+  const [seed, setSeed] = useState<{ running: boolean; done: number; total: number; message: string; error: string | null; failed?: string[]; finishedAt?: string | null } | null>(null);
   const [seedErr, setSeedErr] = useState('');
+
+  useEffect(() => {
+    api.demoSeedStatus().then(setSeed).catch(() => {});
+  }, []);
 
   useEffect(() => {
     if (!seed?.running) return;
@@ -269,8 +273,14 @@ export default function SettingsPage() {
               <div className="text-xs text-[#71717a] mt-1.5">{seed.message} ({seed.done}/{seed.total || 10})</div>
             </div>
           )}
-          {seed && !seed.running && !seed.error && seed.total > 0 && (
+          {seed && !seed.running && !seed.error && seed.total > 0 && !(seed.failed?.length) && (
             <div className="bg-[#f0fdf4] border border-[#bbf7d0] rounded-lg px-3 py-2 text-xs text-[#16a34a]">Дууслаа - нүүр хуудсыг шинэчилж харна уу</div>
+          )}
+          {!!seed?.failed?.length && !seed.running && (
+            <div className="bg-amber-50 border border-amber-200 rounded-lg px-3 py-2 text-xs text-amber-800 space-y-1">
+              <div className="font-bold">{seed.failed.length} машин амжилтгүй болсон:</div>
+              {seed.failed.map((f) => <div key={f}>{f}</div>)}
+            </div>
           )}
           {(seed?.error || seedErr) && (
             <div className="bg-red-50 border border-red-200 rounded-lg px-3 py-2 text-xs text-red-600">{seed?.error || seedErr}</div>

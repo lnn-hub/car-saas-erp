@@ -118,28 +118,39 @@ async function seedDemo({ companyId, onProgress = () => {} } = {}) {
 
   await pool.query("DELETE FROM vehicles WHERE company_id=$1 AND vin LIKE 'DEMO%'", [cid]);
 
+  const failed = [];
   for (const [n, c] of CARS.entries()) {
     onProgress({ done: n, total: CARS.length, message: `${c.brand} ${c.model} оруулж байна...` });
     const imgs = IMAGES[c.key];
     const credit = [...new Set(imgs.map(x => `${x.author} (${x.license})`))].join(', ');
     const description = `${c.text}\n\n${c.list.map(l => `• ${l}`).join('\n')}\n\nЗургийн эх сурвалж: Wikimedia Commons - ${credit}.`;
     const vin = `DEMO${c.key.toUpperCase().padEnd(8, '0').slice(0, 8)}${c.year}${n}`;
-    const { rows: [v] } = await pool.query(
-      `INSERT INTO vehicles (company_id, vin, brand, model, year, mileage, color, fuel_type, transmission,
-                             engine_cc, status, description, arrived_at, manufactured_date, has_plates, created_by)
-       VALUES ($1,$2,$3,$4,$5,$6,$7,$8,'AUTO',$9,$10,$11, CURRENT_DATE - $12::int, $13, $14, $15) RETURNING id`,
-      [cid, vin, c.brand, c.model, c.year, c.mileage, c.color, c.fuel, c.cc, c.status, description,
-       10 + n * 3, c.mfg, n % 2 === 0, admin?.id || null]
-    );
-    for (const [type, amount] of c.costs)
-      await pool.query('INSERT INTO vehicle_costs (vehicle_id, cost_type, amount, currency, created_by) VALUES ($1,$2,$3,\'MNT\',$4)', [v.id, type, amount, admin?.id || null]);
-    for (const [i, src] of imgs.entries()) {
-      const url = await ensureImage(c.key, i, src);
-      await pool.query('INSERT INTO vehicle_images (vehicle_id, url, is_main, sort_order) VALUES ($1,$2,$3,$4)', [v.id, url, i === 0, i]);
+    let vehicleId = null;
+    try {
+      const { rows: [v] } = await pool.query(
+        `INSERT INTO vehicles (company_id, vin, brand, model, year, mileage, color, fuel_type, transmission,
+                               engine_cc, status, description, arrived_at, manufactured_date, has_plates, created_by)
+         VALUES ($1,$2,$3,$4,$5,$6,$7,$8,'AUTO',$9,$10,$11, CURRENT_DATE - $12::int, $13, $14, $15) RETURNING id`,
+        [cid, vin, c.brand, c.model, c.year, c.mileage, c.color, c.fuel, c.cc, c.status, description,
+         10 + n * 3, c.mfg, n % 2 === 0, admin?.id || null]
+      );
+      vehicleId = v.id;
+      for (const [type, amount] of c.costs)
+        await pool.query('INSERT INTO vehicle_costs (vehicle_id, cost_type, amount, currency, created_by) VALUES ($1,$2,$3,\'MNT\',$4)', [v.id, type, amount, admin?.id || null]);
+      for (const [i, src] of imgs.entries()) {
+        const url = await ensureImage(c.key, i, src);
+        await pool.query('INSERT INTO vehicle_images (vehicle_id, url, is_main, sort_order) VALUES ($1,$2,$3,$4)', [v.id, url, i === 0, i]);
+      }
+      console.log(`+ ${c.brand} ${c.model} ${c.year} (${c.status}) - ${imgs.length} зураг`);
+    } catch (err) {
+      console.error(`! ${c.brand} ${c.model}:`, err.message);
+      failed.push(`${c.brand} ${c.model}: ${err.message}`);
+      // Зураггүй хагас машин үлдээхгүй
+      if (vehicleId) await pool.query('DELETE FROM vehicles WHERE id=$1', [vehicleId]).catch(() => {});
     }
-    console.log(`+ ${c.brand} ${c.model} ${c.year} (${c.status}) - ${imgs.length} зураг`);
   }
   onProgress({ done: CARS.length, total: CARS.length, message: 'Дууслаа' });
+  return { failed };
 }
 
 module.exports = { seedDemo, DEMO_COUNT: CARS.length };
@@ -151,7 +162,7 @@ if (require.main === module) {
     process.exit(1);
   }
   seedDemo()
-    .then(() => pool.end())
+    .then(r => { if (r.failed.length) console.error(`${r.failed.length} машин амжилтгүй`); return pool.end(); })
     .then(() => console.log('Дууслаа.'))
     .catch(e => { console.error(e); process.exit(1); });
 }

@@ -3,7 +3,7 @@ const pool   = require('../db/pool');
 const auth   = require('../middleware/auth');
 const { seedDemo } = require('../../scripts/seed-demo');
 
-let state = { running: false, done: 0, total: 0, message: '', error: null, finishedAt: null };
+let state = { running: false, done: 0, total: 0, message: '', error: null, failed: [], finishedAt: null };
 
 // Нийтийн сайтад харагддаг (анхны) компанийн админ л ажиллуулна
 async function guard(req, res, next) {
@@ -20,13 +20,13 @@ router.get('/demo-seed', auth, guard, (req, res) => res.json(state));
 
 router.post('/demo-seed', auth, guard, (req, res) => {
   if (state.running) return res.status(409).json({ error: 'Аль хэдийн ажиллаж байна', ...state });
-  state = { running: true, done: 0, total: 0, message: 'Эхэлж байна...', error: null, finishedAt: null };
+  state = { running: true, done: 0, total: 0, message: 'Эхэлж байна...', error: null, failed: [], finishedAt: null };
 
   seedDemo({
     companyId: req.user.company_id,
     onProgress: ({ done, total, message }) => { state = { ...state, done, total, message }; },
   })
-    .then(() => { state = { ...state, running: false, finishedAt: new Date().toISOString() }; })
+    .then((r) => { state = { ...state, running: false, failed: r?.failed || [], finishedAt: new Date().toISOString() }; })
     .catch(err => {
       console.error('demo-seed алдаа:', err);
       state = { ...state, running: false, error: err.message, finishedAt: new Date().toISOString() };
