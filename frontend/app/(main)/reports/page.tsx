@@ -57,13 +57,24 @@ interface MonthRow { month: string; sold_count: string; revenue: string; profit:
 interface BrandRow { brand: string; sold_count: string; revenue: string; avg_profit: string; total_profit: string; avg_days_to_sell: string; }
 interface PersonRow { user_id: string; name: string; role: string; sold_count: string; revenue: string; avg_sale_price: string; total_profit: string; avg_profit: string; }
 interface AgingRow  { id: string; brand: string; model: string; year: number; status: string; days_in_stock: number; total_cost: string; }
+interface DetailRow {
+  id: string; sold_at: string;
+  brand: string; model: string; year: number; vin: string;
+  color: string; fuel_type: string; transmission: string; mileage: number;
+  customer_name: string; customer_phone: string;
+  sold_by_name: string;
+  total_cost: string; sale_price: string; net_profit: string;
+  payment_type: string;
+}
 
+const PAYMENT: Record<string,string> = { CASH:'Бэлэн', LOAN:'Зээл', LEASING:'Лизинг' };
 const AGING_COLORS: Record<string,string> = { '0-30':'bg-emerald-400','31-60':'bg-amber-400','61-90':'bg-orange-400','90+':'bg-red-400' };
 const AGING_TEXT:   Record<string,string> = { '0-30':'text-emerald-600','31-60':'text-amber-600','61-90':'text-orange-600','90+':'text-red-500' };
 
-type TabKey = 'overview' | 'daily' | 'monthly' | 'salesperson' | 'brands' | 'aging';
+type TabKey = 'overview' | 'detail' | 'daily' | 'monthly' | 'salesperson' | 'brands' | 'aging';
 const TABS: { key: TabKey; label: string }[] = [
   { key: 'overview',    label: 'Ерөнхий' },
+  { key: 'detail',      label: 'Дэлгэрэнгүй' },
   { key: 'daily',       label: 'Өдөр' },
   { key: 'monthly',     label: 'Сар' },
   { key: 'salesperson', label: 'Борлуулагч' },
@@ -113,6 +124,7 @@ export default function ReportsPage() {
   const [brands,      setBrands]      = useState<BrandRow[]>([]);
   const [salesperson, setSalesperson] = useState<PersonRow[]>([]);
   const [aging,       setAging]       = useState<{ rows: AgingRow[]; buckets: Record<string,AgingRow[]> } | null>(null);
+  const [detail,      setDetail]      = useState<DetailRow[]>([]);
   const [loading, setLoading] = useState(false);
 
   // Init dates from preset
@@ -140,6 +152,7 @@ export default function ReportsPage() {
         get('/monthly' + qs).then(setMonthly).catch(console.error),
         get('/brands' + qs).then(setBrands).catch(console.error),
         get('/salesperson' + qs).then(setSalesperson).catch(console.error),
+        get('/sales-detail' + qs).then(setDetail).catch(console.error),
       ]);
     } finally { setLoading(false); }
   }, []);
@@ -198,6 +211,26 @@ export default function ReportsPage() {
       'Нэр': r.name, 'Үүрэг': r.role, 'Зарагдсан': r.sold_count,
       'Орлого (₮)': r.revenue, 'Нийт ашиг (₮)': r.total_profit, 'Дундаж ашиг (₮)': r.avg_profit,
     })), `Борлуулагч_${todayStr()}`, 'Борлуулагч');
+  }
+  function exportDetail() {
+    exportToExcel(detail.map(r => ({
+      'Огноо':            fmtDate(r.sold_at),
+      'Марк':             r.brand,
+      'Загвар':           r.model,
+      'Он':               r.year,
+      'VIN':              r.vin,
+      'Өнгө':             r.color || '—',
+      'Түлш':             r.fuel_type,
+      'Хурдны хайрцаг':  r.transmission,
+      'Гүйлт (км)':      r.mileage,
+      'Үйлчлүүлэгч':     r.customer_name || '—',
+      'Утас':             r.customer_phone || '—',
+      'Борлуулагч':       r.sold_by_name || '—',
+      'Нийт өртөг (₮)':  r.total_cost,
+      'Зарагдсан үнэ (₮)': r.sale_price,
+      'Цэвэр ашиг (₮)':  r.net_profit,
+      'Төлбөр':           PAYMENT[r.payment_type] || r.payment_type,
+    })), `Дэлгэрэнгүй_борлуулалт_${todayStr()}`, 'Дэлгэрэнгүй');
   }
   function exportBrands() {
     exportToExcel(brands.map(r => ({
@@ -354,6 +387,83 @@ export default function ReportsPage() {
               );
             })}
           </div>
+        </div>
+      )}
+
+      {/* ── DETAIL ── */}
+      {tab === 'detail' && (
+        <div className="space-y-4">
+          <div className="flex items-center justify-between">
+            <span className="text-xs text-[#a1a1aa]">{detail.length} борлуулалт — бүх баганатай дэлгэрэнгүй</span>
+            <ExportBtn onClick={exportDetail} label="Excel (бүх багана)" />
+          </div>
+          <div className="bg-white border border-[#e4e4e7] rounded-lg overflow-hidden overflow-x-auto">
+            <table className="w-full text-sm" style={{ minWidth: '1100px' }}>
+              <thead>
+                <tr className="border-b border-[#e4e4e7]">
+                  <TH>Огноо</TH>
+                  <TH>Машин</TH>
+                  <TH>VIN</TH>
+                  <TH>Үйлчлүүлэгч</TH>
+                  <TH>Борлуулагч</TH>
+                  <TH>Төлбөр</TH>
+                  <TH right>Нийт өртөг</TH>
+                  <TH right>Зарагдсан үнэ</TH>
+                  <TH right>Цэвэр ашиг</TH>
+                </tr>
+              </thead>
+              <tbody>
+                {detail.map((r, i) => (
+                  <tr key={r.id} className={`hover:bg-[#fafafa] ${i < detail.length-1 ? 'border-b border-[#f4f4f5]' : ''}`}>
+                    <td className="px-5 py-3 text-[#09090b] tabular-nums whitespace-nowrap">{fmtDate(r.sold_at)}</td>
+                    <td className="px-5 py-3">
+                      <div className="text-[#09090b] font-medium whitespace-nowrap">{r.brand} {r.model}</div>
+                      <div className="text-[10px] text-[#a1a1aa] mt-0.5">{r.year} · {r.color || '—'} · {r.fuel_type} · {r.mileage.toLocaleString()} км</div>
+                    </td>
+                    <td className="px-5 py-3 text-[#a1a1aa] text-xs font-mono">{r.vin ? r.vin.slice(-8) : '—'}</td>
+                    <td className="px-5 py-3">
+                      <div className="text-[#09090b] whitespace-nowrap">{r.customer_name || '—'}</div>
+                      {r.customer_phone && <div className="text-[10px] text-[#a1a1aa] mt-0.5">{r.customer_phone}</div>}
+                    </td>
+                    <td className="px-5 py-3">
+                      <span className="inline-flex items-center gap-1.5">
+                        <span className="w-5 h-5 rounded-full bg-[#f4f4f5] flex items-center justify-center text-[9px] font-bold text-[#71717a]">
+                          {(r.sold_by_name || '?').slice(0,1).toUpperCase()}
+                        </span>
+                        <span className="text-[#09090b] whitespace-nowrap">{r.sold_by_name || '—'}</span>
+                      </span>
+                    </td>
+                    <td className="px-5 py-3">
+                      <span className={`text-xs px-2 py-0.5 rounded-full ${
+                        r.payment_type === 'CASH'    ? 'bg-emerald-50 text-emerald-700' :
+                        r.payment_type === 'LOAN'    ? 'bg-blue-50 text-blue-700' :
+                        'bg-violet-50 text-violet-700'
+                      }`}>{PAYMENT[r.payment_type] || r.payment_type}</span>
+                    </td>
+                    <td className="px-5 py-3 text-right text-[#71717a] tabular-nums whitespace-nowrap">{fmt(r.total_cost)}</td>
+                    <td className="px-5 py-3 text-right text-[#09090b] tabular-nums font-medium whitespace-nowrap">{fmt(r.sale_price)}</td>
+                    <td className="px-5 py-3 text-right tabular-nums whitespace-nowrap">
+                      <span className={Number(r.net_profit) >= 0 ? 'text-emerald-600 font-medium' : 'text-red-500'}>
+                        {Number(r.net_profit) >= 0 ? '+' : ''}{fmt(r.net_profit)}
+                      </span>
+                    </td>
+                  </tr>
+                ))}
+                {detail.length === 0 && (
+                  <tr><td colSpan={9} className="text-center text-[#a1a1aa] text-sm py-16">Өгөгдөл байхгүй байна</td></tr>
+                )}
+              </tbody>
+            </table>
+          </div>
+
+          {/* Summary footer */}
+          {detail.length > 0 && (
+            <div className="grid grid-cols-3 gap-3">
+              <Card label="Нийт борлуулалт"   value={`${detail.length} машин`} />
+              <Card label="Нийт орлого"        value={fmt(detail.reduce((s,r) => s + Number(r.sale_price), 0))} />
+              <Card label="Нийт цэвэр ашиг"    value={fmt(detail.reduce((s,r) => s + Number(r.net_profit), 0))} />
+            </div>
+          )}
         </div>
       )}
 

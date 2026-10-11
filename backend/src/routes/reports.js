@@ -165,6 +165,36 @@ router.get('/salesperson', auth, async (req, res) => {
   } catch (err) { res.status(500).json({ error: err.message }); }
 });
 
+// GET /sales-detail — every sale row with full columns
+router.get('/sales-detail', auth, async (req, res) => {
+  const cid = req.user.company_id;
+  const { w, v } = sf(req.query, 2);
+  try {
+    const { rows } = await pool.query(`
+      WITH ${COSTS}
+      SELECT
+        s.id,
+        s.sold_at,
+        v.brand, v.model, v.year, v.vin,
+        v.color, v.fuel_type, v.transmission, v.mileage,
+        cust.name  AS customer_name,
+        cust.phone AS customer_phone,
+        u.name     AS sold_by_name,
+        COALESCE(ca.total_cost, 0)            AS total_cost,
+        s.sale_price,
+        s.sale_price - COALESCE(ca.total_cost, 0) AS net_profit,
+        s.payment_type
+      FROM sales s
+      JOIN vehicles v      ON v.id    = s.vehicle_id
+      LEFT JOIN customers cust ON cust.id = s.customer_id
+      LEFT JOIN users u        ON u.id   = s.sold_by
+      LEFT JOIN cost_agg ca    ON ca.vehicle_id = s.vehicle_id
+      WHERE s.company_id=$1${w}
+      ORDER BY s.sold_at DESC`, [cid, ...v]);
+    res.json(rows);
+  } catch (err) { res.status(500).json({ error: err.message }); }
+});
+
 // GET /filters — available filter options (brands, salespersons)
 router.get('/filters', auth, async (req, res) => {
   const cid = req.user.company_id;
