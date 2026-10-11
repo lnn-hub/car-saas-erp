@@ -21,7 +21,7 @@ const STATUS_LABEL: Record<string, { label: string; color: string }> = {
   SOLD:      { label: 'Зарагдсан',   color: 'bg-green-500/20 text-green-400' },
 };
 
-export default function VehicleDetailPage() {
+function VehicleDetailContent() {
   const { id } = useParams<{ id: string }>();
   const router = useRouter();
   const [vehicle, setVehicle] = useState<Vehicle | null>(null);
@@ -180,5 +180,14 @@ export default function VehicleDetailPage() {
         </div>
       )}
     </div>
+  );
+}
+
+import { Suspense } from 'react';
+export default function VehicleDetailPage() {
+  return (
+    <Suspense fallback={<div className="p-6 text-gray-400">Ачааллаж байна...</div>}>
+      <VehicleDetailContent />
+    </Suspense>
   );
 }
