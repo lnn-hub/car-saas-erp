@@ -6,9 +6,10 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
-app.use('/api/auth',     require('./routes/auth'));
-app.use('/api/vehicles', require('./routes/vehicles'));
-app.use('/api/sales',    require('./routes/sales'));
+app.use('/api/auth',      require('./routes/auth'));
+app.use('/api/vehicles',  require('./routes/vehicles'));
+app.use('/api/sales',     require('./routes/sales'));
+app.use('/api/customers', require('./routes/customers'));
 
 app.get('/health', (_, res) => res.json({ status: 'ok' }));
 
