@@ -42,6 +42,10 @@ export const api = {
   addCost: (id: string, data: object) =>
     request(`/vehicles/${id}/costs`, { method: 'POST', body: JSON.stringify(data) }),
 
+  getSettings: () => request('/settings'),
+  saveSettings: (data: object) =>
+    request('/settings', { method: 'PATCH', body: JSON.stringify(data) }),
+
   getSales: () => request('/sales'),
   getSummary: () => request('/sales/summary'),
   createSale: (data: object) =>

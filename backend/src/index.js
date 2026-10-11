@@ -15,6 +15,7 @@ app.use('/api/expenses',  require('./routes/expenses'));
 app.use('/api/finance',   require('./routes/finance'));
 app.use('/api/billing',   require('./routes/billing'));
 app.use('/api/public',    require('./routes/public'));
+app.use('/api/settings',  require('./routes/settings'));
 
 app.get('/health', (_, res) => res.json({ status: 'ok' }));
 

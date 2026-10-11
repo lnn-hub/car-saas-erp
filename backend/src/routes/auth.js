@@ -22,11 +22,21 @@ router.post('/register', async (req, res) => {
       return res.status(409).json({ error: 'Энэ имэйл аль хэдийн бүртгэлтэй байна' });
     }
 
+    // Slug автоматаар үүсгэх: "Монгол Авто ХХК" → "mongol-avto-9f2a"
+    const baseSlug = company_name
+      .toLowerCase()
+      .replace(/[^a-z0-9Ѐ-ӿ\s]/g, '')
+      .trim()
+      .replace(/\s+/g, '-')
+      .replace(/[^\x00-\x7F]/g, '') // latin only
+      .slice(0, 30) || 'company';
+    const slug = baseSlug + '-' + Math.random().toString(36).slice(2, 6);
+
     // Компани үүсгэх (14 хоногийн trial)
     const { rows: companies } = await client.query(
-      `INSERT INTO companies (name, subscription_status, trial_ends_at)
-       VALUES ($1, 'trialing', NOW() + INTERVAL '14 days') RETURNING id`,
-      [company_name]
+      `INSERT INTO companies (name, slug, subscription_status, trial_ends_at)
+       VALUES ($1, $2, 'trialing', NOW() + INTERVAL '14 days') RETURNING id`,
+      [company_name, slug]
     );
     const company_id = companies[0].id;
 
