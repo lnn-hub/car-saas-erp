@@ -3,6 +3,7 @@ import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import React from 'react';
+import { warmUp } from '@/lib/api';
 
 const BACKEND = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000';
 
@@ -53,6 +54,7 @@ function MainLayoutInner({ children }: { children: React.ReactNode }) {
   const [drawerOpen, setDrawer]   = useState(false);
 
   useEffect(() => {
+    warmUp(); // Render cold start-аас сэргийлэх
     if (!localStorage.getItem('token')) { router.push('/login'); return; }
     const u = JSON.parse(localStorage.getItem('user') || '{}');
     setUserName(u.name || ''); setUserRole(u.role || '');
