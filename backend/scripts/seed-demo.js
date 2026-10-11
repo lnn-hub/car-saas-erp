@@ -97,7 +97,8 @@ async function ensureImage(key, i, src) {
 
 (async () => {
   const dbUrl = process.env.DATABASE_URL || '';
-  const host  = (dbUrl.match(/@([^/:?]+)/) || [])[1] || 'localhost';
+  const m     = dbUrl.match(/@([^/:?]+)/);
+  const host  = m ? m[1] : (dbUrl.startsWith('postgresql://localhost') || !dbUrl ? 'localhost' : 'танигдаагүй-хаяг');
   const remote = !/^(localhost|127\.0\.0\.1)$/.test(host);
   console.log(`DB: ${host} | Зураг: ${USE_CLOUDINARY ? 'Cloudinary' : 'локал /uploads'}`);
   if (remote && !process.argv.includes('--yes')) {
