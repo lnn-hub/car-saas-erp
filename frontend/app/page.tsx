@@ -4,7 +4,6 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 
 const BACKEND = process.env.NEXT_PUBLIC_API_URL || "http://localhost:4000";
-const SLUG = process.env.NEXT_PUBLIC_COMPANY_SLUG || "mongol-auto";
 
 interface Company {
   name: string;
@@ -249,8 +248,8 @@ function HomeContent() {
 
   useEffect(() => {
     Promise.all([
-      fetch(`${BACKEND}/api/public/${SLUG}`).then((r) => r.json()),
-      fetch(`${BACKEND}/api/public/${SLUG}/vehicles`).then((r) => r.json()),
+      fetch(`${BACKEND}/api/public`).then((r) => r.json()),
+      fetch(`${BACKEND}/api/public/vehicles`).then((r) => r.json()),
     ])
       .then(([comp, data]) => {
         if (!comp.error) setCompany(comp);

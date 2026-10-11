@@ -4,7 +4,6 @@ import { useParams, useRouter } from 'next/navigation';
 import Link from 'next/link';
 
 const BACKEND = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000';
-const SLUG     = process.env.NEXT_PUBLIC_COMPANY_SLUG || 'mongol-auto';
 
 interface Vehicle {
   id: string; brand: string; model: string; year: number; color: string;
@@ -50,7 +49,7 @@ function VehicleContent() {
   const [loading, setLoad] = useState(true);
 
   useEffect(() => {
-    fetch(`${BACKEND}/api/public/${SLUG}/vehicles/${id}`)
+    fetch(`${BACKEND}/api/public/vehicles/${id}`)
       .then(r => r.json())
       .then(d => { if (!d.error) setV(d); })
       .finally(() => setLoad(false));
