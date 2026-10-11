@@ -11,6 +11,12 @@ function IconUsers({ className = 'w-4 h-4' }) {
     <path d="M23 21v-2a4 4 0 00-3-3.87M16 3.13a4 4 0 010 7.75"/>
   </svg>;
 }
+function IconReport({ className = 'w-4 h-4' }) {
+  return <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.5}>
+    <path d="M9 17H5a2 2 0 00-2 2v2h18v-2a2 2 0 00-2-2h-4"/>
+    <path d="M9 11V7m3 10V3m3 14v-5"/>
+  </svg>;
+}
 
 const nav = [
   { href: '/dashboard',    label: 'Нүүр хуудас', Icon: IconDashboard },
@@ -18,6 +24,7 @@ const nav = [
   { href: '/vehicles/new', label: 'Машин нэмэх', Icon: IconPlus },
   { href: '/sales',        label: 'Борлуулалт',  Icon: IconSales },
   { href: '/customers',    label: 'Үйлчлүүлэгч', Icon: IconUsers },
+  { href: '/reports',      label: 'Тайлан',       Icon: IconReport },
 ];
 
 export default function MainLayout({ children }: { children: React.ReactNode }) {
