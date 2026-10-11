@@ -31,12 +31,15 @@ export default function VehiclesPage() {
   const [search, setSearch] = useState('');
   const [statusFilter, setStatusFilter] = useState<string[]>(['ARRIVED', 'PUBLISHED', 'RESERVED']);
   const [collapsed, setCollapsed] = useState<Record<string, boolean>>({});
+  const [page, setPage] = useState(1);
+  const PAGE_SIZE = 20;
 
   useEffect(() => {
     api.getVehicles().then(d => { setVehicles(d); setLoading(false); }).catch(console.error);
   }, []);
 
   function toggleStatus(s: string) {
+    setPage(1);
     setStatusFilter(prev => prev.includes(s) ? prev.filter(x => x !== s) : [...prev, s]);
   }
   function toggleBrand(brand: string) {
@@ -56,14 +59,16 @@ export default function VehiclesPage() {
     });
   }, [vehicles, statusFilter, search]);
 
-  const grouped = useMemo(() => {
+  const totalPages = Math.max(1, Math.ceil(filtered.length / PAGE_SIZE));
+  const pagedFiltered = filtered.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE);
+  const pagedGrouped = useMemo(() => {
     const map: Record<string, Vehicle[]> = {};
-    filtered.forEach(v => {
+    pagedFiltered.forEach(v => {
       if (!map[v.brand]) map[v.brand] = [];
       map[v.brand].push(v);
     });
     return Object.entries(map).sort((a, b) => b[1].length - a[1].length);
-  }, [filtered]);
+  }, [pagedFiltered]);
 
   const totalValue = filtered.reduce((s, v) => s + Number(v.total_cost), 0);
   const soldCount  = filtered.filter(v => v.status === 'SOLD').length;
@@ -93,7 +98,7 @@ export default function VehiclesPage() {
             <span className="absolute left-2.5 top-1/2 -translate-y-1/2 text-[#a1a1aa]">
               <svg className="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.5}><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
             </span>
-            <input value={search} onChange={e => setSearch(e.target.value)}
+            <input value={search} onChange={e => { setSearch(e.target.value); setPage(1); }}
               placeholder="Хайх..."
               className="bg-white border border-[#e4e4e7] rounded-md pl-8 pr-3 py-1.5 text-sm text-[#09090b] placeholder-[#a1a1aa] focus:outline-none focus:border-[#09090b] w-36 sm:w-52 transition-colors" />
           </div>
@@ -127,7 +132,7 @@ export default function VehiclesPage() {
       <div className="flex-1 overflow-y-auto">
         {loading ? (
           <div className="flex items-center justify-center h-32 text-[#a1a1aa] text-sm">Ачааллаж байна...</div>
-        ) : grouped.length === 0 ? (
+        ) : pagedGrouped.length === 0 ? (
           <div className="flex flex-col items-center justify-center h-48 text-[#a1a1aa]">
             <div className="text-sm mb-1">Машин олдсонгүй</div>
             {(search || statusFilter.length > 0) && (
@@ -137,7 +142,7 @@ export default function VehiclesPage() {
             )}
           </div>
         ) : (
-          grouped.map(([brand, brandVehicles]) => {
+          pagedGrouped.map(([brand, brandVehicles]) => {
             const isOpen = collapsed[brand] !== true;
             const brandTotal = brandVehicles.reduce((s, v) => s + Number(v.total_cost), 0);
             const color = brandColor(brand);
@@ -206,6 +211,39 @@ export default function VehiclesPage() {
               </div>
             );
           })
+        )}
+
+        {/* Pagination */}
+        {totalPages > 1 && (
+          <div className="flex items-center justify-between px-6 py-3 border-t border-[#f4f4f5] bg-white shrink-0">
+            <span className="text-xs text-[#a1a1aa]">
+              {(page - 1) * PAGE_SIZE + 1}–{Math.min(page * PAGE_SIZE, filtered.length)} / {filtered.length} машин
+            </span>
+            <div className="flex items-center gap-1">
+              <button onClick={() => setPage(p => Math.max(1, p - 1))} disabled={page === 1}
+                className="w-7 h-7 flex items-center justify-center rounded hover:bg-[#f4f4f5] disabled:opacity-30 transition-colors text-[#71717a]">
+                <svg className="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2}><path d="M15 18l-6-6 6-6"/></svg>
+              </button>
+              {Array.from({ length: totalPages }, (_, i) => i + 1)
+                .filter(p => p === 1 || p === totalPages || Math.abs(p - page) <= 1)
+                .reduce<(number | string)[]>((acc, p, i, arr) => {
+                  if (i > 0 && (p as number) - (arr[i - 1] as number) > 1) acc.push('…');
+                  acc.push(p); return acc;
+                }, [])
+                .map((p, i) => typeof p === 'string' ? (
+                  <span key={i} className="w-7 text-center text-xs text-[#a1a1aa]">…</span>
+                ) : (
+                  <button key={p} onClick={() => setPage(p as number)}
+                    className={`w-7 h-7 rounded text-xs transition-colors ${page === p ? 'bg-[#09090b] text-white' : 'hover:bg-[#f4f4f5] text-[#71717a]'}`}>
+                    {p}
+                  </button>
+                ))}
+              <button onClick={() => setPage(p => Math.min(totalPages, p + 1))} disabled={page === totalPages}
+                className="w-7 h-7 flex items-center justify-center rounded hover:bg-[#f4f4f5] disabled:opacity-30 transition-colors text-[#71717a]">
+                <svg className="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2}><path d="M9 18l6-6-6-6"/></svg>
+              </button>
+            </div>
+          </div>
         )}
       </div>
     </div>

@@ -238,6 +238,7 @@ function HomeContent() {
   const [company, setCompany] = useState<Company | null>(null);
   const [vehicles, setVehicles] = useState<Vehicle[]>([]);
   const [loading, setLoading] = useState(true);
+  const [retrying, setRetrying] = useState(false);
   const [search, setSearch] = useState("");
   const [filterFuel, setFilterFuel] = useState("");
   const [filterTrans, setFilterTrans] = useState("");
@@ -258,16 +259,18 @@ function HomeContent() {
         if (!comp.error) setCompany(comp);
         setVehicles(data.vehicles || []);
         setLoading(false);
+        setRetrying(false);
       } catch {
         if (cancelled) return;
         if (retry < 3) {
+          setRetrying(true);
           setTimeout(() => load(retry + 1), 3000 * (retry + 1));
         } else {
           setLoading(false);
+          setRetrying(false);
         }
       }
     }
-    // Render cold start-аас сэргийлж warmUp дуудна
     fetch(`${BACKEND}/health`).catch(() => {});
     load();
     return () => { cancelled = true; };
@@ -436,10 +439,12 @@ function HomeContent() {
         <div className="relative max-w-7xl mx-auto px-4 py-12 sm:py-28">
           <div className="max-w-2xl">
             <div className="inline-flex items-center gap-2 bg-[#c00]/20 border border-[#c00]/30 text-red-300 text-xs font-bold px-3 py-1.5 rounded-full mb-4 sm:mb-6 tracking-widest uppercase">
-              <span className="w-1.5 h-1.5 bg-red-400 rounded-full animate-pulse" />
-              {loading
-                ? "Ачааллаж байна"
-                : `${vehicles.length} машин зарагдаж байна`}
+              <span className={`w-1.5 h-1.5 bg-red-400 rounded-full ${(loading || retrying) ? 'animate-pulse' : ''}`} />
+              {retrying
+                ? "Сервер асаж байна, түр хүлээнэ үү..."
+                : loading
+                  ? "Ачааллаж байна"
+                  : `${vehicles.length} машин зарагдаж байна`}
             </div>
             <h1 className="text-3xl sm:text-6xl font-black leading-tight tracking-tight mb-3 sm:mb-5">
               Чанартай машин —<br />
@@ -662,6 +667,7 @@ function HomeContent() {
                         <img
                           src={src}
                           alt={`${v.brand} ${v.model}`}
+                          loading="lazy"
                           className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                         />
                       ) : (

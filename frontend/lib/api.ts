@@ -23,7 +23,8 @@ export function invalidateCache(prefix?: string) {
   for (const k of cache.keys()) if (k.startsWith(prefix)) cache.delete(k);
 }
 
-async function request(path: string, options: RequestInit = {}, useCache = false, _retry = 0): Promise<unknown> {
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+async function request(path: string, options: RequestInit = {}, useCache = false, _retry = 0): Promise<any> {
   const token = getToken();
   const cacheKey = path + (token || '');
 

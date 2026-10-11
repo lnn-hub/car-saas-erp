@@ -28,9 +28,10 @@ export default function NewVehiclePage() {
     manufactured_date: '', has_plates: false,
   });
   const [models, setModels]   = useState<string[]>([]);
-  const [images, setImages]   = useState<ImageItem[]>([]);
-  const [error, setError]     = useState('');
-  const [loading, setLoading] = useState(false);
+  const [images, setImages]     = useState<ImageItem[]>([]);
+  const [error, setError]       = useState('');
+  const [loading, setLoading]   = useState(false);
+  const [uploadDone, setUpDone] = useState(0);
   const [vehicleId, setVehicleId] = useState<string | null>(null);
   const [step, setStep]       = useState<'form' | 'images'>('form');
   const [dragOver, setDrag]   = useState(false);
@@ -81,31 +82,41 @@ export default function NewVehiclePage() {
     const toUpload = images.filter(img => !img.url);
     if (toUpload.length === 0) { router.push(`/vehicles/${vehicleId}`); return; }
 
+    setUpDone(0);
     setImages(prev => prev.map(img => img.url ? img : { ...img, uploading: true }));
 
-    const formData = new FormData();
-    toUpload.forEach(img => formData.append('images', img.file));
-
-    try {
-      const res  = await fetch(`${BACKEND}/api/upload/vehicle/${vehicleId}`, {
-        method: 'POST', headers: { Authorization: `Bearer ${token}` }, body: formData,
-      });
-      const saved = await res.json();
-      if (!res.ok) throw new Error(saved.error || 'Upload алдаа');
-
-      setImages(prev => {
-        let si = 0;
-        return prev.map(img => {
-          if (img.url) return img;
-          const s = saved[si++];
-          return s ? { ...img, uploading: false, url: s.url, id: s.id } : { ...img, uploading: false };
+    // Нэг нэгээр upload хийж progress харуулна
+    let done = 0;
+    const results: Array<{url: string; id: string} | null> = [];
+    for (const img of toUpload) {
+      try {
+        const formData = new FormData();
+        formData.append('images', img.file);
+        const res = await fetch(`${BACKEND}/api/upload/vehicle/${vehicleId}`, {
+          method: 'POST', headers: { Authorization: `Bearer ${token}` }, body: formData,
         });
-      });
-      router.push(`/vehicles/${vehicleId}`);
-    } catch (err: unknown) {
-      setError(err instanceof Error ? err.message : 'Upload алдаа');
-      setImages(prev => prev.map(img => ({ ...img, uploading: false })));
+        const saved = await res.json();
+        if (!res.ok) throw new Error(saved.error || 'Upload алдаа');
+        results.push(saved[0] || null);
+      } catch {
+        results.push(null);
+      }
+      done++;
+      setUpDone(done);
     }
+
+    setImages(prev => {
+      let si = 0;
+      return prev.map(img => {
+        if (img.url) return img;
+        const s = results[si++];
+        return s ? { ...img, uploading: false, url: s.url, id: s.id } : { ...img, uploading: false };
+      });
+    });
+
+    const failed = results.filter(r => !r).length;
+    if (failed > 0) setError(`${failed} зураг upload хийгдсэнгүй`);
+    else router.push(`/vehicles/${vehicleId}`);
   }
 
   function removeImage(idx: number) {
@@ -182,8 +193,11 @@ export default function NewVehiclePage() {
             Зургийг алгасах
           </button>
           <button type="button" onClick={uploadAll}
-            className="flex-1 py-2.5 text-sm font-medium bg-[#09090b] hover:bg-[#27272a] text-white rounded-lg transition-colors">
-            {images.length > 0 ? `${images.length} зураг хадгалах` : 'Дуусгах'}
+            disabled={images.some(i => i.uploading)}
+            className="flex-1 py-2.5 text-sm font-medium bg-[#09090b] hover:bg-[#27272a] disabled:opacity-60 text-white rounded-lg transition-colors">
+            {images.some(i => i.uploading)
+              ? `${uploadDone}/${images.filter(i => !i.url).length} upload хийгдэж байна...`
+              : images.length > 0 ? `${images.length} зураг хадгалах` : 'Дуусгах'}
           </button>
         </div>
       </div>

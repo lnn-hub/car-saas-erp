@@ -49,10 +49,26 @@ function VehicleContent() {
   const [loading, setLoad] = useState(true);
 
   useEffect(() => {
-    fetch(`${BACKEND}/api/public/vehicles/${id}`)
-      .then(r => r.json())
-      .then(d => { if (!d.error) setV(d); })
-      .finally(() => setLoad(false));
+    let cancelled = false;
+    async function load(retry = 0) {
+      try {
+        const r = await fetch(`${BACKEND}/api/public/vehicles/${id}`);
+        const d = await r.json();
+        if (cancelled) return;
+        if (!d.error) {
+          setV(d);
+          document.title = `${d.brand} ${d.model} ${d.year} — ${d.company?.name || 'AutoDealer'}`;
+        }
+        setLoad(false);
+      } catch {
+        if (cancelled) return;
+        if (retry < 3) setTimeout(() => load(retry + 1), 3000 * (retry + 1));
+        else setLoad(false);
+      }
+    }
+    fetch(`${BACKEND}/health`).catch(() => {});
+    load();
+    return () => { cancelled = true; document.title = 'AutoDealer'; };
   }, [id]);
 
   /* ── Loading ── */
@@ -142,6 +158,7 @@ function VehicleContent() {
         {mainImg ? (
           <>
             <img src={mainImg} alt={`${v.brand} ${v.model}`}
+              loading="lazy"
               className="w-full h-full object-cover absolute inset-0 opacity-70"
               style={{minHeight:'clamp(280px,55vw,480px)'}} />
             <div className="absolute inset-0"
@@ -210,7 +227,7 @@ function VehicleContent() {
               <div className="bg-white rounded-xl overflow-hidden shadow-sm">
                 {/* Main */}
                 <div className="relative aspect-[16/9] bg-gray-100 overflow-hidden cursor-zoom-in">
-                  <img src={imgs[imgIdx]} alt="" className="w-full h-full object-cover" />
+                  <img src={imgs[imgIdx]} alt="" loading="lazy" className="w-full h-full object-cover" />
                   {imgs.length > 1 && (
                     <>
                       <button onClick={() => setIdx(i => (i - 1 + imgs.length) % imgs.length)}
@@ -237,7 +254,7 @@ function VehicleContent() {
                             ? 'border-[#c00] shadow-md'
                             : 'border-transparent opacity-55 hover:opacity-100 hover:border-gray-300'
                         }`}>
-                        <img src={url} alt="" className="w-full h-full object-cover" />
+                        <img src={url} alt="" loading="lazy" className="w-full h-full object-cover" />
                       </button>
                     ))}
                   </div>
