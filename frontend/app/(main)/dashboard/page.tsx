@@ -170,8 +170,7 @@ export default function DashboardPage() {
                 { href: '/vehicles/new', label: 'Машин нэмэх',  primary: true },
                 { href: '/vehicles',     label: 'Агуулах',       primary: false },
                 { href: '/sales',        label: 'Борлуулалт',    primary: false },
-                { href: '/customers',    label: 'Үйлчлүүлэгч',  primary: false },
-                { href: '/reports',      label: 'Тайлан',        primary: false },
+                { href: '/settings',     label: 'Тохиргоо',      primary: false },
               ].map(({ href, label, primary }) => (
                 <Link key={href} href={href}
                   className={`flex items-center justify-between w-full px-3 py-2 rounded-lg text-sm transition-colors ${
