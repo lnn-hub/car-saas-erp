@@ -65,7 +65,7 @@ export default function DashboardPage() {
           <p className="text-xs sm:text-sm text-[#71717a] mt-0.5 hidden sm:block">Өнөөдрийн борлуулалт, агуулахын байдал</p>
         </div>
         <Link href="/vehicles/new"
-          className="flex items-center gap-2 bg-[#c00] hover:bg-[#a00] text-white font-semibold px-3 sm:px-4 py-2 sm:py-2.5 rounded-xl transition-colors text-sm shadow-sm shrink-0">
+          className="flex items-center gap-2 bg-brand hover:bg-brand-dark text-white font-semibold px-3 sm:px-4 py-2 sm:py-2.5 rounded-xl transition-colors text-sm shadow-sm shrink-0">
           <svg className="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2.5}><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
           <span className="hidden sm:inline">Машин нэмэх</span>
           <span className="sm:hidden">Нэмэх</span>
@@ -175,7 +175,7 @@ export default function DashboardPage() {
                 <Link key={href} href={href}
                   className={`flex items-center justify-between w-full px-3 py-2 rounded-lg text-sm transition-colors ${
                     primary
-                      ? 'bg-[#c00] text-white font-medium hover:bg-[#a00]'
+                      ? 'bg-brand text-white font-medium hover:bg-brand-dark'
                       : 'text-[#52525b] hover:bg-[#f4f4f5] hover:text-[#09090b]'
                   }`}>
                   {label}

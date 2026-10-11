@@ -75,7 +75,7 @@ function VehicleContent() {
   if (loading) return (
     <div className="min-h-screen bg-[#f5f5f5] flex items-center justify-center">
       <div className="text-center">
-        <div className="w-10 h-10 border-[3px] border-[#c00] border-t-transparent rounded-full animate-spin mx-auto mb-3" />
+        <div className="w-10 h-10 border-[3px] border-brand border-t-transparent rounded-full animate-spin mx-auto mb-3" />
         <p className="text-sm text-gray-400">Ачааллаж байна...</p>
       </div>
     </div>
@@ -87,7 +87,7 @@ function VehicleContent() {
       <div className="text-center">
         <div className="text-7xl font-black text-gray-200 mb-4">404</div>
         <p className="text-gray-400 text-sm mb-5">Машин олдсонгүй</p>
-        <Link href="/" className="inline-flex items-center gap-2 text-sm text-[#c00] hover:underline">
+        <Link href="/" className="inline-flex items-center gap-2 text-sm text-brand hover:underline">
           {Ic.back} Нүүр хуудас руу буцах
         </Link>
       </div>
@@ -122,7 +122,7 @@ function VehicleContent() {
     <div className="min-h-screen bg-[#f2f2f2] pb-[76px] lg:pb-0" style={{fontFamily:"'Inter','Segoe UI',sans-serif"}}>
 
       {/* ── Top nav ── */}
-      <div className="bg-[#c00] text-white text-xs">
+      <div className="bg-brand text-white text-xs">
         <div className="max-w-7xl mx-auto px-4 h-9 flex items-center gap-4">
           <button onClick={() => router.back()}
             className="flex items-center gap-1.5 hover:opacity-80 transition-opacity font-medium">
@@ -139,14 +139,14 @@ function VehicleContent() {
       <header className="bg-white shadow-sm sticky top-0 z-30">
         <div className="max-w-7xl mx-auto px-4 h-14 flex items-center justify-between">
           <Link href="/" className="flex items-center gap-2">
-            <div className="w-8 h-8 bg-[#c00] rounded flex items-center justify-center">
+            <div className="w-8 h-8 bg-brand rounded flex items-center justify-center">
               <span className="text-white font-black text-base leading-none">{v.company?.name?.[0] || 'A'}</span>
             </div>
             <span className="font-black text-[#111] text-base hidden sm:block">{v.company?.name}</span>
           </Link>
           {v.company?.phone && (
             <a href={`tel:${v.company.phone}`}
-              className="flex items-center gap-2 bg-[#c00] hover:bg-[#a00] text-white text-sm font-bold px-5 py-2 rounded transition-colors">
+              className="flex items-center gap-2 bg-brand hover:bg-brand-dark text-white text-sm font-bold px-5 py-2 rounded transition-colors">
               {Ic.phone}{v.company.phone}
             </a>
           )}
@@ -176,7 +176,7 @@ function VehicleContent() {
         <div className="relative max-w-7xl mx-auto px-4 py-10 sm:py-16 flex flex-col justify-end" style={{minHeight:'clamp(280px,55vw,480px)'}}>
           <div className="max-w-xl">
             {v.has_plates && (
-              <span className="inline-flex items-center gap-1.5 bg-[#c00] text-white text-xs font-bold px-3 py-1 rounded uppercase tracking-widest mb-4">
+              <span className="inline-flex items-center gap-1.5 bg-brand text-white text-xs font-bold px-3 py-1 rounded uppercase tracking-widest mb-4">
                 {Ic.check} Дугаартай
               </span>
             )}
@@ -202,7 +202,7 @@ function VehicleContent() {
           <div className="grid grid-cols-2 sm:grid-cols-4 divide-x divide-y sm:divide-y-0 divide-gray-100">
             {highlights.map(({ icon, label, value }) => (
               <div key={label} className="flex items-center gap-2.5 py-3.5 px-3 sm:px-6">
-                <div className="w-10 h-10 bg-[#fff0f0] rounded-xl flex items-center justify-center text-[#c00] shrink-0">
+                <div className="w-10 h-10 bg-brand-soft rounded-xl flex items-center justify-center text-brand shrink-0">
                   {icon}
                 </div>
                 <div>
@@ -251,7 +251,7 @@ function VehicleContent() {
                       <button key={i} onClick={() => setIdx(i)}
                         className={`shrink-0 snap-start w-20 h-14 sm:w-24 sm:h-16 rounded-lg overflow-hidden border-2 transition-all ${
                           i === imgIdx
-                            ? 'border-[#c00] shadow-md'
+                            ? 'border-brand shadow-md'
                             : 'border-transparent opacity-55 hover:opacity-100 hover:border-gray-300'
                         }`}>
                         <img src={url} alt="" loading="lazy" className="w-full h-full object-cover" />
@@ -265,13 +265,13 @@ function VehicleContent() {
             {/* All specs */}
             <div className="bg-white rounded-xl overflow-hidden shadow-sm">
               <div className="flex items-center gap-3 px-5 py-4 border-b border-gray-100">
-                <div className="w-1 h-5 bg-[#c00] rounded-full" />
+                <div className="w-1 h-5 bg-brand rounded-full" />
                 <h2 className="font-extrabold text-[#111] text-sm uppercase tracking-wider">Техникийн үзүүлэлт</h2>
               </div>
               <div className="divide-y divide-gray-50">
                 {allSpecs.map(({ label, value }) => (
                   <div key={label} className="flex items-center px-5 py-3.5 hover:bg-[#fafafa] transition-colors">
-                    <span className="w-5 h-5 text-[#c00] mr-3 shrink-0">{Ic.check}</span>
+                    <span className="w-5 h-5 text-brand mr-3 shrink-0">{Ic.check}</span>
                     <span className="text-sm text-gray-500 w-40 shrink-0">{label}</span>
                     <span className="text-sm font-bold text-[#111]">{value}</span>
                   </div>
@@ -283,7 +283,7 @@ function VehicleContent() {
             {v.description && (
               <div className="bg-white rounded-xl overflow-hidden shadow-sm">
                 <div className="flex items-center gap-3 px-5 py-4 border-b border-gray-100">
-                  <div className="w-1 h-5 bg-[#c00] rounded-full" />
+                  <div className="w-1 h-5 bg-brand rounded-full" />
                   <h2 className="font-extrabold text-[#111] text-sm uppercase tracking-wider">Нэмэлт мэдээлэл</h2>
                 </div>
                 <p className="px-5 py-5 text-sm text-gray-600 leading-relaxed">{v.description}</p>
@@ -296,18 +296,18 @@ function VehicleContent() {
 
             {/* Price card */}
             <div className="bg-white rounded-xl overflow-hidden shadow-sm">
-              <div className="h-1.5 bg-[#c00]" />
+              <div className="h-1.5 bg-brand" />
               <div className="p-5">
                 {/* Title */}
                 <div className="mb-4">
-                  <div className="text-[11px] font-bold text-[#c00] uppercase tracking-widest mb-0.5">{v.brand}</div>
+                  <div className="text-[11px] font-bold text-brand uppercase tracking-widest mb-0.5">{v.brand}</div>
                   <div className="text-xl font-black text-[#111] leading-tight">{v.model}</div>
                   <div className="text-gray-400 text-sm mt-0.5">{v.year} он · {v.color}</div>
                 </div>
 
                 {/* Price */}
                 {price ? (
-                  <div className="bg-gradient-to-r from-[#c00] to-[#e00] rounded-xl p-4 mb-4 text-white">
+                  <div className="bg-gradient-to-r from-brand to-[#e00] rounded-xl p-4 mb-4 text-white">
                     <div className="text-[10px] uppercase tracking-widest opacity-80 mb-0.5">Борлуулах үнэ</div>
                     <div className="text-2xl font-black leading-tight">{price}</div>
                   </div>
@@ -336,7 +336,7 @@ function VehicleContent() {
                 {v.company?.phone && (
                   <div className="space-y-2.5">
                     <a href={`tel:${v.company.phone}`}
-                      className="flex items-center justify-center gap-2.5 w-full bg-[#c00] hover:bg-[#a00] text-white font-extrabold py-4 rounded-xl transition-colors text-sm tracking-wide">
+                      className="flex items-center justify-center gap-2.5 w-full bg-brand hover:bg-brand-dark text-white font-extrabold py-4 rounded-xl transition-colors text-sm tracking-wide">
                       {Ic.phone}
                       <span>{v.company.phone} — Залгах</span>
                     </a>
@@ -354,7 +354,7 @@ function VehicleContent() {
             {/* Dealer info */}
             <div className="bg-white rounded-xl shadow-sm p-5">
               <div className="flex items-center gap-3 mb-3">
-                <div className="w-10 h-10 bg-[#c00] rounded-lg flex items-center justify-center text-white font-black text-lg shrink-0">
+                <div className="w-10 h-10 bg-brand rounded-lg flex items-center justify-center text-white font-black text-lg shrink-0">
                   {v.company?.name?.[0]}
                 </div>
                 <div>
@@ -371,7 +371,7 @@ function VehicleContent() {
 
             {/* Back */}
             <Link href="/"
-              className="flex items-center justify-center gap-2 w-full bg-white rounded-xl shadow-sm py-3 text-sm text-gray-400 hover:text-[#c00] hover:shadow-md transition-all font-semibold">
+              className="flex items-center justify-center gap-2 w-full bg-white rounded-xl shadow-sm py-3 text-sm text-gray-400 hover:text-brand hover:shadow-md transition-all font-semibold">
               {Ic.back} Бүх машинуудыг үзэх
             </Link>
           </div>
@@ -382,7 +382,7 @@ function VehicleContent() {
       {v.company?.phone && (
         <div className="fixed bottom-0 left-0 right-0 z-50 lg:hidden bg-white border-t border-gray-200 shadow-[0_-4px_16px_rgba(0,0,0,0.08)] px-4 py-3 flex gap-2.5">
           <a href={`tel:${v.company.phone}`}
-            className="flex-1 flex items-center justify-center gap-2 bg-[#c00] active:bg-[#a00] text-white font-extrabold py-3.5 rounded-xl text-sm shadow-sm">
+            className="flex-1 flex items-center justify-center gap-2 bg-brand active:bg-brand-dark text-white font-extrabold py-3.5 rounded-xl text-sm shadow-sm">
             {Ic.phone} Залгах
           </a>
           <a href={`https://wa.me/976${v.company.phone.replace(/\D/g,'')}`}

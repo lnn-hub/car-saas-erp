@@ -76,7 +76,7 @@ function MainLayoutInner({ children }: { children: React.ReactNode }) {
       {/* Компани */}
       <div className="px-5 py-5 border-b border-[#e4e4e7]">
         <div className="flex items-center gap-3">
-          <div className="w-8 h-8 bg-[#c00] rounded-lg flex items-center justify-center shrink-0">
+          <div className="w-8 h-8 bg-brand rounded-lg flex items-center justify-center shrink-0">
             <span className="text-white text-sm font-bold">{companyName?.[0] || 'A'}</span>
           </div>
           <div className="min-w-0">
@@ -94,7 +94,7 @@ function MainLayoutInner({ children }: { children: React.ReactNode }) {
             <Link key={href} href={href}
               className={`flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm transition-all ${
                 active
-                  ? 'bg-[#c00] text-white font-medium shadow-sm'
+                  ? 'bg-brand text-white font-medium shadow-sm'
                   : 'text-[#52525b] hover:text-[#09090b] hover:bg-[#f4f4f5]'
               }`}>
               <Icon />
@@ -116,7 +116,7 @@ function MainLayoutInner({ children }: { children: React.ReactNode }) {
       {/* Хэрэглэгч */}
       <div className="px-3 pb-3 border-t border-[#e4e4e7] pt-3">
         <div className="flex items-center gap-3 px-3 py-2">
-          <div className="w-8 h-8 rounded-full bg-[#c00] flex items-center justify-center shrink-0">
+          <div className="w-8 h-8 rounded-full bg-brand flex items-center justify-center shrink-0">
             <span className="text-white text-xs font-semibold">{initials || '?'}</span>
           </div>
           <div className="flex-1 min-w-0">
@@ -143,7 +143,7 @@ function MainLayoutInner({ children }: { children: React.ReactNode }) {
       {/* ── Mobile top header ── */}
       <header className="lg:hidden fixed top-0 left-0 right-0 z-40 bg-white border-b border-[#e4e4e7] flex items-center justify-between px-4 h-14 shadow-sm">
         <div className="flex items-center gap-2.5">
-          <div className="w-7 h-7 bg-[#c00] rounded-md flex items-center justify-center">
+          <div className="w-7 h-7 bg-brand rounded-md flex items-center justify-center">
             <span className="text-white text-xs font-bold">{companyName?.[0] || 'A'}</span>
           </div>
           <span className="text-sm font-bold text-[#09090b] truncate max-w-[160px]">{companyName || 'Удирдлага'}</span>

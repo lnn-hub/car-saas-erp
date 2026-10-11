@@ -201,7 +201,7 @@ function AdminModal({ onClose }: { onClose: () => void }) {
           <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2}><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
         </button>
         <div className="mb-6">
-          <div className="w-8 h-8 bg-[#c00] rounded-lg mb-4 flex items-center justify-center">
+          <div className="w-8 h-8 bg-brand rounded-lg mb-4 flex items-center justify-center">
             <svg className="w-4 h-4 text-white" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2}><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg>
           </div>
           <h2 className="text-lg font-bold text-[#09090b]">Админ нэвтрэх</h2>
@@ -218,7 +218,7 @@ function AdminModal({ onClose }: { onClose: () => void }) {
             <div className="bg-red-50 border border-red-100 rounded-xl px-4 py-2.5 text-xs text-red-600">{error}</div>
           )}
           <button type="submit" disabled={loading}
-            className="w-full bg-[#c00] hover:bg-[#a00] disabled:opacity-40 text-white font-semibold py-3 rounded-xl text-sm transition-colors">
+            className="w-full bg-brand hover:bg-brand-dark disabled:opacity-40 text-white font-semibold py-3 rounded-xl text-sm transition-colors">
             {loading ? 'Нэвтэрж байна...' : 'Нэвтрэх'}
           </button>
         </form>
@@ -301,7 +301,7 @@ function HomeContent() {
       {/* ━━━ NAVBAR ━━━ */}
       <header className="sticky top-0 z-50 bg-white shadow-sm">
         {/* Top bar */}
-        <div className="bg-[#c00] text-white text-xs">
+        <div className="bg-brand text-white text-xs">
           <div className="max-w-7xl mx-auto px-4 h-8 flex items-center justify-between">
             <span className="opacity-80 font-mono tracking-wide">{clock}</span>
             <div className="flex items-center gap-4">
@@ -327,7 +327,7 @@ function HomeContent() {
                 />
               ) : (
                 <div className="flex items-center gap-2">
-                  <div className="w-9 h-9 bg-[#c00] rounded flex items-center justify-center">
+                  <div className="w-9 h-9 bg-brand rounded flex items-center justify-center">
                     <span className="text-white font-black text-lg leading-none">
                       {cname[0]}
                     </span>
@@ -349,7 +349,7 @@ function HomeContent() {
                 <a
                   key={h}
                   href={h}
-                  className="px-4 py-2 text-sm font-semibold text-[#333] hover:text-[#c00] transition-colors rounded-lg hover:bg-[#fff0f0]"
+                  className="px-4 py-2 text-sm font-semibold text-[#333] hover:text-brand transition-colors rounded-lg hover:bg-brand-soft"
                 >
                   {l}
                 </a>
@@ -360,7 +360,7 @@ function HomeContent() {
               {company?.phone && (
                 <a
                   href={`tel:${company.phone}`}
-                  className="hidden lg:flex items-center gap-2 bg-[#c00] hover:bg-[#a00] text-white text-sm font-bold px-5 py-2.5 rounded transition-colors"
+                  className="hidden lg:flex items-center gap-2 bg-brand hover:bg-brand-dark text-white text-sm font-bold px-5 py-2.5 rounded transition-colors"
                 >
                   <IcPhone /> Залгах
                 </a>
@@ -407,7 +407,7 @@ function HomeContent() {
               ["#contact", "Холбоо барих"],
             ].map(([h, l]) => (
               <a key={h} href={h} onClick={() => setMenu(false)}
-                className="block py-2 px-3 text-sm font-semibold text-[#333] hover:text-[#c00] rounded hover:bg-[#fff0f0]">
+                className="block py-2 px-3 text-sm font-semibold text-[#333] hover:text-brand rounded hover:bg-brand-soft">
                 {l}
               </a>
             ))}
@@ -438,7 +438,7 @@ function HomeContent() {
         />
         <div className="relative max-w-7xl mx-auto px-4 py-12 sm:py-28">
           <div className="max-w-2xl">
-            <div className="inline-flex items-center gap-2 bg-[#c00]/20 border border-[#c00]/30 text-red-300 text-xs font-bold px-3 py-1.5 rounded-full mb-4 sm:mb-6 tracking-widest uppercase">
+            <div className="inline-flex items-center gap-2 bg-brand/20 border border-brand/30 text-red-300 text-xs font-bold px-3 py-1.5 rounded-full mb-4 sm:mb-6 tracking-widest uppercase">
               <span className={`w-1.5 h-1.5 bg-red-400 rounded-full ${(loading || retrying) ? 'animate-pulse' : ''}`} />
               {retrying
                 ? "Сервер асаж байна, түр хүлээнэ үү..."
@@ -448,7 +448,7 @@ function HomeContent() {
             </div>
             <h1 className="text-3xl sm:text-6xl font-black leading-tight tracking-tight mb-3 sm:mb-5">
               Чанартай машин —<br />
-              <span className="text-[#ff3333]">шууд таны гарт</span>
+              <span className="text-brand-light">шууд таны гарт</span>
             </h1>
             <p className="text-gray-400 text-sm sm:text-lg leading-relaxed mb-6 sm:mb-10 max-w-xl">
               {company?.address
@@ -458,7 +458,7 @@ function HomeContent() {
             <div className="flex flex-wrap gap-3">
               <a
                 href="#cars"
-                className="bg-[#c00] active:bg-[#a00] text-white font-bold px-6 sm:px-8 py-3 sm:py-3.5 rounded transition-colors text-sm"
+                className="bg-brand active:bg-brand-dark text-white font-bold px-6 sm:px-8 py-3 sm:py-3.5 rounded transition-colors text-sm"
               >
                 Машинуудыг үзэх
               </a>
@@ -523,7 +523,7 @@ function HomeContent() {
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
                 placeholder="Марк, загвар хайх..."
-                className="w-full pl-8 pr-3 py-2.5 border border-gray-200 rounded-lg text-sm focus:outline-none focus:border-[#c00] transition-colors"
+                className="w-full pl-8 pr-3 py-2.5 border border-gray-200 rounded-lg text-sm focus:outline-none focus:border-brand transition-colors"
               />
             </div>
           </div>
@@ -536,7 +536,7 @@ function HomeContent() {
             <select
               value={filterBrand}
               onChange={(e) => setBrand(e.target.value)}
-              className="shrink-0 px-3 py-1.5 border border-gray-200 rounded-full text-xs text-gray-600 focus:outline-none focus:border-[#c00] bg-white transition-colors font-semibold"
+              className="shrink-0 px-3 py-1.5 border border-gray-200 rounded-full text-xs text-gray-600 focus:outline-none focus:border-brand bg-white transition-colors font-semibold"
             >
               <option value="">Бүх марк</option>
               {uniqueBrands.map((b) => (
@@ -553,7 +553,7 @@ function HomeContent() {
                 onClick={() => setFilterFuel(filterFuel === k ? "" : k)}
                 className={`shrink-0 px-3 py-1.5 rounded-full text-xs font-semibold border transition-colors ${
                   filterFuel === k
-                    ? "bg-[#c00] border-[#c00] text-white"
+                    ? "bg-brand border-brand text-white"
                     : "border-gray-200 text-gray-500"
                 }`}
               >
@@ -641,7 +641,7 @@ function HomeContent() {
                   setFilterTrans("");
                   setBrand("");
                 }}
-                className="text-sm text-[#c00] hover:underline"
+                className="text-sm text-brand hover:underline"
               >
                 Шүүлтийг цэвэрлэх
               </button>
@@ -659,7 +659,7 @@ function HomeContent() {
                   <Link
                     key={v.id}
                     href={`/vehicle/${v.id}`}
-                    className="group bg-white rounded-xl overflow-hidden shadow-sm hover:shadow-xl transition-all duration-300 flex flex-col border border-transparent hover:border-[#c00]/20 active:scale-[0.98]"
+                    className="group bg-white rounded-xl overflow-hidden shadow-sm hover:shadow-xl transition-all duration-300 flex flex-col border border-transparent hover:border-brand/20 active:scale-[0.98]"
                   >
                     {/* Image */}
                     <div className="relative aspect-[4/3] sm:aspect-[16/10] bg-gray-100 overflow-hidden">
@@ -696,19 +696,19 @@ function HomeContent() {
                         {v.year}
                       </div>
                       {v.has_plates && (
-                        <div className="absolute top-2 right-2 bg-[#c00] text-white text-[9px] sm:text-[10px] font-bold px-1.5 py-0.5 rounded uppercase tracking-wide">
+                        <div className="absolute top-2 right-2 bg-brand text-white text-[9px] sm:text-[10px] font-bold px-1.5 py-0.5 rounded uppercase tracking-wide">
                           Дугаартай
                         </div>
                       )}
                       {/* Red hover line */}
-                      <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-[#c00] scale-x-0 group-hover:scale-x-100 transition-transform duration-300 origin-left" />
+                      <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-brand scale-x-0 group-hover:scale-x-100 transition-transform duration-300 origin-left" />
                     </div>
 
                     {/* Info */}
                     <div className="p-3 sm:p-4 flex flex-col flex-1">
                       {/* Name */}
                       <div className="mb-2 sm:mb-3">
-                        <div className="text-[10px] sm:text-[11px] font-bold text-[#c00] uppercase tracking-wider mb-0.5">
+                        <div className="text-[10px] sm:text-[11px] font-bold text-brand uppercase tracking-wider mb-0.5">
                           {v.brand}
                         </div>
                         <h3 className="font-extrabold text-[#111] text-[13px] sm:text-[15px] leading-tight">
@@ -755,7 +755,7 @@ function HomeContent() {
                             <div className="hidden sm:block text-[10px] text-gray-400 uppercase tracking-wide">
                               Үнэ
                             </div>
-                            <div className="text-[13px] sm:text-[15px] font-black text-[#c00] leading-tight">
+                            <div className="text-[13px] sm:text-[15px] font-black text-brand leading-tight">
                               {price}
                             </div>
                           </div>
@@ -764,7 +764,7 @@ function HomeContent() {
                             Тохиролцоно
                           </div>
                         )}
-                        <span className="shrink-0 bg-[#c00] text-white text-[10px] sm:text-xs font-bold px-2 sm:px-3 py-1.5 sm:py-2 rounded transition-colors whitespace-nowrap">
+                        <span className="shrink-0 bg-brand text-white text-[10px] sm:text-xs font-bold px-2 sm:px-3 py-1.5 sm:py-2 rounded transition-colors whitespace-nowrap">
                           Үзэх →
                         </span>
                       </div>
@@ -785,7 +785,7 @@ function HomeContent() {
         <div className="max-w-7xl mx-auto">
           <div className="flex flex-col md:flex-row gap-12 items-center">
             <div className="flex-1">
-              <div className="text-[11px] font-bold text-[#c00] uppercase tracking-widest mb-3">
+              <div className="text-[11px] font-bold text-brand uppercase tracking-widest mb-3">
                 Бидний тухай
               </div>
               <h2 className="text-3xl font-black text-[#111] mb-4 leading-tight">
@@ -799,7 +799,7 @@ function HomeContent() {
               </p>
               <a
                 href="#contact"
-                className="inline-flex items-center gap-2 bg-[#c00] hover:bg-[#a00] text-white text-sm font-bold px-6 py-3 rounded transition-colors"
+                className="inline-flex items-center gap-2 bg-brand hover:bg-brand-dark text-white text-sm font-bold px-6 py-3 rounded transition-colors"
               >
                 Холбогдох
               </a>
@@ -822,7 +822,7 @@ function HomeContent() {
                   key={l}
                   className="bg-[#f9f9f9] rounded-xl p-5 text-center border border-gray-100"
                 >
-                  <div className="text-3xl font-black text-[#c00] mb-1">
+                  <div className="text-3xl font-black text-brand mb-1">
                     {n}
                   </div>
                   <div className="text-sm font-bold text-[#111]">{l}</div>
@@ -841,7 +841,7 @@ function HomeContent() {
       >
         <div className="max-w-7xl mx-auto">
           <div className="text-center mb-10">
-            <div className="text-[11px] font-bold text-[#c00] uppercase tracking-widest mb-2">
+            <div className="text-[11px] font-bold text-brand uppercase tracking-widest mb-2">
               Холбоо барих
             </div>
             <h2 className="text-3xl font-black text-[#111]">
@@ -852,9 +852,9 @@ function HomeContent() {
             {company?.phone && (
               <a
                 href={`tel:${company.phone}`}
-                className="bg-white rounded-xl p-6 text-center border border-gray-200 hover:border-[#c00] hover:shadow-md transition-all group"
+                className="bg-white rounded-xl p-6 text-center border border-gray-200 hover:border-brand hover:shadow-md transition-all group"
               >
-                <div className="w-12 h-12 bg-[#c00] rounded-xl flex items-center justify-center text-white mx-auto mb-3 group-hover:scale-110 transition-transform">
+                <div className="w-12 h-12 bg-brand rounded-xl flex items-center justify-center text-white mx-auto mb-3 group-hover:scale-110 transition-transform">
                   <IcPhone cls="w-5 h-5" />
                 </div>
                 <div className="text-[11px] text-gray-400 uppercase tracking-wide mb-1">
@@ -903,7 +903,7 @@ function HomeContent() {
         <div className="max-w-7xl mx-auto px-4 py-8">
           <div className="flex flex-col sm:flex-row items-center justify-between gap-5 mb-6">
             <div className="flex items-center gap-2.5">
-              <div className="w-8 h-8 bg-[#c00] rounded flex items-center justify-center">
+              <div className="w-8 h-8 bg-brand rounded flex items-center justify-center">
                 <span className="text-white font-black text-sm">
                   {cname[0]}
                 </span>

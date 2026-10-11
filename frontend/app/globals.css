@@ -1,5 +1,12 @@
 @import "tailwindcss";
 
+@theme {
+  --color-brand: #b4232c;
+  --color-brand-dark: #8f1b23;
+  --color-brand-light: #e5484d;
+  --color-brand-soft: #fbeeee;
+}
+
 * { box-sizing: border-box; }
 
 body {

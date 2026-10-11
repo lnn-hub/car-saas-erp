@@ -6,7 +6,7 @@ interface Settings {
   name: string; phone: string; address: string; show_prices: boolean;
 }
 
-const inp = "w-full bg-white border border-[#e4e4e7] rounded-md px-3 py-2 text-sm text-[#09090b] placeholder-[#a1a1aa] focus:outline-none focus:border-[#c00] transition-colors";
+const inp = "w-full bg-white border border-[#e4e4e7] rounded-md px-3 py-2 text-sm text-[#09090b] placeholder-[#a1a1aa] focus:outline-none focus:border-brand transition-colors";
 
 export default function SettingsPage() {
   const [form, setForm]       = useState<Settings>({ name: '', phone: '', address: '', show_prices: true });
@@ -73,7 +73,7 @@ export default function SettingsPage() {
               <div className="text-xs text-[#a1a1aa] mt-0.5">Үйлчлүүлэгчид машины үнийг харуулах эсэх</div>
             </div>
             <button type="button" onClick={() => set('show_prices', !form.show_prices)}
-              className={`relative w-10 h-6 rounded-full transition-colors ${form.show_prices ? 'bg-[#c00]' : 'bg-[#e4e4e7]'}`}>
+              className={`relative w-10 h-6 rounded-full transition-colors ${form.show_prices ? 'bg-brand' : 'bg-[#e4e4e7]'}`}>
               <span className={`absolute top-1 w-4 h-4 bg-white rounded-full shadow transition-all ${form.show_prices ? 'left-5' : 'left-1'}`} />
             </button>
           </div>
@@ -83,7 +83,7 @@ export default function SettingsPage() {
         {saved && <div className="bg-[#f0fdf4] border border-[#bbf7d0] rounded-lg px-3 py-2 text-xs text-[#16a34a]">Хадгалагдлаа</div>}
 
         <button type="submit" disabled={saving}
-          className="w-full py-2.5 bg-[#c00] hover:bg-[#a00] disabled:opacity-40 text-white text-sm font-medium rounded-lg transition-colors">
+          className="w-full py-2.5 bg-brand hover:bg-brand-dark disabled:opacity-40 text-white text-sm font-medium rounded-lg transition-colors">
           {saving ? 'Хадгалж байна...' : 'Хадгалах'}
         </button>
       </form>

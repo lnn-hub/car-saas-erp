@@ -86,7 +86,7 @@ export default function VehiclesPage() {
             </p>
           </div>
           <Link href="/vehicles/new"
-            className="flex items-center gap-1.5 bg-[#c00] hover:bg-[#a00] text-white text-sm font-medium px-3 py-1.5 rounded-md transition-colors shrink-0">
+            className="flex items-center gap-1.5 bg-brand hover:bg-brand-dark text-white text-sm font-medium px-3 py-1.5 rounded-md transition-colors shrink-0">
             <svg className="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2}><path d="M12 5v14M5 12h14"/></svg>
             <span className="hidden sm:inline">Нэмэх</span>
             <span className="sm:hidden">+</span>
@@ -100,7 +100,7 @@ export default function VehiclesPage() {
             </span>
             <input value={search} onChange={e => { setSearch(e.target.value); setPage(1); }}
               placeholder="Хайх..."
-              className="bg-white border border-[#e4e4e7] rounded-md pl-8 pr-3 py-1.5 text-sm text-[#09090b] placeholder-[#a1a1aa] focus:outline-none focus:border-[#c00] w-36 sm:w-52 transition-colors" />
+              className="bg-white border border-[#e4e4e7] rounded-md pl-8 pr-3 py-1.5 text-sm text-[#09090b] placeholder-[#a1a1aa] focus:outline-none focus:border-brand w-36 sm:w-52 transition-colors" />
           </div>
           {ALL_STATUSES.map(s => (
             <button key={s} onClick={() => toggleStatus(s)}
@@ -234,7 +234,7 @@ export default function VehiclesPage() {
                   <span key={i} className="w-7 text-center text-xs text-[#a1a1aa]">…</span>
                 ) : (
                   <button key={p} onClick={() => setPage(p as number)}
-                    className={`w-7 h-7 rounded text-xs transition-colors ${page === p ? 'bg-[#c00] text-white' : 'hover:bg-[#f4f4f5] text-[#71717a]'}`}>
+                    className={`w-7 h-7 rounded text-xs transition-colors ${page === p ? 'bg-brand text-white' : 'hover:bg-[#f4f4f5] text-[#71717a]'}`}>
                     {p}
                   </button>
                 ))}
