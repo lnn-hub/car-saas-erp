@@ -247,15 +247,30 @@ function HomeContent() {
   const clock = useClock();
 
   useEffect(() => {
-    Promise.all([
-      fetch(`${BACKEND}/api/public`).then((r) => r.json()),
-      fetch(`${BACKEND}/api/public/vehicles`).then((r) => r.json()),
-    ])
-      .then(([comp, data]) => {
+    let cancelled = false;
+    async function load(retry = 0) {
+      try {
+        const [comp, data] = await Promise.all([
+          fetch(`${BACKEND}/api/public`).then(r => r.json()),
+          fetch(`${BACKEND}/api/public/vehicles`).then(r => r.json()),
+        ]);
+        if (cancelled) return;
         if (!comp.error) setCompany(comp);
         setVehicles(data.vehicles || []);
-      })
-      .finally(() => setLoading(false));
+        setLoading(false);
+      } catch {
+        if (cancelled) return;
+        if (retry < 3) {
+          setTimeout(() => load(retry + 1), 3000 * (retry + 1));
+        } else {
+          setLoading(false);
+        }
+      }
+    }
+    // Render cold start-аас сэргийлж warmUp дуудна
+    fetch(`${BACKEND}/health`).catch(() => {});
+    load();
+    return () => { cancelled = true; };
   }, []);
 
   const uniqueBrands = [...new Set(vehicles.map((v) => v.brand))].sort();
