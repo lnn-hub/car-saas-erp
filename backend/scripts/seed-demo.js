@@ -1,11 +1,23 @@
 // Жишээ (demo) машинууд + Wikimedia Commons-ийн лицензтэй зургууд оруулна.
-//   node scripts/seed-demo.js
+//   Локал:      node scripts/seed-demo.js
+//   Production: DATABASE_URL='<neon>' CLOUDINARY_CLOUD_NAME=.. CLOUDINARY_API_KEY=.. \
+//               CLOUDINARY_API_SECRET=.. node scripts/seed-demo.js --yes
 // Дахин ажиллуулахад өмнө оруулсан DEMO машинуудыг шинэчилнэ (бусад өгөгдөлд хүрэхгүй).
 require('dotenv').config();
 const fs    = require('fs');
 const path  = require('path');
 const sharp = require('sharp');
 const pool  = require('../src/db/pool');
+const { v2: cloudinary } = require('cloudinary');
+
+const USE_CLOUDINARY = !!(process.env.CLOUDINARY_CLOUD_NAME && process.env.CLOUDINARY_API_KEY && process.env.CLOUDINARY_API_SECRET);
+if (USE_CLOUDINARY) {
+  cloudinary.config({
+    cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
+    api_key: process.env.CLOUDINARY_API_KEY,
+    api_secret: process.env.CLOUDINARY_API_SECRET,
+  });
+}
 
 const UPLOAD_DIR = path.join(__dirname, '../uploads');
 const IMAGES     = require('./demo-images.json');
@@ -61,6 +73,18 @@ async function fetchBuf(url) {
 }
 
 async function ensureImage(key, i, src) {
+  if (USE_CLOUDINARY) {
+    const buf  = await fetchBuf(src.url);
+    const webp = await sharp(buf).resize(1600, 1200, { fit: 'inside', withoutEnlargement: true }).webp({ quality: 85 }).toBuffer();
+    const url = await new Promise((resolve, reject) => {
+      cloudinary.uploader.upload_stream(
+        { folder: 'car-saas/demo', public_id: `${key}-${i}`, overwrite: true, resource_type: 'image', format: 'webp' },
+        (err, result) => (err ? reject(err) : resolve(result.secure_url))
+      ).end(webp);
+    });
+    await new Promise(res => setTimeout(res, 800));
+    return url;
+  }
   const name = `demo-${key}-${i}.webp`;
   const file = path.join(UPLOAD_DIR, name);
   if (!fs.existsSync(file)) {
@@ -72,6 +96,18 @@ async function ensureImage(key, i, src) {
 }
 
 (async () => {
+  const dbUrl = process.env.DATABASE_URL || '';
+  const host  = (dbUrl.match(/@([^/:?]+)/) || [])[1] || 'localhost';
+  const remote = !/^(localhost|127\.0\.0\.1)$/.test(host);
+  console.log(`DB: ${host} | Зураг: ${USE_CLOUDINARY ? 'Cloudinary' : 'локал /uploads'}`);
+  if (remote && !process.argv.includes('--yes')) {
+    console.error('Алсын (production) DB илэрлээ. Мэдэгдэж байгаа бол --yes нэмж дахин ажиллуулна уу.');
+    process.exit(1);
+  }
+  if (remote && !USE_CLOUDINARY) {
+    console.error('Production-д CLOUDINARY_* хувьсагч шаардлагатай (локал /uploads Render дээр хадгалагдахгүй).');
+    process.exit(1);
+  }
   fs.mkdirSync(UPLOAD_DIR, { recursive: true });
   const { rows: [company] } = await pool.query('SELECT id FROM companies ORDER BY created_at ASC LIMIT 1');
   if (!company) throw new Error('Компани олдсонгүй');
