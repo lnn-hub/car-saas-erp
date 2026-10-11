@@ -95,28 +95,31 @@ async function ensureImage(key, i, src) {
   return `/uploads/${name}`;
 }
 
-(async () => {
+function dbHost() {
   const dbUrl = process.env.DATABASE_URL || '';
   const m     = dbUrl.match(/@([^/:?]+)/);
-  const host  = m ? m[1] : (dbUrl.startsWith('postgresql://localhost') || !dbUrl ? 'localhost' : 'танигдаагүй-хаяг');
-  const remote = !/^(localhost|127\.0\.0\.1)$/.test(host);
-  console.log(`DB: ${host} | Зураг: ${USE_CLOUDINARY ? 'Cloudinary' : 'локал /uploads'}`);
-  if (remote && !process.argv.includes('--yes')) {
-    console.error('Алсын (production) DB илэрлээ. Мэдэгдэж байгаа бол --yes нэмж дахин ажиллуулна уу.');
-    process.exit(1);
-  }
-  if (remote && !USE_CLOUDINARY) {
-    console.error('Production-д CLOUDINARY_* хувьсагч шаардлагатай (локал /uploads Render дээр хадгалагдахгүй).');
-    process.exit(1);
-  }
-  fs.mkdirSync(UPLOAD_DIR, { recursive: true });
-  const { rows: [company] } = await pool.query('SELECT id FROM companies ORDER BY created_at ASC LIMIT 1');
-  if (!company) throw new Error('Компани олдсонгүй');
-  const { rows: [admin] } = await pool.query("SELECT id FROM users WHERE company_id=$1 AND role='ADMIN' ORDER BY created_at LIMIT 1", [company.id]);
+  return m ? m[1] : (dbUrl.startsWith('postgresql://localhost') || !dbUrl ? 'localhost' : 'танигдаагүй-хаяг');
+}
+const isRemote = () => !/^(localhost|127\.0\.0\.1)$/.test(dbHost());
 
-  await pool.query("DELETE FROM vehicles WHERE company_id=$1 AND vin LIKE 'DEMO%'", [company.id]);
+// onProgress({ done, total, message }) - сервер дээрээс явц харуулахад ашиглана
+async function seedDemo({ companyId, onProgress = () => {} } = {}) {
+  if (isRemote() && !USE_CLOUDINARY)
+    throw new Error('Production-д CLOUDINARY_* хувьсагч шаардлагатай (локал /uploads Render дээр хадгалагдахгүй).');
+
+  fs.mkdirSync(UPLOAD_DIR, { recursive: true });
+  let cid = companyId;
+  if (!cid) {
+    const { rows: [company] } = await pool.query('SELECT id FROM companies ORDER BY created_at ASC LIMIT 1');
+    if (!company) throw new Error('Компани олдсонгүй');
+    cid = company.id;
+  }
+  const { rows: [admin] } = await pool.query("SELECT id FROM users WHERE company_id=$1 AND role='ADMIN' ORDER BY created_at LIMIT 1", [cid]);
+
+  await pool.query("DELETE FROM vehicles WHERE company_id=$1 AND vin LIKE 'DEMO%'", [cid]);
 
   for (const [n, c] of CARS.entries()) {
+    onProgress({ done: n, total: CARS.length, message: `${c.brand} ${c.model} оруулж байна...` });
     const imgs = IMAGES[c.key];
     const credit = [...new Set(imgs.map(x => `${x.author} (${x.license})`))].join(', ');
     const description = `${c.text}\n\n${c.list.map(l => `• ${l}`).join('\n')}\n\nЗургийн эх сурвалж: Wikimedia Commons - ${credit}.`;
@@ -125,7 +128,7 @@ async function ensureImage(key, i, src) {
       `INSERT INTO vehicles (company_id, vin, brand, model, year, mileage, color, fuel_type, transmission,
                              engine_cc, status, description, arrived_at, manufactured_date, has_plates, created_by)
        VALUES ($1,$2,$3,$4,$5,$6,$7,$8,'AUTO',$9,$10,$11, CURRENT_DATE - $12::int, $13, $14, $15) RETURNING id`,
-      [company.id, vin, c.brand, c.model, c.year, c.mileage, c.color, c.fuel, c.cc, c.status, description,
+      [cid, vin, c.brand, c.model, c.year, c.mileage, c.color, c.fuel, c.cc, c.status, description,
        10 + n * 3, c.mfg, n % 2 === 0, admin?.id || null]
     );
     for (const [type, amount] of c.costs)
@@ -136,6 +139,19 @@ async function ensureImage(key, i, src) {
     }
     console.log(`+ ${c.brand} ${c.model} ${c.year} (${c.status}) - ${imgs.length} зураг`);
   }
-  await pool.end();
-  console.log('Дууслаа.');
-})().catch(e => { console.error(e); process.exit(1); });
+  onProgress({ done: CARS.length, total: CARS.length, message: 'Дууслаа' });
+}
+
+module.exports = { seedDemo, DEMO_COUNT: CARS.length };
+
+if (require.main === module) {
+  console.log(`DB: ${dbHost()} | Зураг: ${USE_CLOUDINARY ? 'Cloudinary' : 'локал /uploads'}`);
+  if (isRemote() && !process.argv.includes('--yes')) {
+    console.error('Алсын (production) DB илэрлээ. Мэдэгдэж байгаа бол --yes нэмж дахин ажиллуулна уу.');
+    process.exit(1);
+  }
+  seedDemo()
+    .then(() => pool.end())
+    .then(() => console.log('Дууслаа.'))
+    .catch(e => { console.error(e); process.exit(1); });
+}

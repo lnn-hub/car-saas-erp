@@ -45,6 +45,24 @@ export default function SettingsPage() {
   const [mError, setMError]   = useState('');
   const fileRef = useRef<HTMLInputElement>(null);
 
+  const [seed, setSeed] = useState<{ running: boolean; done: number; total: number; message: string; error: string | null } | null>(null);
+  const [seedErr, setSeedErr] = useState('');
+
+  useEffect(() => {
+    if (!seed?.running) return;
+    const t = setInterval(() => {
+      api.demoSeedStatus().then(setSeed).catch(() => {});
+    }, 3000);
+    return () => clearInterval(t);
+  }, [seed?.running]);
+
+  async function startSeed() {
+    if (!confirm('10 жишээ машин (зурагтай) оруулах уу? Өмнө оруулсан жишээ машинууд шинэчлэгдэнэ.')) return;
+    setSeedErr('');
+    try { setSeed(await api.startDemoSeed()); }
+    catch (err: unknown) { setSeedErr(err instanceof Error ? err.message : 'Алдаа гарлаа'); }
+  }
+
   const loadTeam = () => api.getTeam().then(setTeam).catch(console.error);
 
   useEffect(() => {
@@ -184,6 +202,33 @@ export default function SettingsPage() {
         <div className="p-4 border-t border-[#e4e4e7] bg-[#fafafa]">
           <button type="button" onClick={() => openMember('new')}
             className="text-xs font-black uppercase tracking-widest text-brand hover:text-brand-dark">+ Гишүүн нэмэх</button>
+        </div>
+      </Section>
+
+      <Section title="Жишээ өгөгдөл" hint="Demo харуулахад">
+        <div className="p-5 space-y-3">
+          <p className="text-sm text-[#71717a] leading-relaxed">
+            Toyota, Lexus-ийн 10 жишээ машиныг мэдээлэл, зурагтай нь вэбсайтад оруулна.
+            Нэг минут орчим үргэлжилнэ. Дахин дарахад өмнөх жишээ машинууд шинэчлэгдэнэ, бусад машинд хөндлөнгөөс орохгүй.
+          </p>
+          <button type="button" onClick={startSeed} disabled={seed?.running}
+            className="px-5 py-2.5 bg-[#111] hover:bg-brand disabled:opacity-50 text-white text-xs font-black uppercase tracking-widest rounded-md transition-colors">
+            {seed?.running ? 'Оруулж байна...' : 'Жишээ машин оруулах'}
+          </button>
+          {seed?.running && (
+            <div>
+              <div className="h-1.5 bg-[#f4f4f5] rounded-full overflow-hidden">
+                <div className="h-full bg-brand transition-all" style={{ width: `${seed.total ? (seed.done / seed.total) * 100 : 5}%` }} />
+              </div>
+              <div className="text-xs text-[#71717a] mt-1.5">{seed.message} ({seed.done}/{seed.total || 10})</div>
+            </div>
+          )}
+          {seed && !seed.running && !seed.error && seed.total > 0 && (
+            <div className="bg-[#f0fdf4] border border-[#bbf7d0] rounded-lg px-3 py-2 text-xs text-[#16a34a]">Дууслаа - нүүр хуудсыг шинэчилж харна уу</div>
+          )}
+          {(seed?.error || seedErr) && (
+            <div className="bg-red-50 border border-red-200 rounded-lg px-3 py-2 text-xs text-red-600">{seed?.error || seedErr}</div>
+          )}
         </div>
       </Section>
 

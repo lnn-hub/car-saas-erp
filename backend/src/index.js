@@ -22,6 +22,7 @@ app.use('/api/billing',   require('./routes/billing'));
 app.use('/api/public',    require('./routes/public'));
 app.use('/api/settings',  require('./routes/settings'));
 app.use('/api/team',      require('./routes/team'));
+app.use('/api/admin',     require('./routes/admin'));
 app.use('/api/upload',    require('./routes/upload'));
 app.use('/uploads',       require('express').static(require('path').join(__dirname, '../uploads')));
 

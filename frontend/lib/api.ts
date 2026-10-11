@@ -106,6 +106,9 @@ export const api = {
     return request('/sales', { method: 'POST', body: JSON.stringify(data) });
   },
 
+  startDemoSeed: () => request('/admin/demo-seed', { method: 'POST' }),
+  demoSeedStatus: () => request('/admin/demo-seed'),
+
   getTeam: () => request('/team'),
   createTeamMember: (data: { name: string; position: string; bio: string }) =>
     request('/team', { method: 'POST', body: JSON.stringify(data) }),
