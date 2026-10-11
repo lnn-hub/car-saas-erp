@@ -11,7 +11,10 @@ interface Sale {
 interface Summary { total_sold: string; total_revenue: string; total_profit: string; }
 
 function fmt(n: string | number) { return Number(n).toLocaleString('mn-MN') + '₮'; }
-function fmtDate(d: string) { return new Date(d).toLocaleDateString('mn-MN', { year: 'numeric', month: 'short', day: 'numeric' }); }
+function fmtDate(d: string) {
+  const dt = new Date(d);
+  return `${dt.getFullYear()}.${String(dt.getMonth()+1).padStart(2,'0')}.${String(dt.getDate()).padStart(2,'0')}`;
+}
 
 const PAYMENT: Record<string, string> = { CASH: 'Бэлэн', LOAN: 'Зээл', LEASING: 'Лизинг' };
 
