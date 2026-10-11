@@ -2,6 +2,10 @@
 import { useEffect, useState, Suspense } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import Link from 'next/link';
+import { Company } from '@/lib/site';
+import { useCompany } from '@/lib/useSiteData';
+import { SiteHeader } from '@/components/site/SiteHeader';
+import { SiteFooter } from '@/components/site/SiteFooter';
 
 const BACKEND = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000';
 
@@ -10,7 +14,7 @@ interface Vehicle {
   fuel_type: string; transmission: string; engine_cc: string; mileage: number;
   description: string; has_plates: boolean; manufactured_date: string | null;
   total_cost: string | null; images: string[];
-  company: { name: string; phone: string; };
+  company: Company;
 }
 
 const FUEL:  Record<string,string> = { PETROL:'Бензин', DIESEL:'Дизель', HYBRID:'Хибрид', ELECTRIC:'Цахилгаан' };
@@ -44,6 +48,7 @@ function VehicleContent() {
   const router = useRouter();
   const id = params.id as string;
 
+  const siteCompany        = useCompany();
   const [v, setV]          = useState<Vehicle|null>(null);
   const [imgIdx, setIdx]   = useState(0);
   const [loading, setLoad] = useState(true);
@@ -71,26 +76,36 @@ function VehicleContent() {
     return () => { cancelled = true; document.title = 'AutoDealer'; };
   }, [id]);
 
+  const company = v?.company ?? siteCompany;
+
   /* ── Loading ── */
   if (loading) return (
-    <div className="min-h-screen bg-[#f5f5f5] flex items-center justify-center">
-      <div className="text-center">
-        <div className="w-10 h-10 border-[3px] border-brand border-t-transparent rounded-full animate-spin mx-auto mb-3" />
-        <p className="text-sm text-gray-400">Ачааллаж байна...</p>
+    <div className="min-h-screen bg-[#f5f5f5] flex flex-col">
+      <SiteHeader company={company} />
+      <div className="flex-1 flex items-center justify-center py-24">
+        <div className="text-center">
+          <div className="w-10 h-10 border-[3px] border-brand border-t-transparent rounded-full animate-spin mx-auto mb-3" />
+          <p className="text-sm text-gray-400">Ачааллаж байна...</p>
+        </div>
       </div>
+      <SiteFooter company={company} />
     </div>
   );
 
   /* ── 404 ── */
   if (!v) return (
-    <div className="min-h-screen bg-[#f5f5f5] flex items-center justify-center">
-      <div className="text-center">
-        <div className="text-7xl font-black text-gray-200 mb-4">404</div>
-        <p className="text-gray-400 text-sm mb-5">Машин олдсонгүй</p>
-        <Link href="/" className="inline-flex items-center gap-2 text-sm text-brand hover:underline">
-          {Ic.back} Нүүр хуудас руу буцах
-        </Link>
+    <div className="min-h-screen bg-[#f5f5f5] flex flex-col">
+      <SiteHeader company={company} />
+      <div className="flex-1 flex items-center justify-center py-24">
+        <div className="text-center">
+          <div className="text-7xl font-black text-gray-200 mb-4">404</div>
+          <p className="text-gray-400 text-sm mb-5">Машин олдсонгүй</p>
+          <Link href="/#cars" className="inline-flex items-center gap-2 text-sm text-brand hover:underline">
+            {Ic.back} Машинууд руу буцах
+          </Link>
+        </div>
       </div>
+      <SiteFooter company={company} />
     </div>
   );
 
@@ -121,37 +136,21 @@ function VehicleContent() {
   return (
     <div className="min-h-screen bg-[#f2f2f2] pb-[76px] lg:pb-0" style={{fontFamily:"'Inter','Segoe UI',sans-serif"}}>
 
-      {/* ── Top nav ── */}
-      <div className="bg-brand text-white text-xs">
-        <div className="max-w-7xl mx-auto px-4 h-9 flex items-center gap-4">
+      <SiteHeader company={company} />
+
+      {/* ── Breadcrumb ── */}
+      <div className="bg-white border-b border-zinc-200">
+        <div className="max-w-7xl mx-auto px-4 h-11 flex items-center gap-3 text-[11px] font-black uppercase tracking-[0.12em] text-zinc-400">
           <button onClick={() => router.back()}
-            className="flex items-center gap-1.5 hover:opacity-80 transition-opacity font-medium">
+            className="flex items-center gap-1.5 text-[#111] hover:text-brand transition-colors">
             {Ic.back} Буцах
           </button>
-          <span className="opacity-30">|</span>
-          <Link href="/" className="hover:opacity-80 transition-opacity">{v.company?.name}</Link>
-          <span className="opacity-30 hidden sm:inline">›</span>
-          <span className="opacity-60 hidden sm:inline">{v.brand} {v.model}</span>
+          <span className="text-zinc-300">|</span>
+          <Link href="/#cars" className="hover:text-brand transition-colors">Машинууд</Link>
+          <span className="text-zinc-300">/</span>
+          <span className="text-brand truncate">{v.brand} {v.model}</span>
         </div>
       </div>
-
-      {/* ── White header ── */}
-      <header className="bg-white shadow-sm sticky top-0 z-30">
-        <div className="max-w-7xl mx-auto px-4 h-14 flex items-center justify-between">
-          <Link href="/" className="flex items-center gap-2">
-            <div className="w-8 h-8 bg-brand rounded flex items-center justify-center">
-              <span className="text-white font-black text-base leading-none">{v.company?.name?.[0] || 'A'}</span>
-            </div>
-            <span className="font-black text-[#111] text-base hidden sm:block">{v.company?.name}</span>
-          </Link>
-          {v.company?.phone && (
-            <a href={`tel:${v.company.phone}`}
-              className="flex items-center gap-2 bg-brand hover:bg-brand-dark text-white text-sm font-bold px-5 py-2 rounded transition-colors">
-              {Ic.phone}{v.company.phone}
-            </a>
-          )}
-        </div>
-      </header>
 
       {/* ── HERO image ── */}
       <div className="relative bg-[#111] overflow-hidden" style={{minHeight:'clamp(280px,55vw,480px)'}}>
@@ -377,6 +376,8 @@ function VehicleContent() {
           </div>
         </div>
       </main>
+
+      <SiteFooter company={company} />
 
       {/* Mobile sticky bottom call bar */}
       {v.company?.phone && (

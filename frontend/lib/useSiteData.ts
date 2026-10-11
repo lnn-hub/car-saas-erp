@@ -44,3 +44,14 @@ export function useSiteData() {
 
   return { company, vehicles, team, loading, retrying };
 }
+
+export function useCompany() {
+  const [company, setCompany] = useState<Company | null>(null);
+  useEffect(() => {
+    fetch(`${BACKEND}/api/public`)
+      .then((r) => r.json())
+      .then((c) => { if (!c.error) setCompany(c); })
+      .catch(() => {});
+  }, []);
+  return company;
+}
