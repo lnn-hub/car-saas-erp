@@ -1,6 +1,7 @@
 'use client';
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
+import Link from 'next/link';
 import { api } from '@/lib/api';
 
 export default function LoginPage() {
@@ -50,6 +51,11 @@ export default function LoginPage() {
             {loading ? 'Нэвтэрж байна...' : 'Нэвтрэх'}
           </button>
         </form>
+
+        <p className="text-center text-xs text-[#a1a1aa] mt-6">
+          Бүртгэлгүй юу?{' '}
+          <Link href="/register" className="text-[#09090b] font-medium hover:underline">Үнэгүй эхлэх</Link>
+        </p>
       </div>
     </div>
   );
