@@ -154,7 +154,7 @@ function HomeContent() {
     });
 
   const hasFilter = search || filterFuel || filterTrans || filterBrand || filterPrice;
-  const cname = company?.name || "AutoDealer";
+  const cname = company?.name ?? "";
 
   return (
     <div

@@ -15,7 +15,10 @@ router.get('/', auth, async (req, res) => {
 
 // PATCH /api/settings — тохиргоо хадгалах
 router.patch('/', auth, async (req, res) => {
-  const { slug, phone, address, email, working_hours, logo_url, show_prices } = req.body;
+  const { name, slug, phone, address, email, working_hours, logo_url, show_prices } = req.body;
+
+  if (name !== undefined && !String(name).trim())
+    return res.status(400).json({ error: 'Компанийн нэр хоосон байж болохгүй' });
 
   // Slug зөвхөн a-z, 0-9, - тэмдэгт байна
   if (slug && !/^[a-z0-9-]{3,50}$/.test(slug))
@@ -38,12 +41,13 @@ router.patch('/', auth, async (req, res) => {
         logo_url    = COALESCE($4, logo_url),
         show_prices = COALESCE($5, show_prices),
         email         = COALESCE($7, email),
-        working_hours = COALESCE($8, working_hours)
+        working_hours = COALESCE($8, working_hours),
+        name          = COALESCE($9, name)
        WHERE id=$6
        RETURNING name, slug, phone, address, email, working_hours, logo_url, show_prices`,
       [slug || null, phone || null, address || null, logo_url || null,
        show_prices !== undefined ? show_prices : null, req.user.company_id,
-       email ?? null, working_hours ?? null]
+       email ?? null, working_hours ?? null, name ? String(name).trim() : null]
     );
     res.json(rows[0]);
   } catch (err) { res.status(500).json({ error: err.message }); }

@@ -62,6 +62,7 @@ function VehicleContent() {
 
   useEffect(() => {
     let cancelled = false;
+    const prevTitle = document.title;
     async function load(retry = 0) {
       try {
         const r = await fetch(`${BACKEND}/api/public/vehicles/${id}`);
@@ -69,7 +70,7 @@ function VehicleContent() {
         if (cancelled) return;
         if (!d.error) {
           setV(d);
-          document.title = `${d.brand} ${d.model} ${d.year} — ${d.company?.name || 'AutoDealer'}`;
+          document.title = `${d.brand} ${d.model} ${d.year}${d.company?.name ? ` | ${d.company.name}` : ''}`;
         }
         setLoad(false);
       } catch {
@@ -84,7 +85,7 @@ function VehicleContent() {
       .then(d => { if (!cancelled) setOthers((d.vehicles || []).filter((x: Other) => x.id !== id).slice(0, 4)); })
       .catch(() => {});
     load();
-    return () => { cancelled = true; document.title = 'AutoDealer'; };
+    return () => { cancelled = true; document.title = prevTitle; };
   }, [id]);
 
   const company = v?.company ?? siteCompany;

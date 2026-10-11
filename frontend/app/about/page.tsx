@@ -1,5 +1,5 @@
 "use client";
-import { Suspense } from "react";
+import { Suspense, useEffect } from "react";
 import { imgUrl } from "@/lib/site";
 import { useSiteData } from "@/lib/useSiteData";
 import { SiteHeader } from "@/components/site/SiteHeader";
@@ -8,7 +8,11 @@ import { SiteCta, SiteFooter } from "@/components/site/SiteFooter";
 function AboutContent() {
   const { company, vehicles, team, loading } = useSiteData();
   const uniqueBrands = [...new Set(vehicles.map((v) => v.brand))];
-  const cname = company?.name || "AutoDealer";
+  const cname = company?.name ?? "";
+
+  useEffect(() => {
+    if (company?.name) document.title = `Бидний тухай | ${company.name}`;
+  }, [company?.name]);
 
   return (
     <div className="min-h-screen bg-[#f5f5f5]">

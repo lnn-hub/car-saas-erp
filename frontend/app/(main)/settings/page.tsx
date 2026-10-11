@@ -106,7 +106,7 @@ export default function SettingsPage() {
     setSaving(true); setError(''); setSaved(false);
     try {
       await api.saveSettings({
-        phone: form.phone, address: form.address, email: form.email,
+        name: form.name, phone: form.phone, address: form.address, email: form.email,
         working_hours: form.working_hours, show_prices: form.show_prices,
       });
       setSaved(true);
@@ -183,7 +183,7 @@ export default function SettingsPage() {
           <div className="p-5 grid sm:grid-cols-2 gap-4">
             <div className="sm:col-span-2">
               <label className="text-xs text-[#71717a] block mb-1.5">Компанийн нэр</label>
-              <input value={form.name} disabled className={inp + ' bg-[#fafafa] text-[#a1a1aa] cursor-not-allowed'} />
+              <input value={form.name} onChange={e => set('name', e.target.value)} placeholder="Компанийн нэр" className={inp} required />
             </div>
             <div>
               <label className="text-xs text-[#71717a] block mb-1.5">Утасны дугаар</label>

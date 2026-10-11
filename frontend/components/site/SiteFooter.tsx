@@ -3,7 +3,7 @@ import { Company } from "@/lib/site";
 import { IcPhone } from "./icons";
 
 export function SiteCta({ company }: { company: Company | null }) {
-  const cname = company?.name || "AutoDealer";
+  const cname = company?.name ?? "";
   return (
     <>
       {/* ━━━ CTA BANNER ━━━ */}
@@ -38,7 +38,7 @@ export function SiteCta({ company }: { company: Company | null }) {
 }
 
 export function SiteFooter({ company }: { company: Company | null }) {
-  const cname = company?.name || "AutoDealer";
+  const cname = company?.name ?? "";
   return (
     <>
       {/* ━━━ FOOTER ━━━ */}

@@ -134,7 +134,7 @@ export function SiteHeader({ company }: { company: Company | null }) {
   const [menuOpen, setMenu] = useState(false);
   const [adminModal, setAdminModal] = useState(false);
   const clock = useClock();
-  const cname = company?.name || "AutoDealer";
+  const cname = company?.name ?? "";
 
   return (
     <>
