@@ -27,41 +27,46 @@ export default function LoginPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-950 flex items-center justify-center">
-      <div className="bg-gray-900 border border-gray-800 rounded-2xl p-8 w-full max-w-sm">
-        <div className="mb-8 text-center">
-          <div className="text-3xl font-bold text-white mb-1">🚗 AutoERP</div>
-          <p className="text-gray-400 text-sm">Машин борлуулалтын систем</p>
+    <div className="min-h-screen bg-[#0d0d0d] flex items-center justify-center px-4">
+      <div className="w-full max-w-[360px]">
+        <div className="mb-10">
+          <div className="w-8 h-8 bg-white rounded-sm mb-6" />
+          <h1 className="text-[22px] font-semibold text-white tracking-tight">AutoERP нэвтрэх</h1>
+          <p className="text-sm text-[#666] mt-1">Машин борлуулалтын удирдлагын систем</p>
         </div>
 
-        <form onSubmit={handleSubmit} className="space-y-4">
+        <form onSubmit={handleSubmit} className="space-y-3">
           <div>
-            <label className="text-gray-400 text-sm block mb-1">И-мэйл</label>
+            <label className="text-xs text-[#888] block mb-1.5">И-мэйл хаяг</label>
             <input
               type="email"
               value={email}
               onChange={e => setEmail(e.target.value)}
-              className="w-full bg-gray-800 border border-gray-700 rounded-lg px-4 py-2.5 text-white focus:outline-none focus:border-blue-500"
+              className="w-full bg-[#1a1a1a] border border-[#2a2a2a] rounded-md px-3 py-2.5 text-sm text-white placeholder-[#444] focus:outline-none focus:border-[#444] transition-colors"
               required
             />
           </div>
           <div>
-            <label className="text-gray-400 text-sm block mb-1">Нууц үг</label>
+            <label className="text-xs text-[#888] block mb-1.5">Нууц үг</label>
             <input
               type="password"
               value={password}
               onChange={e => setPassword(e.target.value)}
-              className="w-full bg-gray-800 border border-gray-700 rounded-lg px-4 py-2.5 text-white focus:outline-none focus:border-blue-500"
+              className="w-full bg-[#1a1a1a] border border-[#2a2a2a] rounded-md px-3 py-2.5 text-sm text-white placeholder-[#444] focus:outline-none focus:border-[#444] transition-colors"
               required
             />
           </div>
 
-          {error && <p className="text-red-400 text-sm">{error}</p>}
+          {error && (
+            <div className="bg-red-500/10 border border-red-500/20 rounded-md px-3 py-2 text-xs text-red-400">
+              {error}
+            </div>
+          )}
 
           <button
             type="submit"
             disabled={loading}
-            className="w-full bg-blue-600 hover:bg-blue-700 disabled:opacity-50 text-white font-medium py-2.5 rounded-lg transition-colors"
+            className="w-full bg-white hover:bg-[#e8e8e8] disabled:opacity-40 text-black font-medium py-2.5 rounded-md text-sm transition-colors mt-1"
           >
             {loading ? 'Нэвтэрж байна...' : 'Нэвтрэх'}
           </button>
