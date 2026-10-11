@@ -174,12 +174,12 @@ function MainLayoutInner({ children }: { children: React.ReactNode }) {
       )}
 
       {/* ── Main content ── */}
-      <main className="flex-1 lg:ml-60 min-w-0 overflow-auto pt-14 lg:pt-0 pb-20 lg:pb-0">
+      <main className="flex-1 lg:ml-60 min-w-0 overflow-auto pt-14 lg:pt-0 pb-[calc(5rem+env(safe-area-inset-bottom))] lg:pb-0">
         {children}
       </main>
 
       {/* ── Mobile bottom tab bar ── */}
-      <nav className="lg:hidden fixed bottom-0 left-0 right-0 z-40 bg-white border-t border-zinc-200 shadow-[0_-4px_16px_rgba(0,0,0,0.06)]">
+      <nav className="lg:hidden fixed bottom-0 left-0 right-0 z-40 bg-white border-t border-zinc-200 shadow-[0_-4px_16px_rgba(0,0,0,0.06)] pb-[env(safe-area-inset-bottom)]">
         <div className="flex items-stretch h-16">
           {TAB_NAV.map(({ href, label, Icon }) => {
             const active = isActive(href);

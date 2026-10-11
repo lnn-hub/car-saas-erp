@@ -4,7 +4,7 @@ import Link from "next/link";
 import { imgUrl } from "@/lib/site";
 import { useSiteData } from "@/lib/useSiteData";
 import { SiteHeader } from "@/components/site/SiteHeader";
-import { SiteCta, SiteFooter } from "@/components/site/SiteFooter";
+import { MobileCallBar, SiteCta, SiteFooter } from "@/components/site/SiteFooter";
 import { IcPhone, IcWa, IcPin } from "@/components/site/icons";
 
 
@@ -158,7 +158,7 @@ function HomeContent() {
 
   return (
     <div
-      className="min-h-screen bg-[#f5f5f5]"
+      className="min-h-screen bg-[#f5f5f5] pb-[76px] lg:pb-0"
       style={{ fontFamily: "'Inter','Segoe UI',sans-serif" }}
     >
       <SiteHeader company={company} />
@@ -679,6 +679,7 @@ function HomeContent() {
 
       <SiteCta company={company} />
       <SiteFooter company={company} />
+      <MobileCallBar company={company} />
     </div>
   );
 }

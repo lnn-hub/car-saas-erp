@@ -148,13 +148,13 @@ export function SiteHeader({ company }: { company: Company | null }) {
               {company?.phone && (
                 <a
                   href={`tel:${company.phone}`}
-                  className="hidden sm:flex items-center gap-1.5 font-semibold"
+                  className="flex items-center gap-1.5 font-semibold"
                 >
                   <IcPhone cls="w-3 h-3" />
                   {company.phone}
                 </a>
               )}
-              <span className="opacity-40">|</span>
+              <span className="opacity-40 hidden sm:inline">|</span>
               <span className="opacity-80 hidden sm:block">
                 {company?.address || "Улаанбаатар хот"}
               </span>

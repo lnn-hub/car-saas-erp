@@ -88,7 +88,7 @@ export default function DashboardPage() {
         ].map(c => (
           <div key={c.label} className="rounded-sm bg-white border border-zinc-200 border-t-[3px] border-t-brand px-3 sm:px-5 py-3 sm:py-4 shadow-sm">
             <div className="flex items-center justify-between mb-3">
-              <span className="text-[10px] font-black text-[#71717a] uppercase tracking-[0.15em]">{c.label}</span>
+              <span className="text-[10px] font-black text-[#71717a] uppercase tracking-[0.06em] sm:tracking-[0.15em] leading-tight">{c.label}</span>
               <span className="w-8 h-8 rounded-sm bg-brand-soft text-brand flex items-center justify-center">{c.icon}</span>
             </div>
             <div className="text-xl sm:text-2xl font-black tabular-nums leading-none text-[#111]">{c.value}</div>

@@ -3,7 +3,7 @@ import { Suspense, useEffect } from "react";
 import { imgUrl } from "@/lib/site";
 import { useSiteData } from "@/lib/useSiteData";
 import { SiteHeader } from "@/components/site/SiteHeader";
-import { SiteCta, SiteFooter } from "@/components/site/SiteFooter";
+import { MobileCallBar, SiteCta, SiteFooter } from "@/components/site/SiteFooter";
 
 function AboutContent() {
   const { company, vehicles, team, loading } = useSiteData();
@@ -15,7 +15,7 @@ function AboutContent() {
   }, [company?.name]);
 
   return (
-    <div className="min-h-screen bg-[#f5f5f5]">
+    <div className="min-h-screen bg-[#f5f5f5] pb-[76px] lg:pb-0">
       <SiteHeader company={company} />
 
       {/* ━━━ PAGE HERO ━━━ */}
@@ -193,6 +193,7 @@ function AboutContent() {
 
       <SiteCta company={company} />
       <SiteFooter company={company} />
+      <MobileCallBar company={company} />
     </div>
   );
 }

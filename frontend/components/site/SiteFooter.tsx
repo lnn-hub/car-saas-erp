@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { Company } from "@/lib/site";
-import { IcPhone } from "./icons";
+import { IcPhone, IcWa } from "./icons";
 
 export function SiteCta({ company }: { company: Company | null }) {
   const cname = company?.name ?? "";
@@ -81,5 +81,22 @@ export function SiteFooter({ company }: { company: Company | null }) {
         </div>
       </footer>
     </>
+  );
+}
+
+export function MobileCallBar({ company }: { company: Company | null }) {
+  if (!company?.phone) return null;
+  const digits = company.phone.replace(/\D/g, "");
+  return (
+    <div className="lg:hidden fixed bottom-0 left-0 right-0 z-40 bg-white border-t border-zinc-200 shadow-[0_-4px_16px_rgba(0,0,0,0.08)] px-4 pt-3 pb-[calc(0.75rem+env(safe-area-inset-bottom))] flex gap-2.5">
+      <a href={`tel:${company.phone}`}
+        className="flex-1 flex items-center justify-center gap-2 bg-brand active:bg-brand-dark text-white text-[11px] font-black uppercase tracking-[0.15em] py-3.5 rounded-sm">
+        <IcPhone cls="w-4 h-4" /> Залгах
+      </a>
+      <a href={`https://wa.me/976${digits}`} target="_blank" rel="noreferrer"
+        className="flex-1 flex items-center justify-center gap-2 bg-[#25d366] active:bg-[#1ebe5d] text-white text-[11px] font-black uppercase tracking-[0.15em] py-3.5 rounded-sm">
+        <IcWa cls="w-4 h-4" /> WhatsApp
+      </a>
+    </div>
   );
 }
