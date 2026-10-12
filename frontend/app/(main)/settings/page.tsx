@@ -168,16 +168,16 @@ export default function SettingsPage() {
             <input ref={logoRef} type="file" accept="image/*" className="hidden" onChange={e => pickLogo(e.target.files?.[0])} />
             <div className="flex gap-2">
               <button type="button" onClick={() => logoRef.current?.click()} disabled={logoBusy}
-                className="text-xs font-black uppercase tracking-widest border border-[#e4e4e7] hover:border-brand hover:text-brand rounded-md px-4 py-2 transition-colors disabled:opacity-40">
+                className="text-sm border border-[#e4e4e7] hover:border-brand hover:text-brand rounded-md px-4 py-2 transition-colors disabled:opacity-40 font-medium">
                 {logoBusy ? 'Хүлээнэ үү...' : logo ? 'Лого солих' : 'Лого оруулах'}
               </button>
               {logo && (
                 <button type="button" onClick={dropLogo} disabled={logoBusy}
-                  className="text-xs font-bold text-[#a1a1aa] hover:text-red-600 px-2 disabled:opacity-40">Устгах</button>
+                  className="text-xs font-bold text-[#a1a1aa] hover:text-brand px-2 disabled:opacity-40">Устгах</button>
               )}
             </div>
             <div className="text-[11px] text-[#a1a1aa]">PNG (тунгалаг дэвсгэртэй) эсвэл JPG. Хэвтээ хэлбэртэй лого сайн харагдана.</div>
-            {logoErr && <div className="text-xs text-red-600">{logoErr}</div>}
+            {logoErr && <div className="text-xs text-brand">{logoErr}</div>}
           </div>
         </div>
       </Section>
@@ -221,11 +221,11 @@ export default function SettingsPage() {
           </div>
         </div>
 
-        {error && <div className="bg-red-50 border border-red-200 rounded-lg px-3 py-2 text-xs text-red-600">{error}</div>}
-        {saved && <div className="bg-[#f0fdf4] border border-[#bbf7d0] rounded-lg px-3 py-2 text-xs text-[#16a34a]">Хадгалагдлаа</div>}
+        {error && <div className="bg-brand-soft border border-brand/20 rounded-lg px-3 py-2 text-xs text-brand">{error}</div>}
+        {saved && <div className="bg-zinc-50 border border-zinc-200 rounded-lg px-3 py-2 text-xs text-zinc-700">Хадгалагдлаа</div>}
 
         <button type="submit" disabled={saving}
-          className="w-full sm:w-auto sm:px-10 py-2.5 bg-brand hover:bg-brand-dark disabled:opacity-40 text-white text-xs font-black uppercase tracking-widest rounded-md transition-colors">
+          className="w-full sm:w-auto sm:px-10 py-2.5 bg-brand hover:bg-brand-dark disabled:opacity-40 text-white text-sm rounded-md transition-colors font-medium">
           {saving ? 'Хадгалж байна...' : 'Хадгалах'}
         </button>
       </form>
@@ -234,7 +234,7 @@ export default function SettingsPage() {
         <div className="divide-y divide-[#f4f4f5]">
           {team.map(m => (
             <div key={m.id} className="flex items-center gap-4 px-5 py-3.5">
-              <div className="w-12 h-12 rounded-full overflow-hidden bg-brand-soft text-brand flex items-center justify-center font-black text-sm shrink-0">
+              <div className="w-12 h-12 rounded-full overflow-hidden bg-brand-soft text-brand flex items-center justify-center font-bold text-sm shrink-0">
                 {photoSrc(m.photo_url)
                   ? <img src={photoSrc(m.photo_url)!} alt="" className="w-full h-full object-cover" />
                   : initials(m.name)}
@@ -244,14 +244,14 @@ export default function SettingsPage() {
                 <div className="text-xs text-[#71717a] truncate">{m.position || '—'}</div>
               </div>
               <button onClick={() => openMember(m)} className="text-xs font-semibold text-[#71717a] hover:text-brand px-2 py-1">Засах</button>
-              <button onClick={() => removeMember(m)} className="text-xs font-semibold text-[#a1a1aa] hover:text-red-600 px-2 py-1">Хасах</button>
+              <button onClick={() => removeMember(m)} className="text-xs font-semibold text-[#a1a1aa] hover:text-brand px-2 py-1">Хасах</button>
             </div>
           ))}
           {team.length === 0 && <div className="px-5 py-8 text-center text-sm text-[#a1a1aa]">Гишүүн нэмээгүй байна</div>}
         </div>
         <div className="p-4 border-t border-[#e4e4e7] bg-[#fafafa]">
           <button type="button" onClick={() => openMember('new')}
-            className="text-xs font-black uppercase tracking-widest text-brand hover:text-brand-dark">+ Гишүүн нэмэх</button>
+            className="text-xs font-medium text-brand hover:text-brand-dark">+ Гишүүн нэмэх</button>
         </div>
       </Section>
 
@@ -262,7 +262,7 @@ export default function SettingsPage() {
             Нэг минут орчим үргэлжилнэ. Дахин дарахад өмнөх жишээ машинууд шинэчлэгдэнэ, бусад машинд хөндлөнгөөс орохгүй.
           </p>
           <button type="button" onClick={startSeed} disabled={seed?.running}
-            className="px-5 py-2.5 bg-[#111] hover:bg-brand disabled:opacity-50 text-white text-xs font-black uppercase tracking-widest rounded-md transition-colors">
+            className="px-5 py-2.5 bg-[#111] hover:bg-brand disabled:opacity-50 text-white text-sm rounded-md transition-colors font-medium">
             {seed?.running ? 'Оруулж байна...' : 'Жишээ машин оруулах'}
           </button>
           {seed?.running && (
@@ -274,16 +274,16 @@ export default function SettingsPage() {
             </div>
           )}
           {seed && !seed.running && !seed.error && seed.total > 0 && !(seed.failed?.length) && (
-            <div className="bg-[#f0fdf4] border border-[#bbf7d0] rounded-lg px-3 py-2 text-xs text-[#16a34a]">Дууслаа - нүүр хуудсыг шинэчилж харна уу</div>
+            <div className="bg-zinc-50 border border-zinc-200 rounded-lg px-3 py-2 text-xs text-zinc-700">Дууслаа - нүүр хуудсыг шинэчилж харна уу</div>
           )}
           {!!seed?.failed?.length && !seed.running && (
-            <div className="bg-amber-50 border border-amber-200 rounded-lg px-3 py-2 text-xs text-amber-800 space-y-1">
+            <div className="bg-zinc-50 border border-zinc-200 rounded-lg px-3 py-2 text-xs text-zinc-700 space-y-1">
               <div className="font-bold">{seed.failed.length} машин амжилтгүй болсон:</div>
               {seed.failed.map((f) => <div key={f}>{f}</div>)}
             </div>
           )}
           {(seed?.error || seedErr) && (
-            <div className="bg-red-50 border border-red-200 rounded-lg px-3 py-2 text-xs text-red-600">{seed?.error || seedErr}</div>
+            <div className="bg-brand-soft border border-brand/20 rounded-lg px-3 py-2 text-xs text-brand">{seed?.error || seedErr}</div>
           )}
         </div>
       </Section>
@@ -298,7 +298,7 @@ export default function SettingsPage() {
             </div>
             <div className="p-5 space-y-4">
               <div className="flex items-center gap-4">
-                <div className="w-20 h-20 rounded-full overflow-hidden bg-brand-soft text-brand flex items-center justify-center font-black text-xl shrink-0">
+                <div className="w-20 h-20 rounded-full overflow-hidden bg-brand-soft text-brand flex items-center justify-center font-bold text-xl shrink-0">
                   {previewUrl ? <img src={previewUrl} alt="" className="w-full h-full object-cover" /> : initials(mForm.name || '?')}
                 </div>
                 <div>
@@ -322,12 +322,12 @@ export default function SettingsPage() {
                 <label className="text-xs text-[#71717a] block mb-1.5">Танилцуулга</label>
                 <textarea value={mForm.bio} onChange={e => setMForm(p => ({ ...p, bio: e.target.value }))} rows={3} className={inp + ' resize-none'} />
               </div>
-              {mError && <div className="bg-red-50 border border-red-200 rounded-md px-3 py-2 text-xs text-red-600">{mError}</div>}
+              {mError && <div className="bg-brand-soft border border-brand/20 rounded-md px-3 py-2 text-xs text-brand">{mError}</div>}
               <div className="flex gap-2">
                 <button type="button" onClick={() => setEditing(null)}
                   className="flex-1 py-2.5 text-sm text-[#71717a] border border-[#e4e4e7] rounded-md hover:border-[#d4d4d8]">Болих</button>
                 <button type="submit" disabled={mBusy}
-                  className="flex-1 py-2.5 text-xs font-black uppercase tracking-widest bg-brand hover:bg-brand-dark disabled:opacity-40 text-white rounded-md">
+                  className="flex-1 py-2.5 text-sm bg-brand hover:bg-brand-dark disabled:opacity-40 text-white rounded-md font-medium">
                   {mBusy ? 'Хадгалж байна...' : 'Хадгалах'}
                 </button>
               </div>

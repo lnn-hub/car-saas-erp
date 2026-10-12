@@ -9,15 +9,15 @@ export function SiteCta({ company }: { company: Company | null }) {
       {/* ━━━ CTA BANNER ━━━ */}
       {company?.phone && (
         <section className="bg-[#111] relative overflow-hidden">
-          <div className="pointer-events-none select-none absolute -top-6 left-1/2 -translate-x-1/2 text-[90px] sm:text-[220px] font-black uppercase tracking-tighter text-white/[0.03] whitespace-nowrap">
+          <div className="pointer-events-none select-none absolute -top-6 left-1/2 -translate-x-1/2 text-[90px] sm:text-[220px] font-semibold uppercase tracking-tighter text-white/[0.03] whitespace-nowrap">
             {cname}
           </div>
           <div className="relative max-w-7xl mx-auto px-4 py-10 sm:py-14 flex flex-col md:flex-row items-center justify-between gap-6 border-l-4 border-brand">
             <div className="text-center md:text-left">
-              <div className="text-[10px] font-black text-brand-light uppercase tracking-[0.25em] mb-2">
+              <div className="text-[10px] font-semibold text-brand-light uppercase tracking-[0.18em] mb-2">
                 Захиалга өгөх
               </div>
-              <h3 className="text-2xl sm:text-3xl font-black text-white leading-tight">
+              <h3 className="text-2xl sm:text-3xl font-bold text-white leading-tight">
                 Хүссэн машинаа хайж олоогүй юу?
               </h3>
               <p className="text-sm text-gray-400 mt-2">
@@ -26,7 +26,7 @@ export function SiteCta({ company }: { company: Company | null }) {
             </div>
             <a
               href={`tel:${company.phone}`}
-              className="shrink-0 flex items-center gap-2 bg-brand hover:bg-white hover:text-[#111] text-white text-[11px] font-black uppercase tracking-[0.2em] px-8 py-4 rounded-sm transition-colors"
+              className="shrink-0 flex items-center gap-2 bg-brand hover:bg-white hover:text-[#111] text-white text-sm px-8 py-4 rounded-sm transition-colors font-medium"
             >
               <IcPhone cls="w-4 h-4" /> {company.phone}
             </a>
@@ -47,11 +47,11 @@ export function SiteFooter({ company }: { company: Company | null }) {
           <div className="flex flex-col sm:flex-row items-center justify-between gap-5 mb-6">
             <div className="flex items-center gap-2.5">
               <div className="w-8 h-8 bg-brand rounded flex items-center justify-center">
-                <span className="text-white font-black text-sm">
+                <span className="text-white font-bold text-sm">
                   {cname[0]}
                 </span>
               </div>
-              <span className="text-white font-black text-base">{cname}</span>
+              <span className="text-white font-bold text-base">{cname}</span>
             </div>
             <div className="flex items-center gap-6 text-xs">
               {[
@@ -94,7 +94,7 @@ export function MobileCallBar({ company }: { company: Company | null }) {
         <IcPhone cls="w-4 h-4" /> Залгах
       </a>
       <a href={`https://wa.me/976${digits}`} target="_blank" rel="noreferrer"
-        className="flex-1 flex items-center justify-center gap-2 border border-[#25d366] text-[#128c4a] active:bg-[#25d366]/10 text-sm font-medium py-3 rounded-sm">
+        className="flex-1 flex items-center justify-center gap-2 border border-zinc-300 text-zinc-700 active:bg-zinc-50 text-sm font-medium py-3 rounded-sm">
         <IcWa cls="w-4 h-4" /> WhatsApp
       </a>
     </div>

@@ -21,16 +21,16 @@ function AboutContent() {
       {/* ━━━ PAGE HERO ━━━ */}
       <section className="relative bg-[#111] text-white overflow-hidden">
         <div className="absolute inset-0" style={{ backgroundImage: "linear-gradient(135deg,#2a0a10 0%,#111 55%,#0d0d0d 100%)" }} />
-        <div className="pointer-events-none select-none absolute top-4 left-1/2 -translate-x-1/2 text-[72px] sm:text-[200px] font-black uppercase tracking-tighter text-white/[0.03] whitespace-nowrap">
+        <div className="pointer-events-none select-none absolute top-4 left-1/2 -translate-x-1/2 text-[72px] sm:text-[200px] font-semibold uppercase tracking-tighter text-white/[0.03] whitespace-nowrap">
           {cname}
         </div>
         <div className="relative max-w-7xl mx-auto px-4 py-14 sm:py-24">
-          <nav className="text-[10px] font-black uppercase tracking-[0.2em] text-white/50 mb-4">
+          <nav className="text-[10px] font-semibold uppercase tracking-[0.18em] text-white/50 mb-4">
             <a href="/" className="hover:text-white transition-colors">Нүүр</a>
             <span className="mx-2">/</span>
             <span className="text-brand-light">Бидний тухай</span>
           </nav>
-          <h1 className="text-4xl sm:text-6xl font-black leading-tight tracking-tight max-w-3xl">
+          <h1 className="text-4xl sm:text-6xl font-bold leading-tight tracking-tight max-w-3xl">
             Итгэлтэй худалдаа,<br />
             <span className="text-brand-light">ил тод үйлчилгээ</span>
           </h1>
@@ -44,10 +44,10 @@ function AboutContent() {
       >
         <div className="max-w-7xl mx-auto grid lg:grid-cols-2 gap-10 lg:gap-16 items-center">
           <div>
-            <div className="text-[10px] font-black text-brand uppercase tracking-[0.25em] mb-3">
+            <div className="text-[10px] font-semibold text-brand uppercase tracking-[0.18em] mb-3">
               Бидний тухай
             </div>
-            <h2 className="text-3xl sm:text-4xl font-black text-[#111] leading-tight border-l-4 border-brand pl-4 mb-5">
+            <h2 className="text-3xl sm:text-4xl font-bold text-[#111] leading-tight border-l-4 border-brand pl-4 mb-5">
               Яагаад бидэнд
               <br />
               итгэх вэ?
@@ -77,11 +77,11 @@ function AboutContent() {
                 ],
               ].map(([n, t, d]) => (
                 <div key={n} className="flex gap-4 py-4 group">
-                  <div className="text-2xl font-black text-zinc-300 group-hover:text-brand transition-colors tabular-nums w-10 shrink-0">
+                  <div className="text-2xl font-bold text-zinc-300 group-hover:text-brand transition-colors tabular-nums w-10 shrink-0">
                     {n}
                   </div>
                   <div>
-                    <div className="text-sm font-black text-[#111] uppercase tracking-wider">
+                    <div className="text-sm font-semibold text-[#111] uppercase tracking-wider">
                       {t}
                     </div>
                     <div className="text-sm text-gray-500 mt-0.5">{d}</div>
@@ -92,7 +92,7 @@ function AboutContent() {
 
             <a
               href="/#contact"
-              className="inline-flex items-center gap-2 bg-[#111] hover:bg-brand text-white text-[11px] font-black uppercase tracking-[0.15em] px-7 py-3.5 rounded-sm transition-colors"
+              className="inline-flex items-center gap-2 bg-[#111] hover:bg-brand text-white text-sm px-7 py-3.5 rounded-sm transition-colors font-medium"
             >
               Холбогдох
               <svg
@@ -108,7 +108,7 @@ function AboutContent() {
           </div>
 
           <div className="relative bg-[#111] border-t-4 border-brand overflow-hidden">
-            <div className="pointer-events-none select-none absolute -bottom-6 -right-2 text-[120px] sm:text-[180px] font-black leading-none text-white/[0.04]">
+            <div className="pointer-events-none select-none absolute -bottom-6 -right-2 text-[120px] sm:text-[180px] font-bold leading-none text-white/[0.04]">
               {new Date().getFullYear() - 2010}+
             </div>
             <div className="relative grid grid-cols-2 divide-x divide-y divide-white/10">
@@ -131,10 +131,10 @@ function AboutContent() {
                 { n: "100%", l: "Шалгасан", sub: "Бүх машин үзлэгт орсон" },
               ].map(({ n, l, sub }) => (
                 <div key={l} className="p-6 sm:p-9">
-                  <div className="text-4xl sm:text-5xl font-black text-white tabular-nums leading-none mb-3">
+                  <div className="text-4xl sm:text-5xl font-bold text-white tabular-nums leading-none mb-3">
                     {n}
                   </div>
-                  <div className="text-[11px] font-black text-brand-light uppercase tracking-[0.2em]">
+                  <div className="text-[11px] font-semibold text-brand-light uppercase tracking-[0.18em]">
                     {l}
                   </div>
                   <div className="text-xs text-gray-500 mt-1">{sub}</div>
@@ -150,8 +150,8 @@ function AboutContent() {
         <section id="team" className="py-16 sm:py-24 px-4 bg-[#f9f9f9] border-t border-zinc-200">
           <div className="max-w-7xl mx-auto">
             <div className="max-w-2xl mb-10 sm:mb-14">
-              <div className="text-[10px] font-black text-brand uppercase tracking-[0.25em] mb-3">Манай баг</div>
-              <h2 className="text-3xl sm:text-4xl font-black text-[#111] leading-tight border-l-4 border-brand pl-4 mb-4">
+              <div className="text-[10px] font-semibold text-brand uppercase tracking-[0.18em] mb-3">Манай баг</div>
+              <h2 className="text-3xl sm:text-4xl font-bold text-[#111] leading-tight border-l-4 border-brand pl-4 mb-4">
                 Таныг угтах<br />мэргэжлийн баг
               </h2>
               <p className="text-gray-500 text-sm sm:text-base leading-relaxed">
@@ -169,7 +169,7 @@ function AboutContent() {
                           className="w-full h-full object-cover object-top group-hover:scale-105 transition-transform duration-500" />
                       ) : (
                         <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-[#2a0a10] to-[#111]">
-                          <span className="text-5xl sm:text-6xl font-black text-white/80 tracking-tight">
+                          <span className="text-5xl sm:text-6xl font-bold text-white/80 tracking-tight">
                             {m.name.split(" ").map((n) => n[0]).join("").slice(0, 2).toUpperCase()}
                           </span>
                         </div>
@@ -178,9 +178,9 @@ function AboutContent() {
                     </div>
                     <div className="p-3 sm:p-5">
                       {m.position && (
-                        <div className="text-[9px] sm:text-[10px] font-black text-brand uppercase tracking-[0.18em] mb-1">{m.position}</div>
+                        <div className="text-[9px] sm:text-[10px] font-semibold text-brand uppercase tracking-[0.18em] mb-1">{m.position}</div>
                       )}
-                      <h3 className="font-black text-[#111] text-sm sm:text-lg leading-tight">{m.name}</h3>
+                      <h3 className="font-bold text-[#111] text-sm sm:text-lg leading-tight">{m.name}</h3>
                       {m.bio && <p className="hidden sm:block text-sm text-gray-500 leading-relaxed mt-2">{m.bio}</p>}
                     </div>
                   </div>

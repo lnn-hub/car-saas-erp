@@ -185,7 +185,7 @@ export default function NewVehiclePage() {
           </div>
         )}
 
-        {error && <div className="bg-red-50 border border-red-200 rounded-lg px-3 py-2 text-xs text-red-600 mb-4">{error}</div>}
+        {error && <div className="bg-brand-soft border border-brand/20 rounded-lg px-3 py-2 text-xs text-brand mb-4">{error}</div>}
 
         <div className="flex gap-2">
           <button type="button" onClick={() => router.push('/vehicles')}
@@ -334,7 +334,7 @@ export default function NewVehiclePage() {
         </Section>
 
         {error && (
-          <div className="bg-red-50 border border-red-200 rounded-md px-3 py-2 text-xs text-red-600">{error}</div>
+          <div className="bg-brand-soft border border-brand/20 rounded-md px-3 py-2 text-xs text-brand">{error}</div>
         )}
 
         <div className="flex gap-2 pt-1">
@@ -356,7 +356,7 @@ function Section({ title, children }: { title: string; children: React.ReactNode
   return (
     <div className="bg-white border border-[#e4e4e7] rounded-lg overflow-hidden">
       <div className="px-4 py-3 border-b border-[#e4e4e7]">
-        <span className="text-xs font-medium text-[#a1a1aa] uppercase tracking-wider">{title}</span>
+        <span className="text-xs font-medium text-[#a1a1aa]">{title}</span>
       </div>
       <div className="p-4">{children}</div>
     </div>
@@ -367,7 +367,7 @@ function Field({ label, children, required, className }: { label: string; childr
     <div className={className}>
       {label && (
         <label className="text-xs text-[#71717a] block mb-1.5">
-          {label}{required && <span className="text-red-500 ml-0.5">*</span>}
+          {label}{required && <span className="text-brand ml-0.5">*</span>}
         </label>
       )}
       {children}

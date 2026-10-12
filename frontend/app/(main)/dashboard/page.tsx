@@ -7,10 +7,10 @@ interface Summary { total_sold: string; total_revenue: string; total_profit: str
 interface Vehicle { id: string; brand: string; model: string; year: number; status: string; total_cost: string; created_at: string; }
 
 const STATUS: Record<string, { label: string; bg: string; text: string; dot: string }> = {
-  ARRIVED:   { label: 'Ирсэн',       bg: 'bg-amber-50',   text: 'text-amber-700',   dot: 'bg-amber-400' },
-  PUBLISHED: { label: 'Зарагдах',    bg: 'bg-blue-50',    text: 'text-blue-700',    dot: 'bg-blue-400' },
-  RESERVED:  { label: 'Захиалга',    bg: 'bg-violet-50',  text: 'text-violet-700',  dot: 'bg-violet-400' },
-  SOLD:      { label: 'Зарагдсан',   bg: 'bg-emerald-50', text: 'text-emerald-700', dot: 'bg-emerald-400' },
+  ARRIVED:   { label: 'Ирсэн',       bg: 'bg-zinc-50',   text: 'text-zinc-600',   dot: 'bg-zinc-400' },
+  PUBLISHED: { label: 'Зарагдах',    bg: 'bg-brand-soft',    text: 'text-brand',    dot: 'bg-brand' },
+  RESERVED:  { label: 'Захиалга',    bg: 'bg-zinc-50',  text: 'text-zinc-800',  dot: 'bg-zinc-700' },
+  SOLD:      { label: 'Зарагдсан',   bg: 'bg-zinc-50', text: 'text-[#111]', dot: 'bg-zinc-300' },
 };
 
 const STATUS_ICONS: Record<string, React.ReactNode> = {
@@ -60,17 +60,17 @@ export default function DashboardPage() {
 
       {/* Banner */}
       <div className="relative bg-[#111] text-white overflow-hidden rounded-sm border-l-4 border-brand px-5 sm:px-8 py-6 sm:py-8">
-        <div className="pointer-events-none select-none absolute -right-2 -bottom-6 text-[90px] sm:text-[150px] font-black uppercase tracking-tighter text-white/[0.04] leading-none">
+        <div className="pointer-events-none select-none absolute -right-2 -bottom-6 text-[90px] sm:text-[150px] font-medium text-white/[0.04] leading-none">
           ADMIN
         </div>
         <div className="relative flex items-center justify-between gap-4">
           <div>
-            <div className="text-[10px] font-black text-brand-light uppercase tracking-[0.25em] mb-2">Админ самбар</div>
-            <h1 className="text-xl sm:text-3xl font-black leading-tight">{greeting}{userName ? `, ${userName.split(' ')[0]}` : ''}!</h1>
+            <div className="text-xs font-medium text-brand-light mb-2">Админ самбар</div>
+            <h1 className="text-xl sm:text-3xl font-bold leading-tight">{greeting}{userName ? `, ${userName.split(' ')[0]}` : ''}!</h1>
             <p className="text-xs sm:text-sm text-white/50 mt-1.5 hidden sm:block">Өнөөдрийн борлуулалт, агуулахын байдал</p>
           </div>
           <Link href="/vehicles/new"
-            className="flex items-center gap-2 bg-brand hover:bg-white hover:text-[#111] text-white text-[11px] font-black uppercase tracking-[0.15em] px-4 sm:px-6 py-3 rounded-sm transition-colors shrink-0">
+            className="flex items-center gap-2 bg-brand hover:bg-white hover:text-[#111] text-white text-sm px-4 sm:px-6 py-3 rounded-sm transition-colors shrink-0 font-medium">
             <svg className="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2.5}><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
             <span className="hidden sm:inline">Машин нэмэх</span>
             <span className="sm:hidden">Нэмэх</span>
@@ -81,17 +81,17 @@ export default function DashboardPage() {
       {/* KPI cards */}
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 sm:gap-3">
         {[
-          { label: 'Нийт борлуулалт', value: `${summary?.total_sold ?? 0}`, unit: 'машин',        color: 'bg-blue-50 border-blue-100',    textColor: 'text-blue-700',    icon: <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.8}><path d="M5 17H3a2 2 0 01-2-2v-4a2 2 0 012-2h16a2 2 0 012 2v4a2 2 0 01-2 2h-2"/><rect x="7" y="17" width="10" height="4" rx="2"/><path d="M5 11L7.5 5h9L19 11"/></svg> },
-          { label: 'Нийт орлого',     value: fmt(summary?.total_revenue ?? 0), unit: '',           color: 'bg-emerald-50 border-emerald-100', textColor: 'text-emerald-700', icon: <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.8}><rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg> },
-          { label: 'Цэвэр ашиг',      value: fmt(summary?.total_profit ?? 0),  unit: '',           color: 'bg-violet-50 border-violet-100',   textColor: 'text-violet-700',  icon: <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.8}><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/></svg> },
-          { label: 'Агуулахын үнэ',   value: fmt(totalCost),                   unit: `${inStock} машин`, color: 'bg-amber-50 border-amber-100', textColor: 'text-amber-700',   icon: <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.8}><path d="M21 16V8a2 2 0 00-1-1.73l-7-4a2 2 0 00-2 0l-7 4A2 2 0 003 8v8a2 2 0 001 1.73l7 4a2 2 0 002 0l7-4A2 2 0 0021 16z"/></svg> },
+          { label: 'Нийт борлуулалт', value: `${summary?.total_sold ?? 0}`, unit: 'машин',    icon: <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.8}><path d="M5 17H3a2 2 0 01-2-2v-4a2 2 0 012-2h16a2 2 0 012 2v4a2 2 0 01-2 2h-2"/><rect x="7" y="17" width="10" height="4" rx="2"/><path d="M5 11L7.5 5h9L19 11"/></svg> },
+          { label: 'Нийт орлого',     value: fmt(summary?.total_revenue ?? 0), unit: '', icon: <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.8}><rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg> },
+          { label: 'Цэвэр ашиг',      value: fmt(summary?.total_profit ?? 0),  unit: '',  icon: <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.8}><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/></svg> },
+          { label: 'Агуулахын үнэ',   value: fmt(totalCost),                   unit: `${inStock} машин`,   icon: <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.8}><path d="M21 16V8a2 2 0 00-1-1.73l-7-4a2 2 0 00-2 0l-7 4A2 2 0 003 8v8a2 2 0 001 1.73l7 4a2 2 0 002 0l7-4A2 2 0 0021 16z"/></svg> },
         ].map(c => (
           <div key={c.label} className="rounded-sm bg-white border border-zinc-200 border-t-[3px] border-t-brand px-3 sm:px-5 py-3 sm:py-4 shadow-sm">
             <div className="flex items-center justify-between mb-3">
-              <span className="text-[10px] font-black text-[#71717a] uppercase tracking-[0.06em] sm:tracking-[0.15em] leading-tight">{c.label}</span>
+              <span className="text-xs font-medium text-[#71717a] sm:tracking-[0.15em] leading-tight">{c.label}</span>
               <span className="w-8 h-8 rounded-sm bg-brand-soft text-brand flex items-center justify-center">{c.icon}</span>
             </div>
-            <div className="text-xl sm:text-2xl font-black tabular-nums leading-none text-[#111]">{c.value}</div>
+            <div className="text-xl sm:text-2xl font-bold tabular-nums leading-none text-[#111]">{c.value}</div>
             {c.unit && <div className="text-xs text-[#71717a] mt-1.5">{c.unit}</div>}
           </div>
         ))}
@@ -100,7 +100,7 @@ export default function DashboardPage() {
       {/* Status overview */}
       <div className="bg-white rounded-xl border border-[#e4e4e7] overflow-hidden shadow-sm">
         <div className="px-5 py-3.5 border-b border-[#e4e4e7]">
-          <span className="text-[11px] font-black text-[#09090b] uppercase tracking-[0.15em]">Агуулахын байдал</span>
+          <span className="text-xs font-medium text-[#09090b]">Агуулахын байдал</span>
         </div>
         <div className="grid grid-cols-2 sm:grid-cols-4 divide-x divide-y sm:divide-y-0 divide-[#f4f4f5]">
           {Object.entries(STATUS).map(([key, val]) => (
@@ -120,10 +120,10 @@ export default function DashboardPage() {
         {/* Progress bar */}
         <div className="flex h-1.5">
           {[
-            { key: 'ARRIVED',   color: 'bg-amber-400' },
-            { key: 'PUBLISHED', color: 'bg-blue-400' },
-            { key: 'RESERVED',  color: 'bg-violet-400' },
-            { key: 'SOLD',      color: 'bg-emerald-400' },
+            { key: 'ARRIVED',   color: 'bg-zinc-400' },
+            { key: 'PUBLISHED', color: 'bg-brand' },
+            { key: 'RESERVED',  color: 'bg-zinc-700' },
+            { key: 'SOLD',      color: 'bg-zinc-300' },
           ].map(({ key, color }) => {
             const pct = vehicles.length ? (counts[key as keyof typeof counts] / vehicles.length) * 100 : 0;
             return <div key={key} className={`${color} transition-all`} style={{ width: `${pct}%` }} />;
@@ -136,7 +136,7 @@ export default function DashboardPage() {
         {/* Recent vehicles */}
         <div className="bg-white rounded-xl border border-[#e4e4e7] overflow-hidden shadow-sm">
           <div className="px-5 py-3.5 border-b border-[#e4e4e7] flex items-center justify-between">
-            <span className="text-[11px] font-black text-[#09090b] uppercase tracking-[0.15em]">Сүүлд нэмэгдсэн</span>
+            <span className="text-xs font-medium text-[#09090b]">Сүүлд нэмэгдсэн</span>
             <Link href="/vehicles" className="text-xs text-[#a1a1aa] hover:text-[#09090b] transition-colors font-medium">
               Бүгд →
             </Link>
@@ -170,7 +170,7 @@ export default function DashboardPage() {
         {/* Quick actions */}
         <div className="space-y-3">
           <div className="bg-white rounded-xl border border-[#e4e4e7] p-4 shadow-sm">
-            <div className="text-[10px] font-black text-[#a1a1aa] uppercase tracking-[0.2em] mb-3">Хурдан үйлдэл</div>
+            <div className="text-xs font-medium text-[#a1a1aa] mb-3">Хурдан үйлдэл</div>
             <div className="space-y-1.5">
               {[
                 { href: '/vehicles/new', label: 'Машин нэмэх',  primary: true },
@@ -193,7 +193,7 @@ export default function DashboardPage() {
 
           {/* Mini stat */}
           <div className="bg-white rounded-xl border border-[#e4e4e7] p-4 shadow-sm">
-            <div className="text-[10px] font-black text-[#a1a1aa] uppercase tracking-[0.2em] mb-3">Нэгж дундаж</div>
+            <div className="text-xs font-medium text-[#a1a1aa] mb-3">Нэгж дундаж</div>
             <div className="space-y-2.5">
               {[
                 { label: 'Нэг машины ашиг', value: fmt(summary?.avg_profit ?? 0) },

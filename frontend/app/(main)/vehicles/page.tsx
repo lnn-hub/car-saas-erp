@@ -9,10 +9,10 @@ interface Vehicle {
 }
 
 const STATUS: Record<string, { label: string; dot: string; text: string }> = {
-  ARRIVED:   { label: 'Ирсэн',        dot: 'bg-amber-400',   text: 'text-amber-600' },
-  PUBLISHED: { label: 'Нийтлэгдсэн',  dot: 'bg-blue-400',    text: 'text-blue-600' },
-  RESERVED:  { label: 'Захиалгатай',  dot: 'bg-violet-400',  text: 'text-violet-600' },
-  SOLD:      { label: 'Зарагдсан',    dot: 'bg-emerald-400', text: 'text-emerald-600' },
+  ARRIVED:   { label: 'Ирсэн',        dot: 'bg-zinc-400',   text: 'text-zinc-600' },
+  PUBLISHED: { label: 'Нийтлэгдсэн',  dot: 'bg-brand',    text: 'text-brand' },
+  RESERVED:  { label: 'Захиалгатай',  dot: 'bg-zinc-700',  text: 'text-zinc-800' },
+  SOLD:      { label: 'Зарагдсан',    dot: 'bg-zinc-300', text: 'text-[#111]' },
 };
 const ALL_STATUSES = ['ARRIVED', 'PUBLISHED', 'RESERVED', 'SOLD'];
 
@@ -118,7 +118,7 @@ export default function VehiclesPage() {
 
       {/* Table header — desktop only */}
       <div className="hidden sm:block px-6 border-b border-[#e4e4e7] bg-white shrink-0">
-        <div className="grid grid-cols-[1fr_100px_80px_110px_130px_32px] gap-3 py-2.5 text-[11px] font-medium text-[#a1a1aa] uppercase tracking-wider">
+        <div className="grid grid-cols-[1fr_100px_80px_110px_130px_32px] gap-3 py-2.5 text-xs font-medium text-[#a1a1aa]">
           <span>Машин</span>
           <span>Гүйлт</span>
           <span>Өнгө</span>

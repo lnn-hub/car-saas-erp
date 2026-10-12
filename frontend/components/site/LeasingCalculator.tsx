@@ -22,7 +22,7 @@ function Field({ label, children, hint }: { label: string; children: React.React
   return (
     <div>
       <div className="flex items-center justify-between gap-3 mb-2">
-        <span className="text-[10px] font-black text-zinc-500 uppercase tracking-[0.18em]">{label}</span>
+        <span className="text-[10px] font-semibold text-zinc-500 uppercase tracking-[0.18em]">{label}</span>
         {hint && <span className="text-[11px] font-bold text-brand">{hint}</span>}
       </div>
       {children}
@@ -76,7 +76,7 @@ export function LeasingCalculator({ open, onClose, price, carName, phone }: {
             <svg className="w-5 h-5 text-brand-light" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2}>
               <rect x="4" y="2" width="16" height="20" rx="2" /><path d="M8 6h8M8 11h2M14 11h2M8 15h2M14 15h2M8 19h2M14 19h2" />
             </svg>
-            <span className="text-[11px] font-black uppercase tracking-[0.2em]">Лизингийн тооцоолуур</span>
+            <span className="text-[11px] font-semibold uppercase tracking-[0.18em]">Лизингийн тооцоолуур</span>
           </div>
           <button onClick={onClose} aria-label="Хаах" className="w-9 h-9 flex items-center justify-center hover:bg-white/10 rounded-sm">
             <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2}><path d="M18 6L6 18M6 6l12 12" /></svg>
@@ -84,13 +84,13 @@ export function LeasingCalculator({ open, onClose, price, carName, phone }: {
         </div>
 
         <div className="flex-1 overflow-y-auto px-5 py-5 space-y-5">
-          {carName && <div className="text-sm font-black text-[#111]">{carName}</div>}
+          {carName && <div className="text-sm font-bold text-[#111]">{carName}</div>}
 
           <Field label="Машины үнэ">
             <div className="relative">
               <input inputMode="numeric" className={boxCls + " pr-9"} value={fmt(carPrice)}
                 onChange={(e) => setCarPrice(clamp(toNum(e.target.value), 1_000_000, 5_000_000_000))} />
-              <span className="absolute right-3 top-1/2 -translate-y-1/2 font-black text-zinc-400">₮</span>
+              <span className="absolute right-3 top-1/2 -translate-y-1/2 font-bold text-zinc-400">₮</span>
             </div>
             <div className="mt-2"><Range value={carPrice} min={10_000_000} max={maxPrice} step={1_000_000} onChange={setCarPrice} /></div>
           </Field>
@@ -99,7 +99,7 @@ export function LeasingCalculator({ open, onClose, price, carName, phone }: {
             <div className="relative">
               <input inputMode="numeric" className={boxCls + " pr-12"} value={months}
                 onChange={(e) => setMonths(clamp(toNum(e.target.value), 1, 120))} />
-              <span className="absolute right-3 top-1/2 -translate-y-1/2 font-black text-zinc-400 text-sm">сар</span>
+              <span className="absolute right-3 top-1/2 -translate-y-1/2 font-bold text-zinc-400 text-sm">сар</span>
             </div>
             <div className="mt-2"><Range value={months} min={6} max={84} step={6} onChange={setMonths} /></div>
           </Field>
@@ -108,7 +108,7 @@ export function LeasingCalculator({ open, onClose, price, carName, phone }: {
             <div className="relative">
               <input inputMode="numeric" className={boxCls + " pr-9"} value={fmt(calc.down)}
                 onChange={(e) => setDownPct(clamp(Math.round((toNum(e.target.value) / carPrice) * 100), 0, 90))} />
-              <span className="absolute right-3 top-1/2 -translate-y-1/2 font-black text-zinc-400">₮</span>
+              <span className="absolute right-3 top-1/2 -translate-y-1/2 font-bold text-zinc-400">₮</span>
             </div>
             <div className="mt-2"><Range value={downPct} min={0} max={90} step={5} onChange={setDownPct} /></div>
           </Field>
@@ -117,14 +117,14 @@ export function LeasingCalculator({ open, onClose, price, carName, phone }: {
             <div className="relative">
               <input inputMode="decimal" className={boxCls + " pr-9"} value={rate}
                 onChange={(e) => setRate(clamp(Number(e.target.value.replace(/[^\d.]/g, "")) || 0, 0, 10))} />
-              <span className="absolute right-3 top-1/2 -translate-y-1/2 font-black text-zinc-400">%</span>
+              <span className="absolute right-3 top-1/2 -translate-y-1/2 font-bold text-zinc-400">%</span>
             </div>
             <div className="mt-2"><Range value={rate} min={0} max={4} step={0.1} onChange={(v) => setRate(Math.round(v * 10) / 10)} /></div>
           </Field>
 
           <div className="bg-[#111] text-white rounded-sm p-6 border-t-4 border-brand">
-            <div className="text-center text-[10px] font-black text-brand-light uppercase tracking-[0.3em] mb-3">Сарын төлбөр</div>
-            <div className="text-center text-4xl font-black tabular-nums tracking-tight">{fmt(calc.monthly)}₮</div>
+            <div className="text-center text-[10px] font-semibold text-brand-light uppercase tracking-[0.18em] mb-3">Сарын төлбөр</div>
+            <div className="text-center text-4xl font-bold tabular-nums tracking-tight">{fmt(calc.monthly)}₮</div>
             <dl className="mt-6 pt-5 border-t border-white/10 space-y-3 text-sm">
               {[
                 ["Зээлэх дүн", calc.loan],
@@ -133,8 +133,8 @@ export function LeasingCalculator({ open, onClose, price, carName, phone }: {
                 ["Нийт төлөх дүн", calc.total],
               ].map(([k, v]) => (
                 <div key={k as string} className="flex items-center justify-between">
-                  <dt className="text-[10px] font-black text-white/50 uppercase tracking-[0.15em]">{k}</dt>
-                  <dd className="font-black tabular-nums">{fmt(v as number)}₮</dd>
+                  <dt className="text-[10px] font-semibold text-white/50 uppercase tracking-[0.15em]">{k}</dt>
+                  <dd className="font-bold tabular-nums">{fmt(v as number)}₮</dd>
                 </div>
               ))}
             </dl>
@@ -148,17 +148,17 @@ export function LeasingCalculator({ open, onClose, price, carName, phone }: {
 
         <div className="shrink-0 border-t border-zinc-200 bg-white p-4 pb-[calc(1rem+env(safe-area-inset-bottom))] space-y-2 shadow-[0_-6px_16px_rgba(0,0,0,0.06)]">
           <div className="flex items-baseline justify-between gap-3 pb-1">
-            <span className="text-[10px] font-black text-zinc-500 uppercase tracking-[0.18em]">Сарын төлбөр</span>
-            <span className="text-2xl font-black text-brand tabular-nums tracking-tight">{fmt(calc.monthly)}₮</span>
+            <span className="text-[10px] font-semibold text-zinc-500 uppercase tracking-[0.18em]">Сарын төлбөр</span>
+            <span className="text-2xl font-bold text-brand tabular-nums tracking-tight">{fmt(calc.monthly)}₮</span>
           </div>
           {phone && (
             <a href={`https://wa.me/976${phone.replace(/\D/g, "")}?text=${encodeURIComponent(waText)}`} target="_blank" rel="noreferrer"
-              className="block text-center bg-[#25d366] hover:bg-[#1ebe5d] text-white text-[11px] font-black uppercase tracking-[0.2em] py-3 rounded-sm transition-colors">
+              className="block text-center border border-zinc-300 text-zinc-700 hover:border-brand hover:text-brand text-sm py-3 rounded-sm transition-colors font-medium">
               Лизингийн талаар лавлах
             </a>
           )}
           <button onClick={onClose}
-            className="w-full bg-brand hover:bg-brand-dark text-white text-[11px] font-black uppercase tracking-[0.2em] py-3.5 rounded-sm transition-colors">
+            className="w-full bg-brand hover:bg-brand-dark text-white text-sm py-3.5 rounded-sm transition-colors font-medium">
             Тооцоолуурыг хаах
           </button>
         </div>

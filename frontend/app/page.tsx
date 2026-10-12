@@ -179,12 +179,12 @@ function HomeContent() {
               "repeating-linear-gradient(0deg,transparent,transparent 39px,rgba(255,255,255,0.5) 39px,rgba(255,255,255,0.5) 40px),repeating-linear-gradient(90deg,transparent,transparent 39px,rgba(255,255,255,0.5) 39px,rgba(255,255,255,0.5) 40px)",
           }}
         />
-        <div className="pointer-events-none select-none absolute top-6 left-1/2 -translate-x-1/2 text-[72px] sm:text-[200px] font-black uppercase tracking-tighter text-white/[0.03] whitespace-nowrap">
+        <div className="pointer-events-none select-none absolute top-6 left-1/2 -translate-x-1/2 text-[72px] sm:text-[200px] font-semibold uppercase tracking-tighter text-white/[0.03] whitespace-nowrap">
           {cname}
         </div>
         <div className="relative max-w-7xl mx-auto px-4 py-12 sm:py-28">
           <div className="max-w-2xl">
-            <div className="inline-flex items-center gap-2 bg-white/5 border border-white/15 text-white/80 text-[10px] font-black px-3 py-1.5 rounded-sm mb-4 sm:mb-6 tracking-[0.2em] uppercase">
+            <div className="inline-flex items-center gap-2 bg-white/5 border border-white/15 text-white/80 text-[10px] font-semibold px-3 py-1.5 rounded-sm mb-4 sm:mb-6 tracking-[0.18em] uppercase">
               <span
                 className={`w-1.5 h-1.5 bg-red-400 rounded-full ${loading || retrying ? "animate-pulse" : ""}`}
               />
@@ -194,7 +194,7 @@ function HomeContent() {
                   ? "Ачааллаж байна"
                   : `${vehicles.length} машин зарагдаж байна`}
             </div>
-            <h1 className="text-3xl sm:text-6xl font-black leading-tight tracking-tight mb-3 sm:mb-5">
+            <h1 className="text-3xl sm:text-6xl font-bold leading-tight tracking-tight mb-3 sm:mb-5">
               Чанартай машин
               <span className="text-brand-light"> шууд таны гарт</span>
             </h1>
@@ -206,14 +206,14 @@ function HomeContent() {
             <div className="flex flex-wrap gap-3">
               <a
                 href="#cars"
-                className="bg-brand hover:bg-white hover:text-[#111] text-white font-black uppercase tracking-[0.15em] px-6 sm:px-8 py-3.5 rounded-sm transition-colors text-[11px]"
+                className="bg-brand hover:bg-white hover:text-[#111] text-white px-6 sm:px-8 py-3.5 rounded-sm transition-colors text-sm font-medium"
               >
                 Машинуудыг үзэх
               </a>
               {company?.phone && (
                 <a
                   href={`tel:${company.phone}`}
-                  className="border border-white/25 hover:border-white text-white font-bold uppercase tracking-[0.15em] px-6 sm:px-8 py-3.5 rounded-sm transition-colors text-[11px]"
+                  className="border border-white/25 hover:border-white text-white px-6 sm:px-8 py-3.5 rounded-sm transition-colors text-sm font-medium"
                 >
                   <span className="flex items-center gap-2">
                     <IcPhone cls="w-3.5 h-3.5" />
@@ -242,7 +242,7 @@ function HomeContent() {
                 },
               ].map(({ n, l }) => (
                 <div key={l} className="py-4 sm:py-5 text-center">
-                  <div className="text-xl sm:text-3xl font-black text-white tabular-nums">
+                  <div className="text-xl sm:text-3xl font-bold text-white tabular-nums">
                     {n}
                   </div>
                   <div className="text-[10px] sm:text-[11px] text-gray-500 mt-0.5 sm:mt-1 uppercase tracking-wider">
@@ -467,11 +467,11 @@ function HomeContent() {
                         </div>
                       )}
                       {/* Year badge */}
-                      <div className="absolute top-2 left-2 bg-[#111]/85 text-white text-[10px] sm:text-[11px] font-black tracking-wider px-2 py-0.5 rounded-sm">
+                      <div className="absolute top-2 left-2 bg-[#111]/85 text-white text-[10px] sm:text-[11px] font-bold tracking-wider px-2 py-0.5 rounded-sm">
                         {v.year}
                       </div>
                       {v.has_plates && (
-                        <div className="absolute top-2 right-2 bg-brand text-white text-[9px] sm:text-[10px] font-black px-1.5 py-0.5 rounded-sm uppercase tracking-widest">
+                        <div className="absolute top-2 right-2 bg-brand text-white text-[9px] sm:text-[10px] font-semibold px-1.5 py-0.5 rounded-sm uppercase tracking-widest">
                           Дугаартай
                         </div>
                       )}
@@ -483,10 +483,10 @@ function HomeContent() {
                     <div className="p-3 sm:p-4 flex flex-col flex-1">
                       {/* Name */}
                       <div className="mb-2 sm:mb-3">
-                        <div className="text-[10px] sm:text-[11px] font-black text-brand uppercase tracking-[0.18em] mb-0.5">
+                        <div className="text-[10px] sm:text-[11px] font-semibold text-brand uppercase tracking-[0.18em] mb-0.5">
                           {v.brand}
                         </div>
-                        <h3 className="font-extrabold text-[#111] text-[13px] sm:text-[15px] leading-tight">
+                        <h3 className="font-semibold text-[#111] text-[13px] sm:text-[15px] leading-tight">
                           {v.model}
                         </h3>
                       </div>
@@ -530,7 +530,7 @@ function HomeContent() {
                             <div className="hidden sm:block text-[10px] text-gray-400 uppercase tracking-wide">
                               Үнэ
                             </div>
-                            <div className="text-[13px] sm:text-[16px] font-black text-[#111] leading-tight">
+                            <div className="text-[13px] sm:text-[16px] font-bold text-[#111] leading-tight">
                               {price}
                             </div>
                           </div>
@@ -539,7 +539,7 @@ function HomeContent() {
                             Тохиролцоно
                           </div>
                         )}
-                        <span className="shrink-0 bg-[#111] group-hover:bg-brand text-white text-[9px] sm:text-[10px] font-black uppercase tracking-widest px-2.5 sm:px-3.5 py-2 rounded-sm transition-colors whitespace-nowrap">
+                        <span className="shrink-0 bg-[#111] group-hover:bg-brand text-white text-sm sm:text-[10px] px-2.5 sm:px-3.5 py-2 rounded-sm transition-colors whitespace-nowrap font-medium">
                           Үзэх →
                         </span>
                       </div>
@@ -559,10 +559,10 @@ function HomeContent() {
       >
         <div className="max-w-7xl mx-auto grid lg:grid-cols-[1fr_1.3fr] gap-10 lg:gap-16 items-start">
           <div>
-            <div className="text-[10px] font-black text-brand uppercase tracking-[0.25em] mb-3">
+            <div className="text-[10px] font-semibold text-brand uppercase tracking-[0.18em] mb-3">
               Холбоо барих
             </div>
-            <h2 className="text-3xl sm:text-4xl font-black text-[#111] leading-tight border-l-4 border-brand pl-4 mb-5">
+            <h2 className="text-3xl sm:text-4xl font-bold text-[#111] leading-tight border-l-4 border-brand pl-4 mb-5">
               Бидэнтэй
               <br />
               холбогдоорой
@@ -588,7 +588,7 @@ function HomeContent() {
                 label: "WhatsApp",
                 value: "Мессеж бичих",
                 icon: <IcWa cls="w-5 h-5" />,
-                bg: "bg-[#25d366]",
+                bg: "bg-brand",
                 ext: true,
               },
               company?.email && {
@@ -601,7 +601,7 @@ function HomeContent() {
                     <path d="M22 7l-10 6L2 7" />
                   </svg>
                 ),
-                bg: "bg-brand-dark",
+                bg: "bg-brand",
                 ext: false,
               },
               company?.working_hours && {
@@ -614,7 +614,7 @@ function HomeContent() {
                     <path d="M12 6v6l4 2" />
                   </svg>
                 ),
-                bg: "bg-zinc-500",
+                bg: "bg-brand",
                 ext: false,
               },
               company?.address && {
@@ -622,7 +622,7 @@ function HomeContent() {
                 label: "Байршил",
                 value: company.address,
                 icon: <IcPin cls="w-5 h-5" />,
-                bg: "bg-[#111]",
+                bg: "bg-brand",
                 ext: true,
               },
             ]
@@ -649,10 +649,10 @@ function HomeContent() {
                       {it.icon}
                     </div>
                     <div className="flex-1 min-w-0">
-                      <div className="text-[10px] font-black text-gray-400 uppercase tracking-[0.2em] mb-0.5">
+                      <div className="text-[10px] font-semibold text-gray-400 uppercase tracking-[0.18em] mb-0.5">
                         {it.label}
                       </div>
-                      <div className="font-black text-[#111] text-base sm:text-lg truncate">
+                      <div className="font-bold text-[#111] text-base sm:text-lg truncate">
                         {it.value}
                       </div>
                     </div>

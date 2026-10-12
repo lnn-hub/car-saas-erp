@@ -83,19 +83,19 @@ function MainLayoutInner({ children }: { children: React.ReactNode }) {
             </div>
           ) : (
             <div className="w-10 h-10 bg-brand rounded-sm flex items-center justify-center shrink-0">
-              <span className="text-white text-base font-black">{companyName?.[0] || 'A'}</span>
+              <span className="text-white text-base font-bold">{companyName?.[0] || 'A'}</span>
             </div>
           )}
           <div className="min-w-0">
-            <div className="text-sm font-black text-white leading-tight truncate">{companyName || 'Удирдлага'}</div>
-            <div className="text-[9px] font-bold text-white/40 uppercase tracking-[0.2em] mt-1">Админ самбар</div>
+            <div className="text-sm font-bold text-white leading-tight truncate">{companyName || 'Удирдлага'}</div>
+            <div className="text-xs font-medium text-white/40 mt-1">Админ самбар</div>
           </div>
         </div>
       </div>
 
       {/* Nav */}
       <nav className="flex-1 px-3 py-4 space-y-1 overflow-y-auto">
-        <div className="px-3 pb-2 text-[9px] font-black text-white/30 uppercase tracking-[0.25em]">Цэс</div>
+        <div className="px-3 pb-2 text-xs font-medium text-white/30">Цэс</div>
         {SIDE_NAV.map(({ href, label, Icon }) => {
           const active = isActive(href);
           return (
@@ -116,7 +116,7 @@ function MainLayoutInner({ children }: { children: React.ReactNode }) {
       {/* Вэбсайт */}
       <div className="px-3 pb-3">
         <a href="/" target="_blank" rel="noreferrer"
-          className="flex items-center justify-center gap-2 px-3 py-3 rounded-sm text-[11px] font-black uppercase tracking-[0.15em] text-white bg-brand hover:bg-brand-dark transition-colors">
+          className="flex items-center justify-center gap-2 px-3 py-3 rounded-sm text-sm text-white bg-brand hover:bg-brand-dark transition-colors font-medium">
           <IcGlobe />
           Вэбсайт үзэх
         </a>
@@ -126,11 +126,11 @@ function MainLayoutInner({ children }: { children: React.ReactNode }) {
       <div className="px-3 pb-3 border-t border-white/10 pt-3">
         <div className="flex items-center gap-3 px-2 py-2">
           <div className="w-9 h-9 rounded-full bg-white/10 flex items-center justify-center shrink-0">
-            <span className="text-white text-xs font-black">{initials || '?'}</span>
+            <span className="text-white text-xs font-bold">{initials || '?'}</span>
           </div>
           <div className="flex-1 min-w-0">
             <div className="text-xs font-bold text-white truncate">{userName}</div>
-            <div className="text-[10px] text-white/40 uppercase tracking-wider">{userRole}</div>
+            <div className="text-xs text-white/40">{userRole}</div>
           </div>
           <button onClick={logout} title="Гарах"
             className="text-white/40 hover:text-brand-light transition-colors shrink-0">
@@ -153,9 +153,9 @@ function MainLayoutInner({ children }: { children: React.ReactNode }) {
       <header className="lg:hidden fixed top-0 left-0 right-0 z-40 bg-[#111] border-b-2 border-brand flex items-center justify-between px-4 h-14">
         <div className="flex items-center gap-2.5">
           <div className="w-8 h-8 bg-brand rounded-sm flex items-center justify-center">
-            <span className="text-white text-sm font-black">{companyName?.[0] || 'A'}</span>
+            <span className="text-white text-sm font-bold">{companyName?.[0] || 'A'}</span>
           </div>
-          <span className="text-sm font-black text-white truncate max-w-[180px]">{companyName || 'Удирдлага'}</span>
+          <span className="text-sm font-bold text-white truncate max-w-[180px]">{companyName || 'Удирдлага'}</span>
         </div>
         <button onClick={() => setDrawer(v => !v)}
           className="w-9 h-9 flex items-center justify-center rounded-sm hover:bg-white/10 transition-colors text-white">

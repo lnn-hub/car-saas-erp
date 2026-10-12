@@ -29,7 +29,7 @@ export default function LoginPage() {
       <div className="w-full max-w-[360px]">
         <div className="mb-8">
           <div className="w-9 h-9 bg-brand rounded flex items-center justify-center mb-6">
-            <span className="text-white font-black text-lg leading-none">A</span>
+            <span className="text-white font-bold text-lg leading-none">A</span>
           </div>
           <h1 className="text-xl font-bold text-[#09090b] tracking-tight">Админ нэвтрэх</h1>
           <p className="text-sm text-[#71717a] mt-1">Машин удирдлагын самбар</p>
@@ -47,7 +47,7 @@ export default function LoginPage() {
               className="w-full bg-white border border-[#e4e4e7] rounded-md px-3 py-2 text-sm text-[#09090b] focus:outline-none focus:border-brand transition-colors"
               required />
           </div>
-          {error && <div className="bg-red-50 border border-red-200 rounded-md px-3 py-2 text-xs text-red-600">{error}</div>}
+          {error && <div className="bg-brand-soft border border-brand/20 rounded-md px-3 py-2 text-xs text-brand">{error}</div>}
           <button type="submit" disabled={loading}
             className="w-full bg-brand hover:bg-brand-dark disabled:opacity-40 text-white font-medium py-2 rounded-md text-sm transition-colors mt-1">
             {loading ? 'Нэвтэрж байна...' : 'Нэвтрэх'}

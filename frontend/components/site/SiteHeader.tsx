@@ -103,7 +103,7 @@ function AdminModal({ onClose }: { onClose: () => void }) {
             className="w-full border border-gray-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-[#09090b] transition-colors"
           />
           {error && (
-            <div className="bg-red-50 border border-red-100 rounded-xl px-4 py-2.5 text-xs text-red-600">
+            <div className="bg-brand-soft border border-brand/20 rounded-xl px-4 py-2.5 text-xs text-brand">
               {error}
             </div>
           )}
@@ -174,11 +174,11 @@ export function SiteHeader({ company }: { company: Company | null }) {
               ) : (
                 <div className="flex items-center gap-2">
                   <div className="w-9 h-9 bg-brand rounded flex items-center justify-center">
-                    <span className="text-white font-black text-lg leading-none">
+                    <span className="text-white font-bold text-lg leading-none">
                       {cname[0]}
                     </span>
                   </div>
-                  <span className="font-black text-[#111] text-lg tracking-tight">
+                  <span className="font-bold text-[#111] text-lg tracking-tight">
                     {cname}
                   </span>
                 </div>
@@ -195,7 +195,7 @@ export function SiteHeader({ company }: { company: Company | null }) {
                 <a
                   key={h}
                   href={h}
-                  className="px-4 py-2 text-[11px] font-black uppercase tracking-[0.15em] text-[#333] hover:text-brand transition-colors border-b-2 border-transparent hover:border-brand"
+                  className="px-4 py-2 text-sm text-[#333] hover:text-brand transition-colors border-b-2 border-transparent hover:border-brand font-medium"
                 >
                   {l}
                 </a>
@@ -206,7 +206,7 @@ export function SiteHeader({ company }: { company: Company | null }) {
               {company?.phone && (
                 <a
                   href={`tel:${company.phone}`}
-                  className="hidden lg:flex items-center gap-2 bg-brand hover:bg-[#111] text-white text-[11px] font-black uppercase tracking-[0.15em] px-5 py-3 rounded-sm transition-colors"
+                  className="hidden lg:flex items-center gap-2 bg-brand hover:bg-[#111] text-white text-sm px-5 py-3 rounded-sm transition-colors font-medium"
                 >
                   <IcPhone /> Залгах
                 </a>

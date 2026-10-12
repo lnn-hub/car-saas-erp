@@ -18,9 +18,9 @@ function fmtDate(d: string) {
 
 const PAYMENT: Record<string, string> = { CASH: 'Бэлэн', LOAN: 'Зээл', LEASING: 'Лизинг' };
 const PAYMENT_COLOR: Record<string, string> = {
-  CASH:    'bg-emerald-50 text-emerald-700',
-  LOAN:    'bg-blue-50 text-blue-700',
-  LEASING: 'bg-violet-50 text-violet-700',
+  CASH:    'bg-zinc-100 text-zinc-500',
+  LOAN:    'bg-brand-soft text-brand',
+  LEASING: 'bg-zinc-900 text-white',
 };
 
 export default function SalesPage() {
@@ -47,14 +47,14 @@ export default function SalesPage() {
       {/* KPI cards */}
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 sm:gap-3">
         {[
-          { label: 'Нийт зарагдсан',  value: `${summary?.total_sold ?? '0'}`, unit: 'машин',        color: 'bg-blue-50 border-blue-100',     textColor: 'text-blue-700' },
-          { label: 'Нийт орлого',     value: summary ? fmt(summary.total_revenue) : '—', unit: '', color: 'bg-emerald-50 border-emerald-100', textColor: 'text-emerald-700' },
-          { label: 'Цэвэр ашиг',      value: summary ? fmt(summary.total_profit) : '—',  unit: '', color: 'bg-violet-50 border-violet-100',   textColor: 'text-violet-700' },
-          { label: 'Дундаж ашиг',     value: summary ? fmt(summary.avg_profit ?? 0) : '—', unit: '', color: 'bg-amber-50 border-amber-100',  textColor: 'text-amber-700' },
+          { label: 'Нийт зарагдсан',  value: `${summary?.total_sold ?? '0'}`, unit: 'машин', },
+          { label: 'Нийт орлого',     value: summary ? fmt(summary.total_revenue) : '—', unit: '', },
+          { label: 'Цэвэр ашиг',      value: summary ? fmt(summary.total_profit) : '—',  unit: '', },
+          { label: 'Дундаж ашиг',     value: summary ? fmt(summary.avg_profit ?? 0) : '—', unit: '', },
         ].map(c => (
-          <div key={c.label} className={`rounded-xl border px-3 sm:px-5 py-3 sm:py-4 ${c.color}`}>
-            <div className="text-[11px] font-medium text-[#71717a] mb-2">{c.label}</div>
-            <div className={`text-xl sm:text-2xl font-bold tabular-nums leading-none ${c.textColor}`}>{c.value}</div>
+          <div key={c.label} className="rounded-sm bg-white border border-zinc-200 border-t-[3px] border-t-brand px-3 sm:px-5 py-3 sm:py-4 shadow-sm">
+            <div className="text-xs text-[#71717a] mb-2">{c.label}</div>
+            <div className="text-xl sm:text-2xl font-semibold tabular-nums leading-none text-[#111]">{c.value}</div>
             {c.unit && <div className="text-xs text-[#71717a] mt-1">{c.unit}</div>}
           </div>
         ))}
@@ -74,7 +74,7 @@ export default function SalesPage() {
             <thead>
               <tr className="border-b border-[#e4e4e7] bg-[#fafafa]">
                 {['Машин', 'Үйлчлүүлэгч', 'Төлбөр', 'Зарагдсан үнэ', 'Цэвэр ашиг', 'Огноо'].map((h, i) => (
-                  <th key={i} className={`py-2.5 px-5 text-[11px] font-medium text-[#a1a1aa] uppercase tracking-wider ${['Зарагдсан үнэ','Цэвэр ашиг'].includes(h) ? 'text-right' : 'text-left'}`}>{h}</th>
+                  <th key={i} className={`py-2.5 px-5 text-xs font-medium text-[#a1a1aa] ${['Зарагдсан үнэ','Цэвэр ашиг'].includes(h) ? 'text-right' : 'text-left'}`}>{h}</th>
                 ))}
               </tr>
             </thead>
@@ -95,7 +95,7 @@ export default function SalesPage() {
                   </td>
                   <td className="px-5 py-3 text-right tabular-nums text-[#09090b]">{fmt(s.sale_price)}</td>
                   <td className="px-5 py-3 text-right tabular-nums">
-                    <span className={Number(s.net_profit) >= 0 ? 'text-emerald-600 font-medium' : 'text-red-500 font-medium'}>
+                    <span className={Number(s.net_profit) >= 0 ? 'text-[#111] font-medium' : 'text-brand font-medium'}>
                       {Number(s.net_profit) >= 0 ? '+' : ''}{fmt(s.net_profit)}
                     </span>
                   </td>
@@ -109,7 +109,7 @@ export default function SalesPage() {
 
       {/* Cards — mobile */}
       <div className="sm:hidden space-y-2">
-        <div className="text-xs font-semibold text-[#a1a1aa] uppercase tracking-wider px-1">Борлуулалтын жагсаалт</div>
+        <div className="text-xs font-medium text-[#a1a1aa] px-1">Борлуулалтын жагсаалт</div>
         {loading ? (
           <div className="bg-white border border-[#e4e4e7] rounded-xl py-10 text-center text-sm text-[#a1a1aa]">Ачааллаж байна...</div>
         ) : sales.length === 0 ? (
@@ -138,7 +138,7 @@ export default function SalesPage() {
               </div>
               <div className="text-right">
                 <div className="text-[10px] text-[#a1a1aa]">Цэвэр ашиг</div>
-                <div className={`text-sm font-semibold tabular-nums ${Number(s.net_profit) >= 0 ? 'text-emerald-600' : 'text-red-500'}`}>
+                <div className={`text-sm font-semibold tabular-nums ${Number(s.net_profit) >= 0 ? 'text-[#111]' : 'text-brand'}`}>
                   {Number(s.net_profit) >= 0 ? '+' : ''}{fmt(s.net_profit)}
                 </div>
               </div>
