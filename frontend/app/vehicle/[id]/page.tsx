@@ -6,6 +6,7 @@ import { BACKEND as API, Company } from '@/lib/site';
 import { useCompany } from '@/lib/useSiteData';
 import { SiteHeader } from '@/components/site/SiteHeader';
 import { SiteFooter } from '@/components/site/SiteFooter';
+import { LeasingCalculator } from '@/components/site/LeasingCalculator';
 
 const BACKEND = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000';
 
@@ -58,6 +59,7 @@ function VehicleContent() {
   const [imgIdx, setIdx]   = useState(0);
   const [others, setOthers]  = useState<Other[]>([]);
   const [copied, setCopied]  = useState(false);
+  const [calcOpen, setCalcOpen] = useState(false);
   const [loading, setLoad] = useState(true);
 
   useEffect(() => {
@@ -360,6 +362,13 @@ function VehicleContent() {
                   </div>
                 )}
 
+                {/* Leasing calculator */}
+                <button type="button" onClick={() => setCalcOpen(true)}
+                  className="w-full mb-4 flex items-center justify-center gap-2 border-2 border-[#111] hover:bg-[#111] hover:text-white text-[#111] text-[11px] font-black uppercase tracking-[0.15em] py-3 rounded-sm transition-colors">
+                  <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2}><rect x="4" y="2" width="16" height="20" rx="2"/><path d="M8 6h8M8 11h2M14 11h2M8 15h2M14 15h2M8 19h2M14 19h2"/></svg>
+                  Лизингийн тооцоолол
+                </button>
+
                 {/* Quick specs badges */}
                 <div className="grid grid-cols-2 gap-2 mb-5">
                   {[
@@ -463,9 +472,17 @@ function VehicleContent() {
 
       <SiteFooter company={company} />
 
+      <LeasingCalculator open={calcOpen} onClose={() => setCalcOpen(false)}
+        price={price ? Number(v.total_cost) : null}
+        carName={`${v.year} ${v.brand} ${v.model}`} phone={v.company?.phone} />
+
       {/* Mobile sticky bottom call bar */}
       {v.company?.phone && (
         <div className="fixed bottom-0 left-0 right-0 z-50 lg:hidden bg-white border-t border-gray-200 shadow-[0_-4px_16px_rgba(0,0,0,0.08)] px-4 pt-3 pb-[calc(0.75rem+env(safe-area-inset-bottom))] flex gap-2.5">
+          <button type="button" onClick={() => setCalcOpen(true)} aria-label="Лизингийн тооцоолол"
+            className="shrink-0 w-14 flex items-center justify-center bg-[#111] active:bg-black text-white rounded-xl">
+            <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2}><rect x="4" y="2" width="16" height="20" rx="2"/><path d="M8 6h8M8 11h2M14 11h2M8 15h2M14 15h2M8 19h2M14 19h2"/></svg>
+          </button>
           <a href={`tel:${v.company.phone}`}
             className="flex-1 flex items-center justify-center gap-2 bg-brand active:bg-brand-dark text-white font-extrabold py-3.5 rounded-xl text-sm shadow-sm">
             {Ic.phone} Залгах
