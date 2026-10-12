@@ -4,6 +4,7 @@ import { usePathname, useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import React from 'react';
 import { warmUp } from '@/lib/api';
+import { BrandMark } from '@/components/site/BrandMark';
 
 const BACKEND = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000';
 
@@ -79,21 +80,8 @@ function MainLayoutInner({ children }: { children: React.ReactNode }) {
     <>
       {/* Компани */}
       <div className="px-5 py-5 border-b border-white/10">
-        <div className="flex items-center gap-3">
-          {logoUrl ? (
-            <div className="w-10 h-10 bg-white rounded-sm flex items-center justify-center shrink-0 overflow-hidden p-1">
-              <img src={logoUrl.startsWith('http') ? logoUrl : `${BACKEND}${logoUrl}`} alt="" className="max-w-full max-h-full object-contain" />
-            </div>
-          ) : (
-            <div className="w-10 h-10 bg-brand rounded-sm flex items-center justify-center shrink-0">
-              <span className="text-white text-base font-bold">{companyName?.[0] || 'A'}</span>
-            </div>
-          )}
-          <div className="min-w-0">
-            <div className="text-sm font-bold text-white leading-tight truncate">{companyName || 'Удирдлага'}</div>
-            <div className="text-xs font-medium text-white/40 mt-1">Админ самбар</div>
-          </div>
-        </div>
+        <BrandMark logoUrl={logoUrl} name={companyName || 'Удирдлага'} size={36} onDark nameClassName="text-sm font-bold text-white" />
+        <div className="text-xs font-medium text-white/40 mt-2">Админ самбар</div>
       </div>
 
       {/* Nav */}
@@ -155,10 +143,7 @@ function MainLayoutInner({ children }: { children: React.ReactNode }) {
       {/* ── Mobile top header ── */}
       <header className="lg:hidden fixed top-0 left-0 right-0 z-40 bg-[#111] border-b-2 border-brand flex items-center justify-between px-4 h-14">
         <div className="flex items-center gap-2.5">
-          <div className="w-8 h-8 bg-brand rounded-sm flex items-center justify-center">
-            <span className="text-white text-sm font-bold">{companyName?.[0] || 'A'}</span>
-          </div>
-          <span className="text-sm font-bold text-white truncate max-w-[180px]">{companyName || 'Удирдлага'}</span>
+          <BrandMark logoUrl={logoUrl} name={companyName || 'Удирдлага'} size={32} onDark nameClassName="text-sm font-bold text-white max-w-[180px]" />
         </div>
         <button onClick={() => setDrawer(v => !v)}
           className="w-9 h-9 flex items-center justify-center rounded-sm hover:bg-white/10 transition-colors text-white">

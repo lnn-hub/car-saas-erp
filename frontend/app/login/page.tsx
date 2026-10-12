@@ -3,9 +3,12 @@ import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { api } from '@/lib/api';
+import { useCompany } from '@/lib/useSiteData';
+import { BrandMark } from '@/components/site/BrandMark';
 
 export default function LoginPage() {
   const router = useRouter();
+  const company = useCompany();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
@@ -28,8 +31,8 @@ export default function LoginPage() {
     <div className="min-h-screen bg-white flex items-center justify-center px-4">
       <div className="w-full max-w-[360px]">
         <div className="mb-8">
-          <div className="w-9 h-9 bg-brand rounded flex items-center justify-center mb-6">
-            <span className="text-white font-bold text-lg leading-none">A</span>
+          <div className="mb-6">
+            <BrandMark logoUrl={company?.logo_url} name={company?.name || ""} size={40} nameClassName="text-lg font-bold text-[#1c1917]" />
           </div>
           <h1 className="text-xl font-bold text-[#1c1917] tracking-tight">Админ нэвтрэх</h1>
           <p className="text-sm text-[#5f5a54] mt-1">Машин удирдлагын самбар</p>

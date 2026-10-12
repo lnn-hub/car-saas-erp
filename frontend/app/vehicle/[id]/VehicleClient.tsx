@@ -7,6 +7,7 @@ import { useCompany } from '@/lib/useSiteData';
 import { SiteHeader } from '@/components/site/SiteHeader';
 import { SiteFooter } from '@/components/site/SiteFooter';
 import { LeasingCalculator } from '@/components/site/LeasingCalculator';
+import { BrandMark } from '@/components/site/BrandMark';
 import { Lightbox } from '@/components/site/Lightbox';
 
 const BACKEND = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000';
@@ -392,9 +393,7 @@ function VehicleContent({ id, initial }: { id: string; initial: VehicleDetail | 
 
             {/* Dealer info */}
             <div className="bg-white border border-zinc-200 rounded-sm shadow-sm p-4 flex items-center gap-3">
-              <div className="w-10 h-10 bg-brand rounded-sm flex items-center justify-center text-white font-semibold text-lg shrink-0">
-                {v.company?.name?.[0]}
-              </div>
+              <BrandMark logoUrl={v.company?.logo_url} name={v.company?.name || ""} size={40} showName={false} />
               <div className="min-w-0">
                 <div className="text-xs text-zinc-500">Дилер</div>
                 <div className="font-semibold text-[#111] text-sm truncate">{v.company?.name}</div>

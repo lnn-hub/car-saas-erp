@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { Company } from "@/lib/site";
 import { IcPhone, IcWa } from "./icons";
+import { BrandMark } from "./BrandMark";
 
 export function SiteCta({ company }: { company: Company | null }) {
   const cname = company?.name ?? "";
@@ -45,14 +46,7 @@ export function SiteFooter({ company }: { company: Company | null }) {
       <footer className="bg-[#0b0b0b] text-[#8a837a] border-t border-white/10">
         <div className="max-w-7xl mx-auto px-4 py-8">
           <div className="flex flex-col sm:flex-row items-center justify-between gap-5 mb-6">
-            <div className="flex items-center gap-2.5">
-              <div className="w-8 h-8 bg-brand rounded flex items-center justify-center">
-                <span className="text-white font-bold text-sm">
-                  {cname[0]}
-                </span>
-              </div>
-              <span className="text-white font-bold text-base">{cname}</span>
-            </div>
+            <BrandMark logoUrl={company?.logo_url} name={cname} size={36} onDark nameClassName="text-white font-bold text-base" />
             <div className="flex items-center gap-6 text-xs">
               {[
                 ["/#cars", "Машинууд"],
@@ -75,6 +69,14 @@ export function SiteFooter({ company }: { company: Company | null }) {
               </Link>
             </div>
           </div>
+          {(company?.address || company?.phone || company?.email || company?.working_hours) && (
+            <div className="flex flex-wrap justify-center gap-x-6 gap-y-1 pb-6 text-xs">
+              {company?.address && <span>{company.address}</span>}
+              {company?.phone && <a href={`tel:${company.phone}`} className="py-1 hover:text-white transition-colors">{company.phone}</a>}
+              {company?.email && <a href={`mailto:${company.email}`} className="py-1 hover:text-white transition-colors">{company.email}</a>}
+              {company?.working_hours && <span>{company.working_hours}</span>}
+            </div>
+          )}
           <div className="border-t border-white/10 pt-6 text-xs text-center text-[#8a837a]">
             © {new Date().getFullYear()} {cname}. Бүх эрх хуулиар хамгаалагдсан.
           </div>

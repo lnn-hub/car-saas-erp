@@ -3,8 +3,9 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { BACKEND, Company, imgUrl } from "@/lib/site";
 import { IcPhone } from "./icons";
+import { BrandMark } from "./BrandMark";
 
-function AdminModal({ onClose }: { onClose: () => void }) {
+function AdminModal({ onClose, company }: { onClose: () => void; company: Company | null }) {
   const router = useRouter();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -78,6 +79,9 @@ function AdminModal({ onClose }: { onClose: () => void }) {
           </svg>
         </button>
         <div className="mb-6">
+          {company?.logo_url ? (
+            <div className="mb-4"><BrandMark logoUrl={company.logo_url} name={company.name} size={36} showName={false} /></div>
+          ) : (
           <div className="w-8 h-8 bg-brand rounded-lg mb-4 flex items-center justify-center">
             <svg
               className="w-4 h-4 text-white"
@@ -90,6 +94,7 @@ function AdminModal({ onClose }: { onClose: () => void }) {
               <path d="M7 11V7a5 5 0 0110 0v4" />
             </svg>
           </div>
+          )}
           <h2 className="text-lg font-bold text-[#1c1917]">Админ нэвтрэх</h2>
           <p className="text-sm text-gray-500 mt-0.5">Удирдлагын систем</p>
         </div>
@@ -147,7 +152,7 @@ export function SiteHeader({ company }: { company: Company | null }) {
 
   return (
     <>
-      {adminModal && <AdminModal onClose={() => setAdminModal(false)} />}
+      {adminModal && <AdminModal onClose={() => setAdminModal(false)} company={company} />}
       <header className="sticky top-0 z-50 bg-white shadow-sm">
         {/* Top bar */}
         <div className="bg-brand text-white text-xs">
@@ -174,24 +179,7 @@ export function SiteHeader({ company }: { company: Company | null }) {
         <div className="max-w-7xl mx-auto px-4">
           <div className="h-16 flex items-center justify-between">
             <a href="/" className="flex items-center gap-3">
-              {company?.logo_url ? (
-                <img
-                  src={imgUrl(company.logo_url)!}
-                  className="h-10 object-contain"
-                  alt=""
-                />
-              ) : (
-                <div className="flex items-center gap-2">
-                  <div className="w-9 h-9 bg-brand rounded flex items-center justify-center">
-                    <span className="text-white font-bold text-lg leading-none">
-                      {cname[0]}
-                    </span>
-                  </div>
-                  <span className="font-bold text-[#111] text-lg tracking-tight">
-                    {cname}
-                  </span>
-                </div>
-              )}
+              <BrandMark logoUrl={company?.logo_url} name={cname} size={40} nameClassName="font-bold text-[#111] text-lg tracking-tight" />
             </a>
 
             <nav className="hidden md:flex items-center gap-1">
