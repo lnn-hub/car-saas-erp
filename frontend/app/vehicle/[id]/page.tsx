@@ -339,97 +339,84 @@ function VehicleContent() {
           <div className="lg:sticky lg:top-20 lg:self-start space-y-4">
 
             {/* Price card */}
-            <div className="bg-white rounded-xl overflow-hidden shadow-sm">
-              <div className="h-1.5 bg-brand" />
-              <div className="p-5">
-                {/* Title */}
-                <div className="mb-4">
-                  <div className="text-[11px] font-bold text-brand uppercase tracking-widest mb-0.5">{v.brand}</div>
-                  <div className="text-xl font-black text-[#111] leading-tight">{v.model}</div>
-                  <div className="text-gray-400 text-sm mt-0.5">{v.year} он · {v.color}</div>
-                </div>
+            <div className="bg-white border border-zinc-200 rounded-sm shadow-sm p-5">
+              {/* Title */}
+              <div className="mb-5">
+                <div className="text-[11px] font-semibold text-brand uppercase tracking-[0.18em] mb-1">{v.brand}</div>
+                <div className="text-[22px] font-semibold text-[#111] leading-tight">{v.model}</div>
+                <div className="text-zinc-500 text-sm mt-1">{v.year} он{v.color ? ` · ${v.color}` : ''}</div>
+              </div>
 
-                {/* Price */}
+              {/* Price field */}
+              <div className="mb-3 border border-zinc-200 rounded-sm px-4 py-3 border-l-[3px] border-l-brand">
+                <div className="text-[11px] text-zinc-500 mb-0.5">Борлуулах үнэ</div>
                 {price ? (
-                  <div className="bg-gradient-to-r from-brand-dark to-brand rounded-sm p-4 mb-4 text-white">
-                    <div className="text-[10px] uppercase tracking-widest opacity-80 mb-0.5">Борлуулах үнэ</div>
-                    <div className="text-2xl font-black leading-tight">{price}</div>
-                  </div>
+                  <div className="text-[26px] font-semibold text-[#111] leading-tight tabular-nums">{price}</div>
                 ) : (
-                  <div className="bg-gray-50 border border-dashed border-gray-200 rounded-xl p-4 mb-4">
-                    <div className="text-[11px] text-gray-400 uppercase tracking-wide mb-0.5">Үнэ</div>
-                    <div className="text-base font-bold text-gray-500">Тохиролцоно</div>
-                  </div>
-                )}
-
-                {/* Leasing calculator */}
-                <button type="button" onClick={() => setCalcOpen(true)}
-                  className="w-full mb-4 flex items-center justify-center gap-2 border-2 border-[#111] hover:bg-[#111] hover:text-white text-[#111] text-[11px] font-black uppercase tracking-[0.15em] py-3 rounded-sm transition-colors">
-                  <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2}><rect x="4" y="2" width="16" height="20" rx="2"/><path d="M8 6h8M8 11h2M14 11h2M8 15h2M14 15h2M8 19h2M14 19h2"/></svg>
-                  Лизингийн тооцоолол
-                </button>
-
-                {/* Quick specs badges */}
-                <div className="grid grid-cols-2 gap-2 mb-5">
-                  {[
-                    FUEL[v.fuel_type],
-                    TRANS[v.transmission],
-                    v.mileage > 0 ? `${(v.mileage/1000).toFixed(0)}k км` : null,
-                    v.engine_cc ? `${(Number(v.engine_cc)/1000).toFixed(1)}L` : null,
-                  ].filter(Boolean).map((t, i) => (
-                    <div key={i} className="flex items-center justify-center gap-1.5 bg-[#f8f8f8] border border-gray-100 rounded-lg py-2 px-3 text-xs font-bold text-gray-600">
-                      {t}
-                    </div>
-                  ))}
-                </div>
-
-                {/* Call buttons */}
-                {v.company?.phone && (
-                  <div className="space-y-2.5">
-                    <a href={`tel:${v.company.phone}`}
-                      className="flex items-center justify-center gap-2.5 w-full bg-brand hover:bg-brand-dark text-white font-extrabold py-4 rounded-xl transition-colors text-sm tracking-wide">
-                      {Ic.phone}
-                      <span>{v.company.phone} — Залгах</span>
-                    </a>
-                    <a href={waHref}
-                      target="_blank" rel="noreferrer"
-                      className="flex items-center justify-center gap-2.5 w-full bg-[#25d366] hover:bg-[#1ebe5d] text-white font-extrabold py-4 rounded-xl transition-colors text-sm">
-                      {Ic.wa}
-                      <span>WhatsApp — Мессеж</span>
-                    </a>
-                  </div>
+                  <div className="text-lg font-medium text-zinc-500">Тохиролцоно</div>
                 )}
               </div>
-            </div>
 
-            {/* Dealer info */}
-            <div className="bg-white rounded-xl shadow-sm p-5">
-              <div className="flex items-center gap-3 mb-3">
-                <div className="w-10 h-10 bg-brand rounded-lg flex items-center justify-center text-white font-black text-lg shrink-0">
-                  {v.company?.name?.[0]}
-                </div>
-                <div>
-                  <div className="text-[10px] text-gray-400 uppercase tracking-wide">Дилер</div>
-                  <div className="font-extrabold text-[#111] text-sm">{v.company?.name}</div>
-                </div>
+              {/* Leasing calculator */}
+              <button type="button" onClick={() => setCalcOpen(true)}
+                className="w-full mb-4 flex items-center justify-center gap-2 border border-zinc-300 hover:border-brand hover:text-brand text-zinc-700 text-sm font-medium py-2.5 rounded-sm transition-colors">
+                <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.8}><rect x="4" y="2" width="16" height="20" rx="2"/><path d="M8 6h8M8 11h2M14 11h2M8 15h2M14 15h2M8 19h2M14 19h2"/></svg>
+                Лизингийн тооцоолол
+              </button>
+
+              {/* Quick specs */}
+              <div className="grid grid-cols-2 gap-2 mb-5">
+                {[
+                  ['Түлш', FUEL[v.fuel_type]],
+                  ['Хайрцаг', TRANS[v.transmission]],
+                  ['Гүйлт', v.mileage > 0 ? `${Number(v.mileage).toLocaleString()} км` : null],
+                  ['Хөдөлгүүр', v.engine_cc ? `${(Number(v.engine_cc)/1000).toFixed(1)}L` : null],
+                ].filter(([, val]) => val).map(([label, val]) => (
+                  <div key={label as string} className="border border-zinc-200 rounded-sm px-3 py-2">
+                    <div className="text-[11px] text-zinc-500">{label}</div>
+                    <div className="text-sm font-medium text-[#111] mt-0.5">{val}</div>
+                  </div>
+                ))}
               </div>
+
+              {/* Contact */}
               {v.company?.phone && (
-                <div className="flex items-center gap-2 text-sm text-gray-500 border-t border-gray-100 pt-3">
-                  {Ic.phone}<span>{v.company.phone}</span>
+                <div className="space-y-2">
+                  <a href={`tel:${v.company.phone}`}
+                    className="flex items-center justify-center gap-2 w-full bg-brand hover:bg-brand-dark text-white text-sm font-medium py-3 rounded-sm transition-colors">
+                    {Ic.phone}
+                    <span>Залгах · {v.company.phone}</span>
+                  </a>
+                  <a href={waHref} target="_blank" rel="noreferrer"
+                    className="flex items-center justify-center gap-2 w-full border border-[#25d366] text-[#128c4a] hover:bg-[#25d366]/10 text-sm font-medium py-3 rounded-sm transition-colors">
+                    {Ic.wa}
+                    <span>WhatsApp-аар бичих</span>
+                  </a>
                 </div>
               )}
             </div>
 
+            {/* Dealer info */}
+            <div className="bg-white border border-zinc-200 rounded-sm shadow-sm p-4 flex items-center gap-3">
+              <div className="w-10 h-10 bg-brand rounded-sm flex items-center justify-center text-white font-semibold text-lg shrink-0">
+                {v.company?.name?.[0]}
+              </div>
+              <div className="min-w-0">
+                <div className="text-[11px] text-zinc-500">Дилер</div>
+                <div className="font-semibold text-[#111] text-sm truncate">{v.company?.name}</div>
+              </div>
+            </div>
+
             {/* Share */}
             <button onClick={copyLink}
-              className="w-full flex items-center justify-center gap-2 bg-white border border-zinc-200 hover:border-brand hover:text-brand text-[#111] text-[11px] font-black uppercase tracking-[0.15em] py-3.5 rounded-sm transition-colors">
+              className="w-full flex items-center justify-center gap-2 bg-white border border-zinc-200 hover:border-brand hover:text-brand text-zinc-700 text-sm font-medium py-2.5 rounded-sm transition-colors">
               <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2}><path d="M10 13a5 5 0 007.07 0l3-3a5 5 0 00-7.07-7.07l-1.5 1.5"/><path d="M14 11a5 5 0 00-7.07 0l-3 3a5 5 0 007.07 7.07l1.5-1.5"/></svg>
               {copied ? 'Хуулагдлаа' : 'Холбоос хуулах'}
             </button>
 
             {/* Back */}
             <Link href="/"
-              className="flex items-center justify-center gap-2 w-full bg-white rounded-xl shadow-sm py-3 text-sm text-gray-400 hover:text-brand hover:shadow-md transition-all font-semibold">
+              className="flex items-center justify-center gap-2 w-full bg-white border border-zinc-200 rounded-sm py-2.5 text-sm text-zinc-500 hover:text-brand hover:border-brand transition-colors font-medium">
               {Ic.back} Бүх машинуудыг үзэх
             </Link>
           </div>
@@ -478,18 +465,17 @@ function VehicleContent() {
 
       {/* Mobile sticky bottom call bar */}
       {v.company?.phone && (
-        <div className="fixed bottom-0 left-0 right-0 z-50 lg:hidden bg-white border-t border-gray-200 shadow-[0_-4px_16px_rgba(0,0,0,0.08)] px-4 pt-3 pb-[calc(0.75rem+env(safe-area-inset-bottom))] flex gap-2.5">
+        <div className="fixed bottom-0 left-0 right-0 z-50 lg:hidden bg-white border-t border-zinc-200 shadow-[0_-4px_16px_rgba(0,0,0,0.08)] px-4 pt-3 pb-[calc(0.75rem+env(safe-area-inset-bottom))] flex gap-2">
           <button type="button" onClick={() => setCalcOpen(true)} aria-label="Лизингийн тооцоолол"
-            className="shrink-0 w-14 flex items-center justify-center bg-[#111] active:bg-black text-white rounded-xl">
-            <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2}><rect x="4" y="2" width="16" height="20" rx="2"/><path d="M8 6h8M8 11h2M14 11h2M8 15h2M14 15h2M8 19h2M14 19h2"/></svg>
+            className="shrink-0 w-12 flex items-center justify-center border border-zinc-300 text-zinc-700 active:bg-zinc-50 rounded-sm">
+            <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.8}><rect x="4" y="2" width="16" height="20" rx="2"/><path d="M8 6h8M8 11h2M14 11h2M8 15h2M14 15h2M8 19h2M14 19h2"/></svg>
           </button>
           <a href={`tel:${v.company.phone}`}
-            className="flex-1 flex items-center justify-center gap-2 bg-brand active:bg-brand-dark text-white font-extrabold py-3.5 rounded-xl text-sm shadow-sm">
+            className="flex-1 flex items-center justify-center gap-2 bg-brand active:bg-brand-dark text-white text-sm font-medium py-3 rounded-sm">
             {Ic.phone} Залгах
           </a>
-          <a href={waHref}
-            target="_blank" rel="noreferrer"
-            className="flex-1 flex items-center justify-center gap-2 bg-[#25d366] active:bg-[#1ebe5d] text-white font-extrabold py-3.5 rounded-xl text-sm shadow-sm">
+          <a href={waHref} target="_blank" rel="noreferrer"
+            className="flex-1 flex items-center justify-center gap-2 border border-[#25d366] text-[#128c4a] active:bg-[#25d366]/10 text-sm font-medium py-3 rounded-sm">
             {Ic.wa} WhatsApp
           </a>
         </div>
