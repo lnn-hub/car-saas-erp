@@ -1,6 +1,14 @@
 const BASE = (process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000') + '/api';
 const BACKEND = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000';
 
+// Токен дууссан/буруу үед нэвтрэх хуудас руу буцаана
+function handleUnauthorized() {
+  if (typeof window === 'undefined') return;
+  localStorage.removeItem('token');
+  localStorage.removeItem('user');
+  if (!window.location.pathname.startsWith('/login')) window.location.href = '/login';
+}
+
 function getToken() {
   if (typeof window === 'undefined') return null;
   return localStorage.getItem('token');
@@ -43,6 +51,10 @@ async function request(path: string, options: RequestInit = {}, useCache = false
       },
     });
     const data = await res.json();
+    if (res.status === 401 && token) {
+      handleUnauthorized();
+      throw new Error('Нэвтрэх хугацаа дууссан. Дахин нэвтэрнэ үү');
+    }
     if (!res.ok) throw new Error(data.error || 'Алдаа гарлаа');
     if (useCache) setCached(cacheKey, data);
     return data;
@@ -123,6 +135,7 @@ export const api = {
       body: fd,
     });
     const data = await res.json();
+    if (res.status === 401) { handleUnauthorized(); throw new Error('Нэвтрэх хугацаа дууссан. Дахин нэвтэрнэ үү'); }
     if (!res.ok) throw new Error(data.error || 'Upload алдаа');
     invalidateCache('/vehicles');
     return data;
@@ -145,6 +158,7 @@ export const api = {
       body: fd,
     });
     const data = await res.json();
+    if (res.status === 401) { handleUnauthorized(); throw new Error('Нэвтрэх хугацаа дууссан. Дахин нэвтэрнэ үү'); }
     if (!res.ok) throw new Error(data.error || 'Upload алдаа');
     invalidateCache('/settings');
     return data as { logo_url: string };
@@ -173,6 +187,7 @@ export const api = {
       body: fd,
     });
     const data = await res.json();
+    if (res.status === 401) { handleUnauthorized(); throw new Error('Нэвтрэх хугацаа дууссан. Дахин нэвтэрнэ үү'); }
     if (!res.ok) throw new Error(data.error || 'Upload алдаа');
     return data;
   },

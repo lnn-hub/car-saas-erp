@@ -13,8 +13,17 @@ function AdminModal({ onClose }: { onClose: () => void }) {
 
   useEffect(() => {
     // Аль хэдийн нэвтэрсэн бол шууд явна
-    if (typeof window !== "undefined" && localStorage.getItem("token")) {
-      router.push("/dashboard");
+    const saved = typeof window !== "undefined" ? localStorage.getItem("token") : null;
+    if (saved) {
+      fetch(`${BACKEND}/api/settings`, { headers: { Authorization: `Bearer ${saved}` } })
+        .then((r) => {
+          if (r.ok) router.push("/dashboard");
+          else if (r.status === 401) {
+            localStorage.removeItem("token");
+            localStorage.removeItem("user");
+          }
+        })
+        .catch(() => {});
     }
     const onKey = (e: KeyboardEvent) => {
       if (e.key === "Escape") onClose();

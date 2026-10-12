@@ -59,7 +59,8 @@ function MainLayoutInner({ children }: { children: React.ReactNode }) {
     setUserName(u.name || ''); setUserRole(u.role || '');
     fetch(`${BACKEND}/api/settings`, {
       headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
-    }).then(r => r.json()).then(d => { setCompany(d.name || ''); setLogoUrl(d.logo_url || null); }).catch(() => {});
+    }).then(r => { if (r.status === 401) { localStorage.clear(); router.push('/login'); throw new Error('unauthorized'); } return r.json(); })
+      .then(d => { setCompany(d.name || ''); setLogoUrl(d.logo_url || null); }).catch(() => {});
   }, [router]);
 
   // Drawer хаах хуудас солигдоход
