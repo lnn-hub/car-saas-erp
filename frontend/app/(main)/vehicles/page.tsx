@@ -131,14 +131,19 @@ export default function VehiclesPage() {
       {/* Content */}
       <div className="flex-1 overflow-y-auto">
         {loading ? (
-          <div className="flex items-center justify-center h-32 text-[#a1a1aa] text-sm">Ачааллаж байна...</div>
+          <div className="divide-y divide-[#f4f4f5]">{[0, 1, 2, 3, 4].map(i => (<div key={i} className="flex items-center gap-4 px-6 py-3.5"><div className="h-4 w-44 rounded bg-[#f4f4f5] animate-pulse" /><div className="h-3 w-16 rounded bg-[#f4f4f5] animate-pulse ml-auto" /></div>))}</div>
         ) : pagedGrouped.length === 0 ? (
-          <div className="flex flex-col items-center justify-center h-48 text-[#a1a1aa]">
-            <div className="text-sm mb-1">Машин олдсонгүй</div>
-            {(search || statusFilter.length > 0) && (
-              <button onClick={() => { setSearch(''); setStatusFilter([]); }} className="text-xs text-[#a1a1aa] hover:text-[#09090b] transition-colors mt-1">
+          <div className="flex flex-col items-center justify-center py-16 px-4 text-center">
+            <div className="w-12 h-12 rounded-full bg-brand-soft text-brand flex items-center justify-center mb-3">
+              <svg className="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.6}><path d="M5 17H3a2 2 0 01-2-2v-4a2 2 0 012-2h16a2 2 0 012 2v4a2 2 0 01-2 2h-2"/><rect x="7" y="17" width="10" height="4" rx="2"/><path d="M5 11L7.5 5h9L19 11"/></svg>
+            </div>
+            <div className="text-sm font-medium text-[#09090b]">Машин олдсонгүй</div>
+            {(search || statusFilter.length > 0) ? (
+              <button onClick={() => { setSearch(''); setStatusFilter([]); }} className="text-sm text-brand hover:text-brand-dark transition-colors mt-2">
                 Шүүлтүүр арилгах
               </button>
+            ) : (
+              <Link href="/vehicles/new" className="mt-3 inline-flex items-center gap-2 bg-brand hover:bg-brand-dark text-white text-sm font-medium px-4 py-2 rounded-md transition-colors">Машин нэмэх</Link>
             )}
           </div>
         ) : (

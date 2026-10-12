@@ -5,6 +5,8 @@ import { optimizeImg, SiteInitial } from "@/lib/site";
 import { useSiteData } from "@/lib/useSiteData";
 import { SiteHeader } from "@/components/site/SiteHeader";
 import { MobileCallBar, SiteCta, SiteFooter } from "@/components/site/SiteFooter";
+import { HeroSlides } from "@/components/site/HeroSlides";
+import { CompareModal } from "@/components/site/CompareModal";
 import { IcPhone, IcWa, IcPin } from "@/components/site/icons";
 
 
@@ -119,6 +121,11 @@ function HomeContent({ initial }: { initial: SiteInitial | null }) {
   const [filterTrans, setFilterTrans] = useState("");
   const [filterBrand, setBrand] = useState("");
   const [filterPrice, setPrice] = useState("");
+  const [compare, setCompare] = useState<string[]>([]);
+  const [compareOpen, setCompareOpen] = useState(false);
+  const toggleCompare = (id: string) =>
+    setCompare((c) => (c.includes(id) ? c.filter((x) => x !== id) : c.length >= 3 ? c : [...c, id]));
+  const compared = vehicles.filter((v) => compare.includes(v.id));
   const [sortBy, setSort] = useState("");
 
   const uniqueBrands = [...new Set(vehicles.map((v) => v.brand))].sort();
@@ -172,6 +179,7 @@ function HomeContent({ initial }: { initial: SiteInitial | null }) {
               "linear-gradient(135deg,#2a0a10 0%,#111 55%,#0d0d0d 100%)",
           }}
         />
+        <HeroSlides vehicles={vehicles} />
         <div
           className="absolute inset-0 opacity-[0.06]"
           style={{
@@ -425,6 +433,7 @@ function HomeContent({ initial }: { initial: SiteInitial | null }) {
             <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3 sm:gap-5">
               {filtered.map((v) => {
                 const src = optimizeImg(v.main_image, 640);
+                const src2 = v.images?.[1] ? optimizeImg(v.images[1], 640) : null;
                 const price = fmtPrice(v.total_cost);
                 const km = fmtKm(v.mileage);
                 const cc = v.engine_cc
@@ -439,12 +448,22 @@ function HomeContent({ initial }: { initial: SiteInitial | null }) {
                     {/* Image */}
                     <div className="relative aspect-[4/3] sm:aspect-[16/10] bg-gray-100 overflow-hidden">
                       {src ? (
+                        <>
                         <img
                           src={src}
                           alt={`${v.brand} ${v.model}`}
                           loading="lazy"
                           className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                         />
+                          {src2 && (
+                            <img
+                              src={src2}
+                              alt=""
+                              loading="lazy"
+                              className="hidden sm:block absolute inset-0 w-full h-full object-cover opacity-0 group-hover:opacity-100 transition-opacity duration-500"
+                            />
+                          )}
+                        </>
                       ) : (
                         <div className="w-full h-full flex items-center justify-center">
                           <svg
@@ -466,6 +485,16 @@ function HomeContent({ initial }: { initial: SiteInitial | null }) {
                           </svg>
                         </div>
                       )}
+                      <button
+                        type="button"
+                        onClick={(e) => { e.preventDefault(); e.stopPropagation(); toggleCompare(v.id); }}
+                        className={`absolute bottom-2 left-2 z-10 flex items-center gap-1.5 text-[11px] font-medium px-2 py-1 rounded-sm transition-colors ${compare.includes(v.id) ? "bg-brand text-white" : "bg-white/90 text-zinc-700 hover:bg-white"} ${compare.includes(v.id) ? "" : "sm:opacity-0 sm:group-hover:opacity-100"}`}
+                      >
+                        <span className={`w-3 h-3 rounded-[2px] border flex items-center justify-center ${compare.includes(v.id) ? "border-white bg-white text-brand" : "border-zinc-400"}`}>
+                          {compare.includes(v.id) && <svg className="w-2.5 h-2.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={4}><path d="M20 6L9 17l-5-5" /></svg>}
+                        </span>
+                        Харьцуулах
+                      </button>
                       {/* Year badge */}
                       <div className="absolute top-2 left-2 bg-[#111]/85 text-white text-[10px] sm:text-[11px] font-bold tracking-wider px-2 py-0.5 rounded-sm">
                         {v.year}
@@ -679,6 +708,22 @@ function HomeContent({ initial }: { initial: SiteInitial | null }) {
 
       <SiteCta company={company} />
       <SiteFooter company={company} />
+      {compare.length > 0 && (
+        <div className="fixed left-1/2 -translate-x-1/2 bottom-[88px] lg:bottom-6 z-40 bg-[#111] text-white rounded-sm shadow-2xl flex items-center gap-3 sm:gap-4 pl-4 pr-2 py-2 max-w-[calc(100vw-24px)]">
+          <span className="text-sm whitespace-nowrap">{compare.length} машин сонгосон</span>
+          <button onClick={() => setCompare([])} className="text-xs text-white/60 hover:text-white whitespace-nowrap">Цэвэрлэх</button>
+          <button
+            onClick={() => setCompareOpen(true)}
+            disabled={compare.length < 2}
+            className="bg-brand hover:bg-brand-light disabled:bg-white/10 disabled:text-white/40 text-white text-sm font-medium px-4 py-2 rounded-sm transition-colors whitespace-nowrap"
+          >
+            {compare.length < 2 ? "2+ сонгоно уу" : "Харьцуулах"}
+          </button>
+        </div>
+      )}
+      {compareOpen && compared.length >= 2 && (
+        <CompareModal vehicles={compared} onClose={() => setCompareOpen(false)} onRemove={(id) => { toggleCompare(id); if (compare.length <= 2) setCompareOpen(false); }} />
+      )}
       <MobileCallBar company={company} />
     </div>
   );

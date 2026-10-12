@@ -2,6 +2,7 @@
 import React, { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { api } from '@/lib/api';
+import { SalesChart } from '@/components/admin/SalesChart';
 
 interface Summary { total_sold: string; total_revenue: string; total_profit: string; avg_profit: string; }
 interface Vehicle { id: string; brand: string; model: string; year: number; status: string; total_cost: string; created_at: string; }
@@ -36,13 +37,16 @@ function fmtDate(d: string) {
 export default function DashboardPage() {
   const [summary, setSummary]   = useState<Summary | null>(null);
   const [vehicles, setVehicles] = useState<Vehicle[]>([]);
+  const [vLoaded, setVLoaded] = useState(false);
+  const [sales, setSales]     = useState<{ sold_at: string; sale_price: string }[] | null>(null);
   const [userName, setUserName] = useState('');
   const [hour, setHour]         = useState(0);
 
   useEffect(() => {
     setHour(new Date().getHours());
     api.getSummary().then(setSummary).catch(console.error);
-    api.getVehicles().then(setVehicles).catch(console.error);
+    api.getVehicles().then(d => { setVehicles(d); setVLoaded(true); }).catch(() => setVLoaded(true));
+    api.getSales().then(setSales).catch(() => setSales([]));
     const u = JSON.parse(localStorage.getItem('user') || '{}');
     setUserName(u.name || '');
   }, []);
@@ -91,11 +95,17 @@ export default function DashboardPage() {
               <span className="text-xs font-medium text-[#71717a] sm:tracking-[0.15em] leading-tight">{c.label}</span>
               <span className="w-8 h-8 rounded-sm bg-brand-soft text-brand flex items-center justify-center">{c.icon}</span>
             </div>
-            <div className="text-xl sm:text-2xl font-bold tabular-nums leading-none text-[#111]">{c.value}</div>
+            {(c.label === 'Агуулахын үнэ' ? !vLoaded : summary === null) ? (
+              <div className="h-6 sm:h-7 w-24 rounded bg-[#f4f4f5] animate-pulse" />
+            ) : (
+              <div className="text-xl sm:text-2xl font-bold tabular-nums leading-none text-[#111]">{c.value}</div>
+            )}
             {c.unit && <div className="text-xs text-[#71717a] mt-1.5">{c.unit}</div>}
           </div>
         ))}
       </div>
+
+      <SalesChart sales={sales} />
 
       {/* Status overview */}
       <div className="bg-white rounded-xl border border-[#e4e4e7] overflow-hidden shadow-sm">
@@ -159,9 +169,20 @@ export default function DashboardPage() {
                 </span>
               </Link>
             ))}
-            {recent.length === 0 && (
-              <div className="text-center text-[#a1a1aa] text-sm py-10">
-                Машин байхгүй байна
+            {!vLoaded && [0, 1, 2].map(i => (
+              <div key={i} className="flex items-center gap-4 px-5 py-3">
+                <div className="w-9 h-9 rounded-lg bg-[#f4f4f5] animate-pulse" />
+                <div className="flex-1 space-y-2"><div className="h-3.5 w-40 rounded bg-[#f4f4f5] animate-pulse" /><div className="h-3 w-20 rounded bg-[#f4f4f5] animate-pulse" /></div>
+              </div>
+            ))}
+            {vLoaded && recent.length === 0 && (
+              <div className="text-center px-5 py-10">
+                <div className="w-12 h-12 rounded-full bg-brand-soft text-brand flex items-center justify-center mx-auto mb-3">
+                  <svg className="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.6}><path d="M5 17H3a2 2 0 01-2-2v-4a2 2 0 012-2h16a2 2 0 012 2v4a2 2 0 01-2 2h-2"/><rect x="7" y="17" width="10" height="4" rx="2"/><path d="M5 11L7.5 5h9L19 11"/></svg>
+                </div>
+                <div className="text-sm font-medium text-[#09090b]">Машин байхгүй байна</div>
+                <div className="text-xs text-[#a1a1aa] mt-1 mb-4">Эхний машиноо нэмээд вэбсайтад нийтэлнэ үү</div>
+                <Link href="/vehicles/new" className="inline-flex items-center gap-2 bg-brand hover:bg-brand-dark text-white text-sm font-medium px-4 py-2 rounded-md transition-colors">Машин нэмэх</Link>
               </div>
             )}
           </div>

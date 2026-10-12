@@ -28,6 +28,7 @@ export interface Vehicle {
   has_plates: boolean;
   total_cost: string | null;
   main_image: string | null;
+  images?: string[];
 }
 
 export function imgUrl(u: string | null) {

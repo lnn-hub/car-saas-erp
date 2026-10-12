@@ -7,6 +7,7 @@ import { useCompany } from '@/lib/useSiteData';
 import { SiteHeader } from '@/components/site/SiteHeader';
 import { SiteFooter } from '@/components/site/SiteFooter';
 import { LeasingCalculator } from '@/components/site/LeasingCalculator';
+import { Lightbox } from '@/components/site/Lightbox';
 
 const BACKEND = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000';
 
@@ -50,6 +51,7 @@ function VehicleContent({ id, initial }: { id: string; initial: VehicleDetail | 
   const [others, setOthers]  = useState<Other[]>([]);
   const [copied, setCopied]  = useState(false);
   const [calcOpen, setCalcOpen] = useState(false);
+  const [lightbox, setLightbox] = useState<number | null>(null);
   const [loading, setLoad] = useState(!initial);
 
   useEffect(() => {
@@ -113,6 +115,7 @@ function VehicleContent({ id, initial }: { id: string; initial: VehicleDetail | 
     </div>
   );
 
+  const fullImgs = v.images?.length ? v.images.map(u => imgSrc(u, 2000)) : [];
   const thumbs = v.images?.length ? v.images.map(u => imgSrc(u, 240)) : [];
   const imgs  = v.images?.length
     ? v.images.map(u => imgSrc(u))
@@ -242,7 +245,7 @@ function VehicleContent({ id, initial }: { id: string; initial: VehicleDetail | 
               <div className="bg-white rounded-xl overflow-hidden shadow-sm">
                 {/* Main */}
                 <div className="relative aspect-[16/9] bg-gray-100 overflow-hidden cursor-zoom-in">
-                  <img src={imgs[imgIdx]} alt="" loading="lazy" className="w-full h-full object-cover" />
+                  <img src={imgs[imgIdx]} alt="" loading="lazy" onClick={() => setLightbox(imgIdx)} className="w-full h-full object-cover" />
                   {imgs.length > 1 && (
                     <>
                       <button onClick={() => setIdx(i => (i - 1 + imgs.length) % imgs.length)}
@@ -449,6 +452,8 @@ function VehicleContent({ id, initial }: { id: string; initial: VehicleDetail | 
       )}
 
       <SiteFooter company={company} />
+
+      <Lightbox images={fullImgs} index={lightbox} onClose={() => setLightbox(null)} onIndex={(i) => { setLightbox(i); setIdx(i); }} />
 
       <LeasingCalculator open={calcOpen} onClose={() => setCalcOpen(false)}
         price={price ? Number(v.total_cost) : null}

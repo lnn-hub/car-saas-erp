@@ -175,7 +175,7 @@ function MainLayoutInner({ children }: { children: React.ReactNode }) {
       )}
 
       {/* ── Main content ── */}
-      <main className="flex-1 lg:ml-60 min-w-0 overflow-auto pt-14 lg:pt-0 pb-[calc(5rem+env(safe-area-inset-bottom))] lg:pb-0">
+      <main className="[&>*]:animate-[pageIn_0.25s_ease-out] flex-1 lg:ml-60 min-w-0 overflow-auto pt-14 lg:pt-0 pb-[calc(5rem+env(safe-area-inset-bottom))] lg:pb-0">
         {children}
       </main>
 

@@ -1,25 +1,18 @@
 import type { Metadata, Viewport } from "next";
 import "./globals.css";
+import { getSiteData } from "@/lib/server-data";
 
 export const viewport: Viewport = { width: "device-width", initialScale: 1, viewportFit: "cover" };
 
 export async function generateMetadata(): Promise<Metadata> {
-  const api = process.env.NEXT_PUBLIC_API_URL || "http://localhost:4000";
-  try {
-    const r = await fetch(`${api}/api/public`, {
-      next: { revalidate: 300 },
-      signal: AbortSignal.timeout(4000),
-    });
-    if (r.ok) {
-      const c = await r.json();
-      if (c?.name) {
-        return {
-          title: { default: c.name, template: `%s | ${c.name}` },
-          description: `${c.name} - чанартай машин шууд таны гарт`,
-        };
-      }
-    }
-  } catch {}
+  const data = await getSiteData();
+  const name = data?.company?.name;
+  if (name) {
+    return {
+      title: { default: name, template: `%s | ${name}` },
+      description: `${name} - чанартай машин шууд таны гарт`,
+    };
+  }
   return { title: "Автомашины худалдаа", description: "Чанартай машин шууд таны гарт" };
 }
 
