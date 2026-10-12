@@ -16,6 +16,78 @@ function sf(q, start) {
 const COSTS = `cost_agg AS (SELECT vehicle_id, SUM(amount) AS total_cost FROM vehicle_costs GROUP BY vehicle_id)`;
 
 // GET /summary
+// GET /api/reports/vehicles?basis=sold|arrived|stock&from=YYYY-MM-DD&to=YYYY-MM-DD
+// Машин бүр нэг мөр: статус, ирсэн/зарсан огноо, өртөг, үнэ, ашиг. Тайлангийн стандарт баганууд.
+//   sold    - борлуулсан огноогоор шүүнэ (зөвхөн зарагдсан машин)
+//   arrived - ирсэн огноогоор шүүнэ (бүх статус)
+//   stock   - одоогийн агуулах (зарагдаагүй машин, огноогоор шүүхгүй)
+router.get('/vehicles', auth, async (req, res) => {
+  const basis = ['sold', 'arrived', 'stock'].includes(req.query.basis) ? req.query.basis : 'sold';
+  const isDate = (d) => /^\d{4}-\d{2}-\d{2}$/.test(d || '');
+  const from = isDate(req.query.from) ? req.query.from : null;
+  const to   = isDate(req.query.to) ? req.query.to : null;
+
+  const params = [req.user.company_id];
+  const where = ['v.company_id = $1'];
+  const arrivedExpr = 'COALESCE(v.arrived_at, v.created_at::date)';
+
+  if (basis === 'sold') where.push('s.id IS NOT NULL');
+  if (basis === 'stock') where.push("v.status <> 'SOLD'");
+  const dateExpr = basis === 'sold' ? 's.sold_at::date' : basis === 'arrived' ? arrivedExpr : null;
+  if (dateExpr && from) { params.push(from); where.push(`${dateExpr} >= $${params.length}`); }
+  if (dateExpr && to)   { params.push(to);   where.push(`${dateExpr} <= $${params.length}`); }
+
+  try {
+    const { rows } = await pool.query(
+      `SELECT v.id, v.vin, v.brand, v.model, v.year, v.color, v.mileage, v.fuel_type, v.transmission,
+              v.engine_cc, v.status,
+              to_char(${arrivedExpr}, 'YYYY-MM-DD') AS arrived_at,
+              to_char(s.sold_at::date, 'YYYY-MM-DD') AS sold_at,
+              CASE WHEN s.id IS NOT NULL THEN (s.sold_at::date - ${arrivedExpr})
+                   ELSE (CURRENT_DATE - ${arrivedExpr}) END AS days_in_stock,
+              COALESCE(costs.total_cost, 0) AS total_cost,
+              s.sale_price, s.payment_type,
+              CASE WHEN s.id IS NOT NULL THEN s.sale_price - COALESCE(costs.total_cost, 0) END AS profit,
+              c.name AS customer_name, c.phone AS customer_phone, u.name AS sold_by_name
+       FROM vehicles v
+       LEFT JOIN sales s ON s.vehicle_id = v.id
+       LEFT JOIN customers c ON c.id = s.customer_id
+       LEFT JOIN users u ON u.id = s.sold_by
+       LEFT JOIN (SELECT vehicle_id, SUM(amount) AS total_cost FROM vehicle_costs GROUP BY vehicle_id) costs
+              ON costs.vehicle_id = v.id
+       WHERE ${where.join(' AND ')}
+       ORDER BY ${basis === 'sold' ? 's.sold_at' : arrivedExpr} DESC, v.brand, v.model`,
+      params
+    );
+
+    const num = (x) => Number(x) || 0;
+    const soldRows = rows.filter(r => r.status === 'SOLD' && r.sale_price != null);
+    const revenue = soldRows.reduce((a, r) => a + num(r.sale_price), 0);
+    const soldCost = soldRows.reduce((a, r) => a + num(r.total_cost), 0);
+    const byStatus = { ARRIVED: 0, PUBLISHED: 0, RESERVED: 0, SOLD: 0 };
+    rows.forEach(r => { if (r.status in byStatus) byStatus[r.status]++; });
+    const months = {};
+    soldRows.forEach(r => {
+      const k = String(r.sold_at).slice(0, 7);
+      const m = (months[k] ||= { month: k, count: 0, revenue: 0, profit: 0 });
+      m.count++; m.revenue += num(r.sale_price); m.profit += num(r.profit);
+    });
+
+    res.json({
+      basis, from, to,
+      summary: {
+        total: rows.length, by_status: byStatus, sold: soldRows.length,
+        revenue, cost: soldCost, profit: revenue - soldCost,
+        margin: revenue > 0 ? ((revenue - soldCost) / revenue) * 100 : 0,
+        avg_days_to_sell: soldRows.length ? soldRows.reduce((a, r) => a + num(r.days_in_stock), 0) / soldRows.length : 0,
+        stock_value: rows.filter(r => r.status !== 'SOLD').reduce((a, r) => a + num(r.total_cost), 0),
+      },
+      months: Object.values(months).sort((a, b) => a.month.localeCompare(b.month)),
+      rows,
+    });
+  } catch (err) { res.status(500).json({ error: err.message }); }
+});
+
 router.get('/summary', auth, async (req, res) => {
   const cid = req.user.company_id;
   const { w, v } = sf(req.query, 2);

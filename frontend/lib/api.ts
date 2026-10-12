@@ -149,6 +149,8 @@ export const api = {
     return request(`/upload/image/${imageId}`, { method: 'DELETE' });
   },
 
+  getVehicleReport: (qs: string) => request(`/reports/vehicles?${qs}`),
+
   uploadLogo: async (file: File) => {
     const fd = new FormData();
     fd.append('logo', file);
