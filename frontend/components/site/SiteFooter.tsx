@@ -14,7 +14,7 @@ export function SiteCta({ company }: { company: Company | null }) {
           </div>
           <div className="relative max-w-7xl mx-auto px-4 py-10 sm:py-14 flex flex-col md:flex-row items-center justify-between gap-6 border-l-4 border-brand">
             <div className="text-center md:text-left">
-              <div className="text-[10px] font-semibold text-brand-light uppercase tracking-[0.18em] mb-2">
+              <div className="text-xs font-semibold text-brand-light mb-2">
                 Захиалга өгөх
               </div>
               <h3 className="text-2xl sm:text-3xl font-bold text-white leading-tight">

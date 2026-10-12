@@ -22,7 +22,7 @@ function Field({ label, children, hint }: { label: string; children: React.React
   return (
     <div>
       <div className="flex items-center justify-between gap-3 mb-2">
-        <span className="text-[10px] font-semibold text-zinc-500 uppercase tracking-[0.18em]">{label}</span>
+        <span className="text-xs font-semibold text-zinc-500">{label}</span>
         {hint && <span className="text-[11px] font-bold text-brand">{hint}</span>}
       </div>
       {children}
@@ -76,7 +76,7 @@ export function LeasingCalculator({ open, onClose, price, carName, phone }: {
             <svg className="w-5 h-5 text-brand-light" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2}>
               <rect x="4" y="2" width="16" height="20" rx="2" /><path d="M8 6h8M8 11h2M14 11h2M8 15h2M14 15h2M8 19h2M14 19h2" />
             </svg>
-            <span className="text-[11px] font-semibold uppercase tracking-[0.18em]">Лизингийн тооцоолуур</span>
+            <span className="text-xs font-semibold">Лизингийн тооцоолуур</span>
           </div>
           <button onClick={onClose} aria-label="Хаах" className="w-9 h-9 flex items-center justify-center hover:bg-white/10 rounded-sm">
             <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2}><path d="M18 6L6 18M6 6l12 12" /></svg>
@@ -123,7 +123,7 @@ export function LeasingCalculator({ open, onClose, price, carName, phone }: {
           </Field>
 
           <div className="bg-[#111] text-white rounded-sm p-6 border-t-4 border-brand">
-            <div className="text-center text-[10px] font-semibold text-brand-light uppercase tracking-[0.18em] mb-3">Сарын төлбөр</div>
+            <div className="text-center text-xs font-semibold text-brand-light mb-3">Сарын төлбөр</div>
             <div className="text-center text-4xl font-bold tabular-nums tracking-tight">{fmt(calc.monthly)}₮</div>
             <dl className="mt-6 pt-5 border-t border-white/10 space-y-3 text-sm">
               {[
@@ -133,7 +133,7 @@ export function LeasingCalculator({ open, onClose, price, carName, phone }: {
                 ["Нийт төлөх дүн", calc.total],
               ].map(([k, v]) => (
                 <div key={k as string} className="flex items-center justify-between">
-                  <dt className="text-[10px] font-semibold text-white/50 uppercase tracking-[0.15em]">{k}</dt>
+                  <dt className="text-xs font-semibold text-white/50">{k}</dt>
                   <dd className="font-bold tabular-nums">{fmt(v as number)}₮</dd>
                 </div>
               ))}
@@ -148,7 +148,7 @@ export function LeasingCalculator({ open, onClose, price, carName, phone }: {
 
         <div className="shrink-0 border-t border-zinc-200 bg-white p-4 pb-[calc(1rem+env(safe-area-inset-bottom))] space-y-2 shadow-[0_-6px_16px_rgba(0,0,0,0.06)]">
           <div className="flex items-baseline justify-between gap-3 pb-1">
-            <span className="text-[10px] font-semibold text-zinc-500 uppercase tracking-[0.18em]">Сарын төлбөр</span>
+            <span className="text-xs font-semibold text-zinc-500">Сарын төлбөр</span>
             <span className="text-2xl font-bold text-brand tabular-nums tracking-tight">{fmt(calc.monthly)}₮</span>
           </div>
           {phone && (

@@ -204,7 +204,7 @@ function VehicleContent() {
                 {Ic.check} Дугаартай
               </span>
             )}
-            <div className="text-white/60 text-sm font-semibold uppercase tracking-widest mb-1">{v.brand}</div>
+            <div className="text-white/60 text-sm font-semibold mb-1">{v.brand}</div>
             <h1 className="text-3xl sm:text-5xl font-bold text-white leading-tight mb-2 drop-shadow-lg">
               {v.model}
             </h1>
@@ -230,7 +230,7 @@ function VehicleContent() {
                   {icon}
                 </div>
                 <div>
-                  <div className="text-[10px] text-gray-400 uppercase tracking-wider font-semibold">{label}</div>
+                  <div className="text-xs text-gray-400 font-semibold">{label}</div>
                   <div className="text-sm font-semibold text-[#111] mt-0.5">{value}</div>
                 </div>
               </div>
@@ -290,7 +290,7 @@ function VehicleContent() {
             <div className="bg-white rounded-xl overflow-hidden shadow-sm">
               <div className="flex items-center gap-3 px-5 py-4 border-b border-gray-100">
                 <div className="w-1 h-5 bg-brand rounded-full" />
-                <h2 className="font-semibold text-[#111] text-sm uppercase tracking-wider">Техникийн үзүүлэлт</h2>
+                <h2 className="font-semibold text-[#111] text-sm">Техникийн үзүүлэлт</h2>
               </div>
               <div className="divide-y divide-gray-50">
                 {allSpecs.map(({ label, value }) => (
@@ -308,7 +308,7 @@ function VehicleContent() {
               <div className="bg-white rounded-xl overflow-hidden shadow-sm">
                 <div className="flex items-center gap-3 px-5 py-4 border-b border-gray-100">
                   <div className="w-1 h-5 bg-brand rounded-full" />
-                  <h2 className="font-semibold text-[#111] text-sm uppercase tracking-wider">Машины тухай</h2>
+                  <h2 className="font-semibold text-[#111] text-sm">Машины тухай</h2>
                 </div>
                 <p className="px-5 py-5 text-sm sm:text-base text-gray-600 leading-relaxed whitespace-pre-line">{intro}</p>
               </div>
@@ -319,7 +319,7 @@ function VehicleContent() {
               <div className="bg-white rounded-xl overflow-hidden shadow-sm">
                 <div className="flex items-center gap-3 px-5 py-4 border-b border-gray-100">
                   <div className="w-1 h-5 bg-brand rounded-full" />
-                  <h2 className="font-semibold text-[#111] text-sm uppercase tracking-wider">Онцлох тоноглол</h2>
+                  <h2 className="font-semibold text-[#111] text-sm">Онцлох тоноглол</h2>
                 </div>
                 <ul className="grid sm:grid-cols-2 gap-x-6 gap-y-3 p-5">
                   {features.map((f) => (
@@ -342,7 +342,7 @@ function VehicleContent() {
             <div className="bg-white border border-zinc-200 rounded-sm shadow-sm p-5">
               {/* Title */}
               <div className="mb-5">
-                <div className="text-[11px] font-semibold text-brand uppercase tracking-[0.18em] mb-1">{v.brand}</div>
+                <div className="text-xs font-semibold text-brand mb-1">{v.brand}</div>
                 <div className="text-[22px] font-semibold text-[#111] leading-tight">{v.model}</div>
                 <div className="text-zinc-500 text-sm mt-1">{v.year} он{v.color ? ` · ${v.color}` : ''}</div>
               </div>
@@ -429,10 +429,10 @@ function VehicleContent() {
           <div className="max-w-7xl mx-auto">
             <div className="flex items-end justify-between gap-4 mb-8">
               <div>
-                <div className="text-[10px] font-semibold text-brand uppercase tracking-[0.18em] mb-2">Бусад машинууд</div>
+                <div className="text-xs font-semibold text-brand mb-2">Бусад машинууд</div>
                 <h2 className="text-2xl sm:text-3xl font-bold text-[#111]">Танд таалагдаж магадгүй</h2>
               </div>
-              <Link href="/#cars" className="text-[11px] font-semibold uppercase tracking-[0.15em] text-brand hover:text-brand-dark whitespace-nowrap">Бүгдийг үзэх →</Link>
+              <Link href="/#cars" className="text-xs font-semibold text-brand hover:text-brand-dark whitespace-nowrap">Бүгдийг үзэх →</Link>
             </div>
             <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-5">
               {others.map((o) => {
@@ -445,7 +445,7 @@ function VehicleContent() {
                       {src && <img src={src} alt={`${o.brand} ${o.model}`} loading="lazy" className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />}
                     </div>
                     <div className="p-3 sm:p-4">
-                      <div className="text-[10px] font-semibold text-brand uppercase tracking-[0.18em]">{o.brand}</div>
+                      <div className="text-xs font-semibold text-brand">{o.brand}</div>
                       <div className="font-bold text-[#111] text-sm sm:text-base leading-tight">{o.model} <span className="text-gray-400 font-bold">{o.year}</span></div>
                       <div className="mt-2 text-sm font-bold text-[#111]">{pr || 'Тохиролцоно'}</div>
                     </div>

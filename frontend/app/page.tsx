@@ -245,7 +245,7 @@ function HomeContent() {
                   <div className="text-xl sm:text-3xl font-bold text-white tabular-nums">
                     {n}
                   </div>
-                  <div className="text-[10px] sm:text-[11px] text-gray-500 mt-0.5 sm:mt-1 uppercase tracking-wider">
+                  <div className="text-xs sm:text-[11px] text-gray-500 mt-0.5 sm:mt-1">
                     {l}
                   </div>
                 </div>
@@ -483,7 +483,7 @@ function HomeContent() {
                     <div className="p-3 sm:p-4 flex flex-col flex-1">
                       {/* Name */}
                       <div className="mb-2 sm:mb-3">
-                        <div className="text-[10px] sm:text-[11px] font-semibold text-brand uppercase tracking-[0.18em] mb-0.5">
+                        <div className="text-xs sm:text-[11px] font-semibold text-brand mb-0.5">
                           {v.brand}
                         </div>
                         <h3 className="font-semibold text-[#111] text-[13px] sm:text-[15px] leading-tight">
@@ -527,7 +527,7 @@ function HomeContent() {
                       <div className="mt-auto pt-2.5 sm:pt-3 border-t border-gray-100 flex items-center justify-between gap-1.5">
                         {price ? (
                           <div>
-                            <div className="hidden sm:block text-[10px] text-gray-400 uppercase tracking-wide">
+                            <div className="hidden sm:block text-xs text-gray-400">
                               Үнэ
                             </div>
                             <div className="text-[13px] sm:text-[16px] font-bold text-[#111] leading-tight">
@@ -559,7 +559,7 @@ function HomeContent() {
       >
         <div className="max-w-7xl mx-auto grid lg:grid-cols-[1fr_1.3fr] gap-10 lg:gap-16 items-start">
           <div>
-            <div className="text-[10px] font-semibold text-brand uppercase tracking-[0.18em] mb-3">
+            <div className="text-xs font-semibold text-brand mb-3">
               Холбоо барих
             </div>
             <h2 className="text-3xl sm:text-4xl font-bold text-[#111] leading-tight border-l-4 border-brand pl-4 mb-5">
@@ -649,7 +649,7 @@ function HomeContent() {
                       {it.icon}
                     </div>
                     <div className="flex-1 min-w-0">
-                      <div className="text-[10px] font-semibold text-gray-400 uppercase tracking-[0.18em] mb-0.5">
+                      <div className="text-xs font-semibold text-gray-400 mb-0.5">
                         {it.label}
                       </div>
                       <div className="font-bold text-[#111] text-base sm:text-lg truncate">

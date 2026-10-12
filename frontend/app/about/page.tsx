@@ -25,7 +25,7 @@ function AboutContent() {
           {cname}
         </div>
         <div className="relative max-w-7xl mx-auto px-4 py-14 sm:py-24">
-          <nav className="text-[10px] font-semibold uppercase tracking-[0.18em] text-white/50 mb-4">
+          <nav className="text-xs font-semibold text-white/50 mb-4">
             <a href="/" className="hover:text-white transition-colors">Нүүр</a>
             <span className="mx-2">/</span>
             <span className="text-brand-light">Бидний тухай</span>
@@ -44,7 +44,7 @@ function AboutContent() {
       >
         <div className="max-w-7xl mx-auto grid lg:grid-cols-2 gap-10 lg:gap-16 items-center">
           <div>
-            <div className="text-[10px] font-semibold text-brand uppercase tracking-[0.18em] mb-3">
+            <div className="text-xs font-semibold text-brand mb-3">
               Бидний тухай
             </div>
             <h2 className="text-3xl sm:text-4xl font-bold text-[#111] leading-tight border-l-4 border-brand pl-4 mb-5">
@@ -81,7 +81,7 @@ function AboutContent() {
                     {n}
                   </div>
                   <div>
-                    <div className="text-sm font-semibold text-[#111] uppercase tracking-wider">
+                    <div className="text-sm font-semibold text-[#111]">
                       {t}
                     </div>
                     <div className="text-sm text-gray-500 mt-0.5">{d}</div>
@@ -134,7 +134,7 @@ function AboutContent() {
                   <div className="text-4xl sm:text-5xl font-bold text-white tabular-nums leading-none mb-3">
                     {n}
                   </div>
-                  <div className="text-[11px] font-semibold text-brand-light uppercase tracking-[0.18em]">
+                  <div className="text-xs font-semibold text-brand-light">
                     {l}
                   </div>
                   <div className="text-xs text-gray-500 mt-1">{sub}</div>
@@ -150,7 +150,7 @@ function AboutContent() {
         <section id="team" className="py-16 sm:py-24 px-4 bg-[#f9f9f9] border-t border-zinc-200">
           <div className="max-w-7xl mx-auto">
             <div className="max-w-2xl mb-10 sm:mb-14">
-              <div className="text-[10px] font-semibold text-brand uppercase tracking-[0.18em] mb-3">Манай баг</div>
+              <div className="text-xs font-semibold text-brand mb-3">Манай баг</div>
               <h2 className="text-3xl sm:text-4xl font-bold text-[#111] leading-tight border-l-4 border-brand pl-4 mb-4">
                 Таныг угтах<br />мэргэжлийн баг
               </h2>
@@ -178,7 +178,7 @@ function AboutContent() {
                     </div>
                     <div className="p-3 sm:p-5">
                       {m.position && (
-                        <div className="text-[9px] sm:text-[10px] font-semibold text-brand uppercase tracking-[0.18em] mb-1">{m.position}</div>
+                        <div className="text-xs sm:text-[10px] font-semibold text-brand mb-1">{m.position}</div>
                       )}
                       <h3 className="font-bold text-[#111] text-sm sm:text-lg leading-tight">{m.name}</h3>
                       {m.bio && <p className="hidden sm:block text-sm text-gray-500 leading-relaxed mt-2">{m.bio}</p>}
