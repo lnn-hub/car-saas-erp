@@ -8,25 +8,25 @@ export function SiteCta({ company }: { company: Company | null }) {
     <>
       {/* ━━━ CTA BANNER ━━━ */}
       {company?.phone && (
-        <section className="bg-[#111] relative overflow-hidden">
-          <div className="pointer-events-none select-none absolute -top-6 left-1/2 -translate-x-1/2 text-[90px] sm:text-[220px] font-semibold uppercase tracking-tighter text-white/[0.03] whitespace-nowrap">
+        <section className="bg-[#ece4da] relative overflow-hidden">
+          <div className="pointer-events-none select-none absolute -top-6 left-1/2 -translate-x-1/2 text-[90px] sm:text-[220px] font-semibold uppercase tracking-tighter text-[#1c1917]/[0.045] whitespace-nowrap">
             {cname}
           </div>
           <div className="relative max-w-7xl mx-auto px-4 py-10 sm:py-14 flex flex-col md:flex-row items-center justify-between gap-6 border-l-4 border-brand">
             <div className="text-center md:text-left">
-              <div className="text-xs font-semibold text-brand-light mb-2">
+              <div className="text-xs font-semibold text-brand mb-2">
                 Захиалга өгөх
               </div>
-              <h3 className="text-2xl sm:text-3xl font-bold text-white leading-tight">
+              <h3 className="text-2xl sm:text-3xl font-bold text-[#1c1917] leading-tight">
                 Хүссэн машинаа хайж олоогүй юу?
               </h3>
-              <p className="text-sm text-gray-400 mt-2">
+              <p className="text-sm text-gray-500 mt-2">
                 Бидэнтэй холбогдоорой — таны сонголтод тохирох машиныг олж өгнө.
               </p>
             </div>
             <a
               href={`tel:${company.phone}`}
-              className="shrink-0 flex items-center gap-2 bg-brand hover:bg-white hover:text-[#111] text-white text-sm px-8 py-4 rounded-sm transition-colors font-medium"
+              className="shrink-0 flex items-center gap-2 bg-brand hover:bg-brand-dark text-white text-sm px-8 py-4 rounded-sm transition-colors font-medium"
             >
               <IcPhone cls="w-4 h-4" /> {company.phone}
             </a>
@@ -42,7 +42,7 @@ export function SiteFooter({ company }: { company: Company | null }) {
   return (
     <>
       {/* ━━━ FOOTER ━━━ */}
-      <footer className="bg-[#0b0b0b] text-gray-500 border-t border-white/10">
+      <footer className="bg-[#0b0b0b] text-[#8a837a] border-t border-white/10">
         <div className="max-w-7xl mx-auto px-4 py-8">
           <div className="flex flex-col sm:flex-row items-center justify-between gap-5 mb-6">
             <div className="flex items-center gap-2.5">
@@ -75,7 +75,7 @@ export function SiteFooter({ company }: { company: Company | null }) {
               </Link>
             </div>
           </div>
-          <div className="border-t border-white/10 pt-6 text-xs text-center text-gray-600">
+          <div className="border-t border-white/10 pt-6 text-xs text-center text-[#8a837a]">
             © {new Date().getFullYear()} {cname}. Бүх эрх хуулиар хамгаалагдсан.
           </div>
         </div>

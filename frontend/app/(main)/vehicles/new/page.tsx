@@ -7,7 +7,7 @@ import { BRANDS_MODELS, COLORS, getWeekday } from '@/lib/vehicle-data';
 import { Combobox } from '@/components/Combobox';
 
 const BACKEND = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000';
-const inp = "w-full bg-white border border-[#e4e4e7] rounded-md px-3 py-2 text-sm text-[#09090b] placeholder-[#a1a1aa] focus:outline-none focus:border-brand transition-colors pr-8";
+const inp = "w-full bg-white border border-[#e6e0d8] rounded-md px-3 py-2 text-sm text-[#1c1917] placeholder-[#6f6a64] focus:outline-none focus:border-brand transition-colors pr-8";
 
 const CURRENT_YEAR = new Date().getFullYear();
 const YEARS = Array.from({ length: CURRENT_YEAR - 1989 }, (_, i) => String(CURRENT_YEAR - i));
@@ -133,8 +133,8 @@ export default function NewVehiclePage() {
   if (step === 'images') {
     return (
       <div className="px-4 sm:px-8 py-5 sm:py-7 max-w-2xl mx-auto">
-        <h1 className="text-lg font-semibold text-[#09090b] mb-1">Зураг оруулах</h1>
-        <p className="text-sm text-[#a1a1aa] mb-6">Машины зурагнуудыг оруулна уу. Эхний зураг үндсэн зураг болно.</p>
+        <h1 className="text-lg font-semibold text-[#1c1917] mb-1">Зураг оруулах</h1>
+        <p className="text-sm text-[#6f6a64] mb-6">Машины зурагнуудыг оруулна уу. Эхний зураг үндсэн зураг болно.</p>
 
         {/* Drop zone */}
         <div
@@ -143,23 +143,23 @@ export default function NewVehiclePage() {
           onDrop={e => { e.preventDefault(); setDrag(false); addFiles(e.dataTransfer.files); }}
           onClick={() => fileInputRef.current?.click()}
           className={`border-2 border-dashed rounded-2xl p-10 text-center cursor-pointer transition-all mb-5 ${
-            dragOver ? 'border-brand bg-[#fafafa]' : 'border-[#e4e4e7] hover:border-[#d4d4d8] hover:bg-[#fafafa]'
+            dragOver ? 'border-brand bg-[#faf8f5]' : 'border-[#e6e0d8] hover:border-[#d4ccc2] hover:bg-[#faf8f5]'
           }`}>
           <input ref={fileInputRef} type="file" multiple accept="image/*" className="hidden"
             onChange={e => addFiles(e.target.files)} />
-          <svg className="w-10 h-10 text-[#d4d4d8] mx-auto mb-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.5}><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
-          <p className="text-sm font-medium text-[#09090b]">Зураг сонгох эсвэл чирж оруулах</p>
-          <p className="text-xs text-[#a1a1aa] mt-1">JPG, PNG, WebP • Дээд тал нь 20MB</p>
+          <svg className="w-10 h-10 text-[#d4ccc2] mx-auto mb-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.5}><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+          <p className="text-sm font-medium text-[#1c1917]">Зураг сонгох эсвэл чирж оруулах</p>
+          <p className="text-xs text-[#6f6a64] mt-1">JPG, PNG, WebP • Дээд тал нь 20MB</p>
         </div>
 
         {/* Preview grid */}
         {images.length > 0 && (
           <div className="grid grid-cols-3 gap-3 mb-5">
             {images.map((img, idx) => (
-              <div key={idx} className="relative aspect-[4/3] rounded-xl overflow-hidden border border-[#e4e4e7] group">
+              <div key={idx} className="relative aspect-[4/3] rounded-xl overflow-hidden border border-[#e6e0d8] group">
                 <img src={img.preview} alt="" className="w-full h-full object-cover" />
                 {idx === 0 && (
-                  <div className="absolute top-2 left-2 bg-brand text-white text-[10px] font-semibold px-2 py-0.5 rounded-full">
+                  <div className="absolute top-2 left-2 bg-brand text-white text-xs font-semibold px-2 py-0.5 rounded-full">
                     Үндсэн
                   </div>
                 )}
@@ -179,8 +179,8 @@ export default function NewVehiclePage() {
             ))}
             {/* Add more */}
             <button type="button" onClick={() => fileInputRef.current?.click()}
-              className="aspect-[4/3] rounded-xl border-2 border-dashed border-[#e4e4e7] flex items-center justify-center hover:border-[#d4d4d8] hover:bg-[#fafafa] transition-all">
-              <svg className="w-6 h-6 text-[#d4d4d8]" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2}><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+              className="aspect-[4/3] rounded-xl border-2 border-dashed border-[#e6e0d8] flex items-center justify-center hover:border-[#d4ccc2] hover:bg-[#faf8f5] transition-all">
+              <svg className="w-6 h-6 text-[#d4ccc2]" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2}><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
             </button>
           </div>
         )}
@@ -189,7 +189,7 @@ export default function NewVehiclePage() {
 
         <div className="flex gap-2">
           <button type="button" onClick={() => router.push('/vehicles')}
-            className="px-4 py-2.5 text-sm text-[#71717a] border border-[#e4e4e7] rounded-lg hover:border-[#d4d4d8] transition-colors">
+            className="px-4 py-2.5 text-sm text-[#5f5a54] border border-[#e6e0d8] rounded-lg hover:border-[#d4ccc2] transition-colors">
             Зургийг алгасах
           </button>
           <button type="button" onClick={uploadAll}
@@ -208,10 +208,10 @@ export default function NewVehiclePage() {
   return (
     <div className="px-4 sm:px-8 py-5 sm:py-7 max-w-2xl mx-auto">
       <button onClick={() => router.back()}
-        className="flex items-center gap-1.5 text-[#a1a1aa] hover:text-[#09090b] text-sm transition-colors mb-6">
+        className="flex items-center gap-1.5 text-[#6f6a64] hover:text-[#1c1917] text-sm transition-colors mb-6">
         <IconArrowLeft className="w-4 h-4" /> Буцах
       </button>
-      <h1 className="text-lg font-semibold text-[#09090b] mb-6">Машин нэмэх</h1>
+      <h1 className="text-lg font-semibold text-[#1c1917] mb-6">Машин нэмэх</h1>
 
       <form onSubmit={handleSubmit} className="space-y-5">
         {/* Үндсэн мэдээлэл */}
@@ -244,7 +244,7 @@ export default function NewVehiclePage() {
                 <input type="date" value={form.arrived_at} onChange={e => set('arrived_at', e.target.value)}
                   className={inp.replace('pr-8','')} />
                 {weekday && (
-                  <span className="absolute right-3 top-1/2 -translate-y-1/2 text-xs text-[#a1a1aa] pointer-events-none">
+                  <span className="absolute right-3 top-1/2 -translate-y-1/2 text-xs text-[#6f6a64] pointer-events-none">
                     {weekday}
                   </span>
                 )}
@@ -261,7 +261,7 @@ export default function NewVehiclePage() {
               <div className="grid grid-cols-2 gap-1.5">
                 {[['false','Дугааргүй'],['true','Дугаартай']].map(([v, l]) => (
                   <button key={v} type="button" onClick={() => set('has_plates', v === 'true')}
-                    className={`py-2 text-xs rounded-md border transition-colors ${String(form.has_plates) === v ? 'bg-brand text-white border-brand' : 'border-[#e4e4e7] text-[#71717a] hover:border-[#d4d4d8]'}`}>
+                    className={`py-2 text-xs rounded-md border transition-colors ${String(form.has_plates) === v ? 'bg-brand text-white border-brand' : 'border-[#e6e0d8] text-[#5f5a54] hover:border-[#d4ccc2]'}`}>
                     {l}
                   </button>
                 ))}
@@ -288,8 +288,8 @@ export default function NewVehiclePage() {
                     {COLORS.map(c => (
                       <button key={c.value} type="button" title={c.value}
                         onClick={() => set('color', c.value)}
-                        className={`w-5 h-5 rounded-full border-2 transition-all ${form.color === c.value ? 'border-brand scale-110' : 'border-transparent hover:border-[#d4d4d8]'}`}
-                        style={{ backgroundColor: c.hex, boxShadow: c.hex === '#ffffff' ? 'inset 0 0 0 1px #e4e4e7' : undefined }} />
+                        className={`w-5 h-5 rounded-full border-2 transition-all ${form.color === c.value ? 'border-brand scale-110' : 'border-transparent hover:border-[#d4ccc2]'}`}
+                        style={{ backgroundColor: c.hex, boxShadow: c.hex === '#ffffff' ? 'inset 0 0 0 1px #e6e0d8' : undefined }} />
                     ))}
                   </div>
                 )}
@@ -300,7 +300,7 @@ export default function NewVehiclePage() {
               <div className="grid grid-cols-2 gap-1.5">
                 {[['PETROL','Бензин'],['DIESEL','Дизель'],['HYBRID','Хибрид'],['ELECTRIC','Цахилгаан']].map(([v,l]) => (
                   <button key={v} type="button" onClick={() => set('fuel_type', v)}
-                    className={`py-1.5 text-xs rounded-md border transition-colors ${form.fuel_type === v ? 'bg-brand text-white border-brand' : 'border-[#e4e4e7] text-[#71717a] hover:border-[#d4d4d8]'}`}>
+                    className={`py-1.5 text-xs rounded-md border transition-colors ${form.fuel_type === v ? 'bg-brand text-white border-brand' : 'border-[#e6e0d8] text-[#5f5a54] hover:border-[#d4ccc2]'}`}>
                     {l}
                   </button>
                 ))}
@@ -311,7 +311,7 @@ export default function NewVehiclePage() {
               <div className="grid grid-cols-2 gap-1.5">
                 {[['AUTO','Автомат'],['MANUAL','Механик']].map(([v,l]) => (
                   <button key={v} type="button" onClick={() => set('transmission', v)}
-                    className={`py-1.5 text-xs rounded-md border transition-colors ${form.transmission === v ? 'bg-brand text-white border-brand' : 'border-[#e4e4e7] text-[#71717a] hover:border-[#d4d4d8]'}`}>
+                    className={`py-1.5 text-xs rounded-md border transition-colors ${form.transmission === v ? 'bg-brand text-white border-brand' : 'border-[#e6e0d8] text-[#5f5a54] hover:border-[#d4ccc2]'}`}>
                     {l}
                   </button>
                 ))}
@@ -339,7 +339,7 @@ export default function NewVehiclePage() {
 
         <div className="flex gap-2 pt-1">
           <button type="button" onClick={() => router.back()}
-            className="px-4 py-2 text-sm text-[#71717a] border border-[#e4e4e7] rounded-md hover:border-[#d4d4d8] transition-colors">
+            className="px-4 py-2 text-sm text-[#5f5a54] border border-[#e6e0d8] rounded-md hover:border-[#d4ccc2] transition-colors">
             Болих
           </button>
           <button type="submit" disabled={loading}
@@ -354,9 +354,9 @@ export default function NewVehiclePage() {
 
 function Section({ title, children }: { title: string; children: React.ReactNode }) {
   return (
-    <div className="bg-white border border-[#e4e4e7] rounded-lg overflow-hidden">
-      <div className="px-4 py-3 border-b border-[#e4e4e7]">
-        <span className="text-xs font-medium text-[#a1a1aa]">{title}</span>
+    <div className="bg-white border border-[#e6e0d8] rounded-lg overflow-hidden">
+      <div className="px-4 py-3 border-b border-[#e6e0d8]">
+        <span className="text-xs font-medium text-[#6f6a64]">{title}</span>
       </div>
       <div className="p-4">{children}</div>
     </div>
@@ -366,7 +366,7 @@ function Field({ label, children, required, className }: { label: string; childr
   return (
     <div className={className}>
       {label && (
-        <label className="text-xs text-[#71717a] block mb-1.5">
+        <label className="text-xs text-[#5f5a54] block mb-1.5">
           {label}{required && <span className="text-brand ml-0.5">*</span>}
         </label>
       )}

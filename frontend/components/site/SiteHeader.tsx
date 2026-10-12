@@ -90,8 +90,8 @@ function AdminModal({ onClose }: { onClose: () => void }) {
               <path d="M7 11V7a5 5 0 0110 0v4" />
             </svg>
           </div>
-          <h2 className="text-lg font-bold text-[#09090b]">Админ нэвтрэх</h2>
-          <p className="text-sm text-gray-400 mt-0.5">Удирдлагын систем</p>
+          <h2 className="text-lg font-bold text-[#1c1917]">Админ нэвтрэх</h2>
+          <p className="text-sm text-gray-500 mt-0.5">Удирдлагын систем</p>
         </div>
         <form onSubmit={handleLogin} className="space-y-3">
           <input
@@ -101,7 +101,7 @@ function AdminModal({ onClose }: { onClose: () => void }) {
             placeholder="И-мэйл"
             required
             autoFocus
-            className="w-full border border-gray-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-[#09090b] transition-colors"
+            className="w-full border border-gray-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-[#1c1917] transition-colors"
           />
           <input
             type="password"
@@ -109,7 +109,7 @@ function AdminModal({ onClose }: { onClose: () => void }) {
             onChange={(e) => setPassword(e.target.value)}
             placeholder="Нууц үг"
             required
-            className="w-full border border-gray-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-[#09090b] transition-colors"
+            className="w-full border border-gray-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-[#1c1917] transition-colors"
           />
           {error && (
             <div className="bg-brand-soft border border-brand/20 rounded-xl px-4 py-2.5 text-xs text-brand">
@@ -222,7 +222,7 @@ export function SiteHeader({ company }: { company: Company | null }) {
               )}
               <button
                 onClick={() => setAdminModal(true)}
-                className="hidden md:flex items-center gap-1.5 border border-gray-200 hover:border-[#09090b] hover:text-[#09090b] text-gray-500 text-xs font-semibold px-3 py-1.5 rounded transition-colors"
+                className="hidden md:flex items-center gap-1.5 border border-gray-200 hover:border-[#1c1917] hover:text-[#1c1917] text-gray-500 text-xs font-semibold px-3 py-1.5 rounded transition-colors"
               >
                 <svg
                   className="w-3.5 h-3.5"
@@ -286,10 +286,10 @@ export function SiteHeader({ company }: { company: Company | null }) {
                 setMenu(false);
                 setAdminModal(true);
               }}
-              className="w-full text-left py-2 px-3 text-sm font-semibold text-[#09090b] rounded hover:bg-gray-50 flex items-center gap-2"
+              className="w-full text-left py-2 px-3 text-sm font-semibold text-[#1c1917] rounded hover:bg-gray-50 flex items-center gap-2"
             >
               <svg
-                className="w-4 h-4 text-gray-400"
+                className="w-4 h-4 text-gray-500"
                 viewBox="0 0 24 24"
                 fill="none"
                 stroke="currentColor"

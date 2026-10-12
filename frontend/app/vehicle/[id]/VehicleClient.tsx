@@ -86,12 +86,12 @@ function VehicleContent({ id, initial }: { id: string; initial: VehicleDetail | 
 
   /* ── Loading ── */
   if (loading) return (
-    <div className="min-h-screen bg-[#f5f5f5] flex flex-col">
+    <div className="min-h-screen bg-[#f6f3ef] flex flex-col">
       <SiteHeader company={company} />
       <div className="flex-1 flex items-center justify-center py-24">
         <div className="text-center">
           <div className="w-10 h-10 border-[3px] border-brand border-t-transparent rounded-full animate-spin mx-auto mb-3" />
-          <p className="text-sm text-gray-400">Ачааллаж байна...</p>
+          <p className="text-sm text-gray-500">Ачааллаж байна...</p>
         </div>
       </div>
       <SiteFooter company={company} />
@@ -100,12 +100,12 @@ function VehicleContent({ id, initial }: { id: string; initial: VehicleDetail | 
 
   /* ── 404 ── */
   if (!v) return (
-    <div className="min-h-screen bg-[#f5f5f5] flex flex-col">
+    <div className="min-h-screen bg-[#f6f3ef] flex flex-col">
       <SiteHeader company={company} />
       <div className="flex-1 flex items-center justify-center py-24">
         <div className="text-center">
           <div className="text-7xl font-bold text-gray-200 mb-4">404</div>
-          <p className="text-gray-400 text-sm mb-5">Машин олдсонгүй</p>
+          <p className="text-gray-500 text-sm mb-5">Машин олдсонгүй</p>
           <Link href="/#cars" className="inline-flex items-center gap-2 text-sm text-brand hover:underline">
             {Ic.back} Машинууд руу буцах
           </Link>
@@ -153,13 +153,13 @@ function VehicleContent({ id, initial }: { id: string; initial: VehicleDetail | 
   }
 
   return (
-    <div className="min-h-screen bg-[#f2f2f2] pb-[76px] lg:pb-0" style={{fontFamily:"'Inter','Segoe UI',sans-serif"}}>
+    <div className="min-h-screen bg-[#f6f3ef] pb-[76px] lg:pb-0" style={{fontFamily:"'Inter','Segoe UI',sans-serif"}}>
 
       <SiteHeader company={company} />
 
       {/* ── Breadcrumb ── */}
       <div className="bg-white border-b border-zinc-200">
-        <div className="max-w-7xl mx-auto px-4 h-11 flex items-center gap-3 text-[11px] font-semibold uppercase tracking-[0.12em] text-zinc-400">
+        <div className="max-w-7xl mx-auto px-4 h-11 flex items-center gap-3 text-xs font-semibold uppercase tracking-[0.12em] text-zinc-500">
           <button onClick={() => router.back()}
             className="flex items-center gap-1.5 text-[#111] hover:text-brand transition-colors">
             {Ic.back} Буцах
@@ -224,7 +224,7 @@ function VehicleContent({ id, initial }: { id: string; initial: VehicleDetail | 
                   {icon}
                 </div>
                 <div>
-                  <div className="text-xs text-gray-400 font-semibold">{label}</div>
+                  <div className="text-xs text-gray-500 font-semibold">{label}</div>
                   <div className="text-sm font-semibold text-[#111] mt-0.5">{value}</div>
                 </div>
               </div>
@@ -288,7 +288,7 @@ function VehicleContent({ id, initial }: { id: string; initial: VehicleDetail | 
               </div>
               <div className="divide-y divide-gray-50">
                 {allSpecs.map(({ label, value }) => (
-                  <div key={label} className="flex items-center px-5 py-3.5 hover:bg-[#fafafa] transition-colors">
+                  <div key={label} className="flex items-center px-5 py-3.5 hover:bg-[#faf8f5] transition-colors">
                     <span className="w-5 h-5 text-brand mr-3 shrink-0">{Ic.check}</span>
                     <span className="text-sm text-gray-500 w-40 shrink-0">{label}</span>
                     <span className="text-sm font-bold text-[#111]">{value}</span>
@@ -326,7 +326,7 @@ function VehicleContent({ id, initial }: { id: string; initial: VehicleDetail | 
               </div>
             )}
 
-            {credit && <p className="text-[11px] text-gray-400 px-1">{credit}</p>}
+            {credit && <p className="text-xs text-gray-500 px-1">{credit}</p>}
           </div>
 
           {/* RIGHT sidebar */}
@@ -343,7 +343,7 @@ function VehicleContent({ id, initial }: { id: string; initial: VehicleDetail | 
 
               {/* Price field */}
               <div className="mb-3 border border-zinc-200 rounded-sm px-4 py-3 border-l-[3px] border-l-brand">
-                <div className="text-[11px] text-zinc-500 mb-0.5">Борлуулах үнэ</div>
+                <div className="text-xs text-zinc-500 mb-0.5">Борлуулах үнэ</div>
                 {price ? (
                   <div className="text-[26px] font-semibold text-[#111] leading-tight tabular-nums">{price}</div>
                 ) : (
@@ -367,7 +367,7 @@ function VehicleContent({ id, initial }: { id: string; initial: VehicleDetail | 
                   ['Хөдөлгүүр', v.engine_cc ? `${(Number(v.engine_cc)/1000).toFixed(1)}L` : null],
                 ].filter(([, val]) => val).map(([label, val]) => (
                   <div key={label as string} className="border border-zinc-200 rounded-sm px-3 py-2">
-                    <div className="text-[11px] text-zinc-500">{label}</div>
+                    <div className="text-xs text-zinc-500">{label}</div>
                     <div className="text-sm font-medium text-[#111] mt-0.5">{val}</div>
                   </div>
                 ))}
@@ -396,7 +396,7 @@ function VehicleContent({ id, initial }: { id: string; initial: VehicleDetail | 
                 {v.company?.name?.[0]}
               </div>
               <div className="min-w-0">
-                <div className="text-[11px] text-zinc-500">Дилер</div>
+                <div className="text-xs text-zinc-500">Дилер</div>
                 <div className="font-semibold text-[#111] text-sm truncate">{v.company?.name}</div>
               </div>
             </div>
@@ -440,7 +440,7 @@ function VehicleContent({ id, initial }: { id: string; initial: VehicleDetail | 
                     </div>
                     <div className="p-3 sm:p-4">
                       <div className="text-xs font-semibold text-brand">{o.brand}</div>
-                      <div className="font-bold text-[#111] text-sm sm:text-base leading-tight">{o.model} <span className="text-gray-400 font-bold">{o.year}</span></div>
+                      <div className="font-bold text-[#111] text-sm sm:text-base leading-tight">{o.model} <span className="text-gray-500 font-bold">{o.year}</span></div>
                       <div className="mt-2 text-sm font-bold text-[#111]">{pr || 'Тохиролцоно'}</div>
                     </div>
                   </Link>

@@ -67,7 +67,7 @@ const PAYMENT_TYPES = [
 ];
 
 const inp =
-  "w-full bg-white border border-[#e4e4e7] rounded-md px-3 py-2 text-sm text-[#09090b] placeholder-[#a1a1aa] focus:outline-none focus:border-brand transition-colors";
+  "w-full bg-white border border-[#e6e0d8] rounded-md px-3 py-2 text-sm text-[#1c1917] placeholder-[#6f6a64] focus:outline-none focus:border-brand transition-colors";
 
 function fmt(n: number) {
   if (n >= 1_000_000) return (n / 1_000_000).toFixed(1) + "сая₮";
@@ -268,7 +268,7 @@ function VehicleDetailContent() {
 
   if (!vehicle)
     return (
-      <div className="px-4 sm:px-8 py-5 sm:py-7 text-[#a1a1aa] text-sm">Ачааллаж байна...</div>
+      <div className="px-4 sm:px-8 py-5 sm:py-7 text-[#6f6a64] text-sm">Ачааллаж байна...</div>
     );
 
   const totalCost = vehicle.costs.reduce((s, c) => s + Number(c.amount), 0);
@@ -282,7 +282,7 @@ function VehicleDetailContent() {
     <div className="px-4 sm:px-8 py-5 sm:py-7 max-w-2xl mx-auto space-y-5">
       <button
         onClick={() => router.back()}
-        className="flex items-center gap-1.5 text-[#a1a1aa] hover:text-[#09090b] text-sm transition-colors"
+        className="flex items-center gap-1.5 text-[#6f6a64] hover:text-[#1c1917] text-sm transition-colors"
       >
         <IconArrowLeft className="w-4 h-4" /> Буцах
       </button>
@@ -290,21 +290,21 @@ function VehicleDetailContent() {
       {/* Header */}
       <div className="flex items-start justify-between">
         <div>
-          <h1 className="text-lg font-semibold text-[#09090b]">
+          <h1 className="text-lg font-semibold text-[#1c1917]">
             {vehicle.brand} {vehicle.model}{" "}
-            <span className="text-[#a1a1aa] font-normal">{vehicle.year}</span>
+            <span className="text-[#6f6a64] font-normal">{vehicle.year}</span>
           </h1>
           <div className="flex items-center gap-2 mt-1.5">
             <span
               className={`w-1.5 h-1.5 rounded-full ${STATUS[vehicle.status]?.dot}`}
             />
-            <span className="text-xs text-[#71717a]">
+            <span className="text-xs text-[#5f5a54]">
               {STATUS[vehicle.status]?.label}
             </span>
             {colorHex && (
-              <span className="flex items-center gap-1 text-xs text-[#71717a]">
+              <span className="flex items-center gap-1 text-xs text-[#5f5a54]">
                 <span
-                  className="w-3 h-3 rounded-full border border-[#e4e4e7] inline-block"
+                  className="w-3 h-3 rounded-full border border-[#e6e0d8] inline-block"
                   style={{ backgroundColor: colorHex }}
                 />
                 {vehicle.color}
@@ -332,15 +332,15 @@ function VehicleDetailContent() {
       </div>
 
       {msg && (
-        <div className="bg-[#f4f4f5] border border-[#e4e4e7] rounded-md px-4 py-2.5 text-sm text-[#71717a]">
+        <div className="bg-[#f3efe9] border border-[#e6e0d8] rounded-md px-4 py-2.5 text-sm text-[#5f5a54]">
           {msg}
         </div>
       )}
 
       {/* Gallery */}
-      <div className="bg-white border border-[#e4e4e7] rounded-lg overflow-hidden">
-        <div className="px-4 py-3 border-b border-[#e4e4e7] flex items-center justify-between gap-3">
-          <span className="text-xs font-medium text-[#a1a1aa]">
+      <div className="bg-white border border-[#e6e0d8] rounded-lg overflow-hidden">
+        <div className="px-4 py-3 border-b border-[#e6e0d8] flex items-center justify-between gap-3">
+          <span className="text-xs font-medium text-[#6f6a64]">
             Зураг ({vehicle.images?.length || 0})
           </span>
           <div>
@@ -355,7 +355,7 @@ function VehicleDetailContent() {
         {vehicle.images?.length ? (
           <div className="p-3 grid grid-cols-2 sm:grid-cols-3 gap-3">
             {vehicle.images.map((img) => (
-              <div key={img.id} className="group relative aspect-[4/3] rounded-md overflow-hidden border border-[#e4e4e7] bg-[#f4f4f5]">
+              <div key={img.id} className="group relative aspect-[4/3] rounded-md overflow-hidden border border-[#e6e0d8] bg-[#f3efe9]">
                 <img src={fileSrc(img.url)} alt="" className="w-full h-full object-cover" loading="lazy" />
                 {img.is_main && (
                   <span className="absolute top-2 left-2 bg-brand text-white text-xs font-medium px-2 py-0.5 rounded-sm">Үндсэн</span>
@@ -363,23 +363,23 @@ function VehicleDetailContent() {
                 <div className="absolute inset-x-0 bottom-0 flex gap-1 p-1.5 bg-gradient-to-t from-black/70 to-transparent opacity-100 sm:opacity-0 sm:group-hover:opacity-100 transition-opacity">
                   {!img.is_main && (
                     <button type="button" onClick={() => makeMain(img.id)}
-                      className="flex-1 bg-white/90 hover:bg-white text-[#111] text-[10px] font-bold py-1 rounded-sm">Үндсэн болгох</button>
+                      className="flex-1 bg-white/90 hover:bg-white text-[#111] text-xs font-bold py-1 rounded-sm">Үндсэн болгох</button>
                   )}
                   <button type="button" onClick={() => removePhoto(img.id)}
-                    className="bg-white/90 hover:bg-brand hover:text-white text-brand text-[10px] font-bold px-2.5 py-1 rounded-sm">Устгах</button>
+                    className="bg-white/90 hover:bg-brand hover:text-white text-brand text-xs font-bold px-2.5 py-1 rounded-sm">Устгах</button>
                 </div>
               </div>
             ))}
           </div>
         ) : (
-          <div className="text-center text-[#a1a1aa] text-sm py-10">Зураг оруулаагүй байна</div>
+          <div className="text-center text-[#6f6a64] text-sm py-10">Зураг оруулаагүй байна</div>
         )}
       </div>
 
       {/* Info grid */}
-      <div className="bg-white border border-[#e4e4e7] rounded-lg overflow-hidden">
-        <div className="px-4 py-3 border-b border-[#e4e4e7]">
-          <span className="text-xs font-medium text-[#a1a1aa]">
+      <div className="bg-white border border-[#e6e0d8] rounded-lg overflow-hidden">
+        <div className="px-4 py-3 border-b border-[#e6e0d8]">
+          <span className="text-xs font-medium text-[#6f6a64]">
             Мэдээлэл
           </span>
         </div>
@@ -396,19 +396,19 @@ function VehicleDetailContent() {
             ["Нийт өртөг", fmt(totalCost)],
           ].map(([k, v]) => (
             <div key={k}>
-              <div className="text-xs text-[#a1a1aa] mb-0.5">
+              <div className="text-xs text-[#6f6a64] mb-0.5">
                 {k}
               </div>
-              <div className="text-sm text-[#09090b] font-medium">{v}</div>
+              <div className="text-sm text-[#1c1917] font-medium">{v}</div>
             </div>
           ))}
         </div>
       </div>
 
       {/* Edit info */}
-      <div className="bg-white border border-[#e4e4e7] rounded-lg overflow-hidden">
-        <div className="px-4 py-3 border-b border-[#e4e4e7] flex items-center justify-between">
-          <span className="text-xs font-medium text-[#a1a1aa]">Мэдээлэл засах</span>
+      <div className="bg-white border border-[#e6e0d8] rounded-lg overflow-hidden">
+        <div className="px-4 py-3 border-b border-[#e6e0d8] flex items-center justify-between">
+          <span className="text-xs font-medium text-[#6f6a64]">Мэдээлэл засах</span>
           {!editOpen && (
             <button type="button" onClick={openEdit}
               className="text-xs font-medium text-brand hover:text-brand-dark">Засах</button>
@@ -433,7 +433,7 @@ function VehicleDetailContent() {
               <option value="MANUAL">Механик</option>
             </select>
             <input type="date" value={edit.manufactured_date} onChange={(e) => setEdit((p) => ({ ...p, manufactured_date: e.target.value }))} className={inp} />
-            <label className="flex items-center gap-2 text-sm text-[#52525b]">
+            <label className="flex items-center gap-2 text-sm text-[#46413c]">
               <input type="checkbox" checked={edit.has_plates} onChange={(e) => setEdit((p) => ({ ...p, has_plates: e.target.checked }))} className="accent-[#8b1e2d]" />
               Улсын дугаартай
             </label>
@@ -441,7 +441,7 @@ function VehicleDetailContent() {
               placeholder={"Тайлбар. Онцлох тоноглолыг мөр бүрийн эхэнд • тэмдэгтэй бичнэ."} className={inp + " col-span-2 resize-y"} />
             <div className="col-span-2 flex gap-2">
               <button type="button" onClick={() => setEditOpen(false)}
-                className="flex-1 py-2.5 text-sm text-[#71717a] border border-[#e4e4e7] rounded-md hover:border-[#d4d4d8]">Болих</button>
+                className="flex-1 py-2.5 text-sm text-[#5f5a54] border border-[#e6e0d8] rounded-md hover:border-[#d4ccc2]">Болих</button>
               <button type="submit" disabled={editBusy}
                 className="flex-1 py-2.5 text-sm bg-brand hover:bg-brand-dark disabled:opacity-40 text-white rounded-md font-medium">
                 {editBusy ? "Хадгалж байна..." : "Хадгалах"}
@@ -453,8 +453,8 @@ function VehicleDetailContent() {
 
       {/* Status change */}
       {vehicle.status !== "SOLD" && (
-        <div className="bg-white border border-[#e4e4e7] rounded-lg p-4">
-          <div className="text-xs font-medium text-[#a1a1aa] mb-3">
+        <div className="bg-white border border-[#e6e0d8] rounded-lg p-4">
+          <div className="text-xs font-medium text-[#6f6a64] mb-3">
             Статус өөрчлөх
           </div>
           <div className="flex gap-2">
@@ -465,8 +465,8 @@ function VehicleDetailContent() {
                 disabled={vehicle.status === s}
                 className={`px-3 py-1.5 rounded-md text-sm transition-colors border ${
                   vehicle.status === s
-                    ? "border-[#e4e4e7] bg-[#f4f4f5] text-[#a1a1aa] cursor-default"
-                    : "border-[#e4e4e7] text-[#71717a] hover:border-[#d4d4d8] hover:text-[#09090b]"
+                    ? "border-[#e6e0d8] bg-[#f3efe9] text-[#6f6a64] cursor-default"
+                    : "border-[#e6e0d8] text-[#5f5a54] hover:border-[#d4ccc2] hover:text-[#1c1917]"
                 }`}
               >
                 {STATUS[s]?.label}
@@ -477,14 +477,14 @@ function VehicleDetailContent() {
       )}
 
       {/* Costs */}
-      <div className="bg-white border border-[#e4e4e7] rounded-lg overflow-hidden">
-        <div className="px-4 py-3 border-b border-[#e4e4e7] flex items-center justify-between">
-          <span className="text-xs font-medium text-[#a1a1aa]">
+      <div className="bg-white border border-[#e6e0d8] rounded-lg overflow-hidden">
+        <div className="px-4 py-3 border-b border-[#e6e0d8] flex items-center justify-between">
+          <span className="text-xs font-medium text-[#6f6a64]">
             Зардлууд
           </span>
-          <span className="text-xs text-[#71717a]">
+          <span className="text-xs text-[#5f5a54]">
             Нийт{" "}
-            <span className="text-[#09090b] font-semibold tabular-nums">
+            <span className="text-[#1c1917] font-semibold tabular-nums">
               {fmt(totalCost)}
             </span>
           </span>
@@ -497,17 +497,17 @@ function VehicleDetailContent() {
                   key={c.id}
                   className={
                     i < vehicle.costs.length - 1
-                      ? "border-b border-[#f4f4f5]"
+                      ? "border-b border-[#f3efe9]"
                       : ""
                   }
                 >
-                  <td className="px-4 py-3 text-[#71717a]">
+                  <td className="px-4 py-3 text-[#5f5a54]">
                     {COST_LABELS[c.cost_type] || c.cost_type}
                   </td>
-                  <td className="px-4 py-3 text-[#a1a1aa] text-xs">
+                  <td className="px-4 py-3 text-[#6f6a64] text-xs">
                     {c.note || "—"}
                   </td>
-                  <td className="px-4 py-3 text-right text-[#09090b] tabular-nums font-medium">
+                  <td className="px-4 py-3 text-right text-[#1c1917] tabular-nums font-medium">
                     {Number(c.amount).toLocaleString("mn-MN")}
                     {c.currency === "MNT" ? "₮" : ` ${c.currency}`}
                   </td>
@@ -517,7 +517,7 @@ function VehicleDetailContent() {
           </table>
         )}
         {vehicle.costs.length === 0 && (
-          <div className="text-center text-[#a1a1aa] text-sm py-8">
+          <div className="text-center text-[#6f6a64] text-sm py-8">
             Зардал оруулаагүй байна
           </div>
         )}
@@ -525,9 +525,9 @@ function VehicleDetailContent() {
         {vehicle.status !== "SOLD" && (
           <form
             onSubmit={addCost}
-            className="p-4 border-t border-[#e4e4e7] space-y-3"
+            className="p-4 border-t border-[#e6e0d8] space-y-3"
           >
-            <div className="text-xs font-medium text-[#a1a1aa]">
+            <div className="text-xs font-medium text-[#6f6a64]">
               Зардал нэмэх
             </div>
             <div className="grid grid-cols-2 gap-2">
@@ -587,8 +587,8 @@ function VehicleDetailContent() {
       {/* Danger zone */}
       <div className="bg-white border border-zinc-200 rounded-lg p-4 flex items-center justify-between gap-4">
         <div>
-          <div className="text-sm font-bold text-[#09090b]">Машин устгах</div>
-          <div className="text-xs text-[#a1a1aa] mt-0.5">Зураг, зардлын хамт бүрмөсөн устна. Борлуулалттай машиныг устгах боломжгүй.</div>
+          <div className="text-sm font-bold text-[#1c1917]">Машин устгах</div>
+          <div className="text-xs text-[#6f6a64] mt-0.5">Зураг, зардлын хамт бүрмөсөн устна. Борлуулалттай машиныг устгах боломжгүй.</div>
         </div>
         <button type="button" onClick={removeVehicle}
           className="shrink-0 text-sm text-brand border border-brand/30 hover:bg-brand hover:text-white hover:border-brand px-4 py-2 rounded-md transition-colors font-medium">Устгах</button>
@@ -597,7 +597,7 @@ function VehicleDetailContent() {
       {/* ── SALE MODAL ── */}
       {showSale && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 px-4">
-          <div className="bg-white border border-[#e4e4e7] rounded-xl shadow-xl w-full max-w-md overflow-hidden">
+          <div className="bg-white border border-[#e6e0d8] rounded-xl shadow-xl w-full max-w-md overflow-hidden">
             {saleSuccess ? (
               /* Амжилттай */
               <div className="p-8 text-center">
@@ -612,10 +612,10 @@ function VehicleDetailContent() {
                     <path d="M5 13l4 4L19 7" />
                   </svg>
                 </div>
-                <h2 className="text-lg font-semibold text-[#09090b] mb-1">
+                <h2 className="text-lg font-semibold text-[#1c1917] mb-1">
                   Амжилттай зарагдлаа!
                 </h2>
-                <p className="text-sm text-[#71717a] mb-1">
+                <p className="text-sm text-[#5f5a54] mb-1">
                   {vehicle.brand} {vehicle.model} {vehicle.year}
                 </p>
                 <p className="text-base font-bold text-[#111] mb-1">
@@ -640,19 +640,19 @@ function VehicleDetailContent() {
             ) : (
               <>
                 {/* Modal header */}
-                <div className="px-5 py-4 border-b border-[#e4e4e7] flex items-center justify-between">
+                <div className="px-5 py-4 border-b border-[#e6e0d8] flex items-center justify-between">
                   <div>
-                    <h2 className="text-sm font-semibold text-[#09090b]">
+                    <h2 className="text-sm font-semibold text-[#1c1917]">
                       Машин зарах
                     </h2>
-                    <p className="text-xs text-[#a1a1aa] mt-0.5">
+                    <p className="text-xs text-[#6f6a64] mt-0.5">
                       {vehicle.brand} {vehicle.model} {vehicle.year} · Өртөг:{" "}
                       {fmt(totalCost)}
                     </p>
                   </div>
                   <button
                     onClick={() => setShowSale(false)}
-                    className="text-[#a1a1aa] hover:text-[#09090b]"
+                    className="text-[#6f6a64] hover:text-[#1c1917]"
                   >
                     <svg
                       className="w-4 h-4"
@@ -670,7 +670,7 @@ function VehicleDetailContent() {
                   {/* Үйлчлүүлэгч */}
                   <div>
                     <div className="flex items-center justify-between mb-2">
-                      <label className="text-xs font-medium text-[#3f3f46]">
+                      <label className="text-xs font-medium text-[#46413c]">
                         Үйлчлүүлэгч
                       </label>
                       <div className="flex gap-1">
@@ -683,7 +683,7 @@ function VehicleDetailContent() {
                               setSelCustomer(null);
                               setCustQuery("");
                             }}
-                            className={`px-2 py-0.5 text-xs rounded transition-colors ${custMode === m ? "bg-brand text-white" : "text-[#71717a] hover:text-[#09090b]"}`}
+                            className={`px-2 py-0.5 text-xs rounded transition-colors ${custMode === m ? "bg-brand text-white" : "text-[#5f5a54] hover:text-[#1c1917]"}`}
                           >
                             {m === "search" ? "Хайх" : "Шинэ"}
                           </button>
@@ -696,11 +696,11 @@ function VehicleDetailContent() {
                         {selCustomer ? (
                           <div className="flex items-center justify-between px-3 py-2 bg-zinc-50 border border-zinc-200 rounded-md">
                             <div>
-                              <span className="text-sm font-medium text-[#09090b]">
+                              <span className="text-sm font-medium text-[#1c1917]">
                                 {selCustomer.name}
                               </span>
                               {selCustomer.phone && (
-                                <span className="text-xs text-[#71717a] ml-2">
+                                <span className="text-xs text-[#5f5a54] ml-2">
                                   {selCustomer.phone}
                                 </span>
                               )}
@@ -711,7 +711,7 @@ function VehicleDetailContent() {
                                 setSelCustomer(null);
                                 setCustQuery("");
                               }}
-                              className="text-[#a1a1aa] hover:text-[#09090b]"
+                              className="text-[#6f6a64] hover:text-[#1c1917]"
                             >
                               <svg
                                 className="w-3.5 h-3.5"
@@ -733,7 +733,7 @@ function VehicleDetailContent() {
                               className={inp}
                             />
                             {custResults.length > 0 && (
-                              <div className="absolute top-full left-0 right-0 mt-1 bg-white border border-[#e4e4e7] rounded-md shadow-lg z-10 overflow-hidden">
+                              <div className="absolute top-full left-0 right-0 mt-1 bg-white border border-[#e6e0d8] rounded-md shadow-lg z-10 overflow-hidden">
                                 {custResults.map((c) => (
                                   <button
                                     key={c.id}
@@ -743,12 +743,12 @@ function VehicleDetailContent() {
                                       setCustQuery("");
                                       setCustResults([]);
                                     }}
-                                    className="w-full flex items-center justify-between px-3 py-2.5 hover:bg-[#f4f4f5] text-left transition-colors"
+                                    className="w-full flex items-center justify-between px-3 py-2.5 hover:bg-[#f3efe9] text-left transition-colors"
                                   >
-                                    <span className="text-sm text-[#09090b]">
+                                    <span className="text-sm text-[#1c1917]">
                                       {c.name}
                                     </span>
-                                    <span className="text-xs text-[#a1a1aa]">
+                                    <span className="text-xs text-[#6f6a64]">
                                       {c.phone}
                                     </span>
                                   </button>
@@ -757,7 +757,7 @@ function VehicleDetailContent() {
                             )}
                             {custQuery.length >= 2 &&
                               custResults.length === 0 && (
-                                <p className="text-xs text-[#a1a1aa] mt-1.5">
+                                <p className="text-xs text-[#6f6a64] mt-1.5">
                                   Олдсонгүй — "Шинэ" дарж нэмнэ үү
                                 </p>
                               )}
@@ -785,7 +785,7 @@ function VehicleDetailContent() {
 
                   {/* Зарагдсан үнэ */}
                   <div>
-                    <label className="text-xs font-medium text-[#3f3f46] block mb-1.5">
+                    <label className="text-xs font-medium text-[#46413c] block mb-1.5">
                       Зарагдсан үнэ (₮)
                     </label>
                     <input
@@ -821,7 +821,7 @@ function VehicleDetailContent() {
 
                   {/* Огноо */}
                   <div>
-                    <label className="text-xs font-medium text-[#3f3f46] block mb-1.5">
+                    <label className="text-xs font-medium text-[#46413c] block mb-1.5">
                       Зарагдсан огноо
                     </label>
                     <input
@@ -834,7 +834,7 @@ function VehicleDetailContent() {
 
                   {/* Төлбөрийн хэлбэр */}
                   <div>
-                    <label className="text-xs font-medium text-[#3f3f46] block mb-2">
+                    <label className="text-xs font-medium text-[#46413c] block mb-2">
                       Төлбөрийн хэлбэр
                     </label>
                     <div className="grid grid-cols-3 gap-2">
@@ -846,7 +846,7 @@ function VehicleDetailContent() {
                           className={`flex flex-col items-center py-2.5 rounded-lg border transition-colors ${
                             payType === p.value
                               ? "border-brand bg-brand text-white"
-                              : "border-[#e4e4e7] text-[#71717a] hover:border-[#d4d4d8] hover:text-[#09090b]"
+                              : "border-[#e6e0d8] text-[#5f5a54] hover:border-[#d4ccc2] hover:text-[#1c1917]"
                           }`}
                         >
                           <span className="text-base mb-0.5">{p.icon}</span>
@@ -860,7 +860,7 @@ function VehicleDetailContent() {
                     <button
                       type="button"
                       onClick={() => setShowSale(false)}
-                      className="flex-1 py-2.5 text-sm text-[#71717a] border border-[#e4e4e7] rounded-md hover:border-[#d4d4d8] hover:text-[#09090b] transition-colors"
+                      className="flex-1 py-2.5 text-sm text-[#5f5a54] border border-[#e6e0d8] rounded-md hover:border-[#d4ccc2] hover:text-[#1c1917] transition-colors"
                     >
                       Болих
                     </button>
@@ -886,7 +886,7 @@ export default function VehicleDetailPage() {
   return (
     <Suspense
       fallback={
-        <div className="px-4 sm:px-8 py-5 sm:py-7 text-[#a1a1aa] text-sm">
+        <div className="px-4 sm:px-8 py-5 sm:py-7 text-[#6f6a64] text-sm">
           Ачааллаж байна...
         </div>
       }

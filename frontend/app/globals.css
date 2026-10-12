@@ -3,9 +3,33 @@
 @theme {
   --color-brand: #8b1e2d;
   --color-brand-dark: #6d1523;
-  --color-brand-light: #b0394a;
+  --color-brand-light: #d4707e;
   --color-brand-soft: #f8eeef;
   --color-ink: #111111;
+
+  /* Дулаан саарал: burgundy-тай зохицно, бичвэр нь WCAG AA (4.5:1+) */
+  --color-zinc-50: #faf8f5;
+  --color-gray-50: #faf8f5;
+  --color-zinc-100: #f3efe9;
+  --color-gray-100: #f3efe9;
+  --color-zinc-200: #e6e0d8;
+  --color-gray-200: #e6e0d8;
+  --color-zinc-300: #d4ccc2;
+  --color-gray-300: #d4ccc2;
+  --color-zinc-400: #a39a8f;
+  --color-gray-400: #a39a8f;
+  --color-zinc-500: #6f6a64;
+  --color-gray-500: #6f6a64;
+  --color-zinc-600: #57524c;
+  --color-gray-600: #57524c;
+  --color-zinc-700: #46413c;
+  --color-gray-700: #46413c;
+  --color-zinc-800: #2f2b27;
+  --color-gray-800: #2f2b27;
+  --color-zinc-900: #1c1917;
+  --color-gray-900: #1c1917;
+  --color-zinc-950: #0f0d0c;
+  --color-gray-950: #0f0d0c;
 
   --radius-sm: 0.125rem;
   --radius-md: 0.1875rem;
@@ -18,7 +42,7 @@
 
 body {
   font-family: 'Inter', 'Segoe UI', sans-serif;
-  background: #f5f5f5;
+  background: #f6f3ef;
   color: #09090b;
   -webkit-font-smoothing: antialiased;
 }

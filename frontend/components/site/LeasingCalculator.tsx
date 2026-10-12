@@ -13,7 +13,7 @@ function Range({ value, min, max, step, onChange }: {
     <input
       type="range" className="calc-range w-full" min={min} max={max} step={step} value={clamp(value, min, max)}
       onChange={(e) => onChange(Number(e.target.value))}
-      style={{ background: `linear-gradient(to right, var(--color-brand) ${pct}%, #e4e4e7 ${pct}%)` }}
+      style={{ background: `linear-gradient(to right, var(--color-brand) ${pct}%, #e6e0d8 ${pct}%)` }}
     />
   );
 }
@@ -23,7 +23,7 @@ function Field({ label, children, hint }: { label: string; children: React.React
     <div>
       <div className="flex items-center justify-between gap-3 mb-2">
         <span className="text-xs font-semibold text-zinc-500">{label}</span>
-        {hint && <span className="text-[11px] font-bold text-brand">{hint}</span>}
+        {hint && <span className="text-xs font-bold text-brand">{hint}</span>}
       </div>
       {children}
     </div>
@@ -90,7 +90,7 @@ export function LeasingCalculator({ open, onClose, price, carName, phone }: {
             <div className="relative">
               <input inputMode="numeric" className={boxCls + " pr-9"} value={fmt(carPrice)}
                 onChange={(e) => setCarPrice(clamp(toNum(e.target.value), 1_000_000, 5_000_000_000))} />
-              <span className="absolute right-3 top-1/2 -translate-y-1/2 font-bold text-zinc-400">₮</span>
+              <span className="absolute right-3 top-1/2 -translate-y-1/2 font-bold text-zinc-500">₮</span>
             </div>
             <div className="mt-2"><Range value={carPrice} min={10_000_000} max={maxPrice} step={1_000_000} onChange={setCarPrice} /></div>
           </Field>
@@ -99,7 +99,7 @@ export function LeasingCalculator({ open, onClose, price, carName, phone }: {
             <div className="relative">
               <input inputMode="numeric" className={boxCls + " pr-12"} value={months}
                 onChange={(e) => setMonths(clamp(toNum(e.target.value), 1, 120))} />
-              <span className="absolute right-3 top-1/2 -translate-y-1/2 font-bold text-zinc-400 text-sm">сар</span>
+              <span className="absolute right-3 top-1/2 -translate-y-1/2 font-bold text-zinc-500 text-sm">сар</span>
             </div>
             <div className="mt-2"><Range value={months} min={6} max={84} step={6} onChange={setMonths} /></div>
           </Field>
@@ -108,7 +108,7 @@ export function LeasingCalculator({ open, onClose, price, carName, phone }: {
             <div className="relative">
               <input inputMode="numeric" className={boxCls + " pr-9"} value={fmt(calc.down)}
                 onChange={(e) => setDownPct(clamp(Math.round((toNum(e.target.value) / carPrice) * 100), 0, 90))} />
-              <span className="absolute right-3 top-1/2 -translate-y-1/2 font-bold text-zinc-400">₮</span>
+              <span className="absolute right-3 top-1/2 -translate-y-1/2 font-bold text-zinc-500">₮</span>
             </div>
             <div className="mt-2"><Range value={downPct} min={0} max={90} step={5} onChange={setDownPct} /></div>
           </Field>
@@ -117,7 +117,7 @@ export function LeasingCalculator({ open, onClose, price, carName, phone }: {
             <div className="relative">
               <input inputMode="decimal" className={boxCls + " pr-9"} value={rate}
                 onChange={(e) => setRate(clamp(Number(e.target.value.replace(/[^\d.]/g, "")) || 0, 0, 10))} />
-              <span className="absolute right-3 top-1/2 -translate-y-1/2 font-bold text-zinc-400">%</span>
+              <span className="absolute right-3 top-1/2 -translate-y-1/2 font-bold text-zinc-500">%</span>
             </div>
             <div className="mt-2"><Range value={rate} min={0} max={4} step={0.1} onChange={(v) => setRate(Math.round(v * 10) / 10)} /></div>
           </Field>

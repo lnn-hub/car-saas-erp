@@ -51,11 +51,11 @@ export function CompareModal({ vehicles, onClose, onRemove }: {
                       <div className="aspect-[4/3] bg-zinc-100 rounded-sm overflow-hidden mb-2">
                         {src && <img src={src} alt="" className="w-full h-full object-cover" />}
                       </div>
-                      <div className="text-[11px] text-brand font-medium">{v.brand}</div>
+                      <div className="text-xs text-brand font-medium">{v.brand}</div>
                       <div className="text-sm font-semibold text-[#111] leading-tight">{v.model}</div>
                       <div className="flex items-center gap-3 mt-1.5">
                         <Link href={`/vehicle/${v.id}`} className="text-xs text-zinc-600 hover:text-brand underline-offset-2 hover:underline">Дэлгэрэнгүй</Link>
-                        <button onClick={() => onRemove(v.id)} className="text-xs text-zinc-400 hover:text-brand">Хасах</button>
+                        <button onClick={() => onRemove(v.id)} className="text-xs text-zinc-500 hover:text-brand">Хасах</button>
                       </div>
                     </th>
                   );

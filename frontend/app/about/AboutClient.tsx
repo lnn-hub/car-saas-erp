@@ -15,7 +15,7 @@ function AboutContent({ initial }: { initial: SiteInitial | null }) {
   }, [company?.name]);
 
   return (
-    <div className="min-h-screen bg-[#f5f5f5] pb-[76px] lg:pb-0">
+    <div className="min-h-screen bg-[#f6f3ef] pb-[76px] lg:pb-0">
       <SiteHeader company={company} />
 
       {/* ━━━ PAGE HERO ━━━ */}
@@ -147,7 +147,7 @@ function AboutContent({ initial }: { initial: SiteInitial | null }) {
 
       {/* ━━━ TEAM ━━━ */}
       {team.length > 0 && (
-        <section id="team" className="py-16 sm:py-24 px-4 bg-[#f9f9f9] border-t border-zinc-200">
+        <section id="team" className="py-16 sm:py-24 px-4 bg-[#faf8f5] border-t border-zinc-200">
           <div className="max-w-7xl mx-auto">
             <div className="max-w-2xl mb-10 sm:mb-14">
               <div className="text-xs font-semibold text-brand mb-3">Манай баг</div>
@@ -178,7 +178,7 @@ function AboutContent({ initial }: { initial: SiteInitial | null }) {
                     </div>
                     <div className="p-3 sm:p-5">
                       {m.position && (
-                        <div className="text-xs sm:text-[10px] font-semibold text-brand mb-1">{m.position}</div>
+                        <div className="text-xs sm:text-xs font-semibold text-brand mb-1">{m.position}</div>
                       )}
                       <h3 className="font-bold text-[#111] text-sm sm:text-lg leading-tight">{m.name}</h3>
                       {m.bio && <p className="hidden sm:block text-sm text-gray-500 leading-relaxed mt-2">{m.bio}</p>}

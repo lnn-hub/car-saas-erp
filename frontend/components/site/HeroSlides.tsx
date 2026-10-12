@@ -28,8 +28,8 @@ export function HeroSlides({ vehicles }: { vehicles: Vehicle[] }) {
             className={`absolute inset-0 w-full h-full object-cover transition-opacity duration-1000 ${k === i ? "opacity-100" : "opacity-0"}`}
           />
         ))}
-        <div className="absolute inset-0 bg-gradient-to-r from-black/90 via-black/65 to-black/25" />
-        <div className="absolute inset-x-0 bottom-0 h-1/2 bg-gradient-to-t from-black/80 to-transparent" />
+        <div className="absolute inset-0 bg-gradient-to-r from-black/75 via-black/45 to-black/5" />
+        <div className="absolute inset-x-0 bottom-0 h-1/2 bg-gradient-to-t from-black/60 to-transparent" />
       </div>
 
       <div className="absolute right-4 bottom-4 sm:right-8 sm:bottom-24 z-10 flex flex-col items-end gap-3">

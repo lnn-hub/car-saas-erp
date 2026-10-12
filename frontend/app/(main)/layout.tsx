@@ -39,7 +39,7 @@ const SIDE_NAV = [
 
 export default function MainLayout({ children }: { children: React.ReactNode }) {
   return (
-    <React.Suspense fallback={<div className="min-h-screen bg-[#f5f5f5]" />}>
+    <React.Suspense fallback={<div className="min-h-screen bg-[#f6f3ef]" />}>
       <MainLayoutInner>{children}</MainLayoutInner>
     </React.Suspense>
   );
@@ -145,7 +145,7 @@ function MainLayoutInner({ children }: { children: React.ReactNode }) {
   );
 
   return (
-    <div className="min-h-screen bg-[#f5f5f5] flex">
+    <div className="min-h-screen bg-[#f6f3ef] flex">
 
       {/* ── Desktop sidebar ── */}
       <aside className="hidden lg:flex w-60 shrink-0 bg-[#111] flex-col fixed h-full z-30 border-r-4 border-brand">
@@ -189,11 +189,11 @@ function MainLayoutInner({ children }: { children: React.ReactNode }) {
             return (
               <Link key={href} href={href}
                 className={`relative flex-1 flex flex-col items-center justify-center gap-0.5 transition-colors ${
-                  active ? 'text-brand' : 'text-zinc-400'
+                  active ? 'text-brand' : 'text-zinc-500'
                 }`}>
                 <span className={`absolute top-0 h-[3px] w-8 rounded-b-full transition-colors ${active ? 'bg-brand' : 'bg-transparent'}`} />
                 <Icon />
-                <span className="text-[10px] font-bold">{label}</span>
+                <span className="text-xs font-bold">{label}</span>
               </Link>
             );
           })}

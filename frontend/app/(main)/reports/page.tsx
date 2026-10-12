@@ -29,7 +29,7 @@ const MONTH_NAMES = ['1-р сар', '2-р сар', '3-р сар', '4-р сар',
 
 const pad = (n: number) => String(n).padStart(2, '0');
 const money = (n: number | string | null) => (n == null || n === '' ? '-' : Math.round(Number(n)).toLocaleString('en-US') + '₮');
-const sel = 'bg-white border border-[#e4e4e7] rounded-md px-3 py-2 text-sm text-[#09090b] focus:outline-none focus:border-brand';
+const sel = 'bg-white border border-[#e6e0d8] rounded-md px-3 py-2 text-sm text-[#1c1917] focus:outline-none focus:border-brand';
 
 function periodRange(mode: Mode, year: number, month: number, quarter: number, cf: string, ct: string) {
   if (mode === 'month') return { from: `${year}-${pad(month)}-01`, to: `${year}-${pad(month)}-${pad(new Date(year, month, 0).getDate())}` };
@@ -134,8 +134,8 @@ export default function ReportsPage() {
     <div className="px-4 sm:px-6 py-4 sm:py-6 max-w-[1500px] mx-auto w-full space-y-4 sm:space-y-5">
       <div className="flex items-start justify-between gap-3">
         <div>
-          <h1 className="text-base sm:text-lg font-bold text-[#09090b]">Тайлан</h1>
-          <p className="text-xs sm:text-sm text-[#71717a] mt-0.5">{basisLabel} · {periodLabel}</p>
+          <h1 className="text-base sm:text-lg font-bold text-[#1c1917]">Тайлан</h1>
+          <p className="text-xs sm:text-sm text-[#5f5a54] mt-0.5">{basisLabel} · {periodLabel}</p>
         </div>
         <button onClick={downloadCsv} disabled={!data || !data.rows.length}
           className="shrink-0 flex items-center gap-2 bg-brand hover:bg-brand-dark disabled:opacity-40 text-white text-sm font-medium px-4 py-2.5 rounded-md transition-colors">
@@ -145,18 +145,18 @@ export default function ReportsPage() {
       </div>
 
       {/* Шүүлтүүр */}
-      <div className="bg-white border border-[#e4e4e7] rounded-xl p-4 sm:p-5 shadow-sm space-y-4">
+      <div className="bg-white border border-[#e6e0d8] rounded-xl p-4 sm:p-5 shadow-sm space-y-4">
         <div className="flex flex-wrap gap-2">
           {([['sold', 'Борлуулсан'], ['arrived', 'Ирсэн'], ['stock', 'Одоогийн агуулах']] as [Basis, string][]).map(([k, l]) => (
             <button key={k} onClick={() => setBasis(k)}
-              className={`px-4 py-2 rounded-md text-sm font-medium border transition-colors ${basis === k ? 'bg-[#111] text-white border-[#111]' : 'bg-white text-[#52525b] border-[#e4e4e7] hover:border-[#a1a1aa]'}`}>{l}</button>
+              className={`px-4 py-2 rounded-md text-sm font-medium border transition-colors ${basis === k ? 'bg-[#111] text-white border-[#111]' : 'bg-white text-[#46413c] border-[#e6e0d8] hover:border-[#6f6a64]'}`}>{l}</button>
           ))}
         </div>
 
         {basis !== 'stock' && (
           <div className="flex flex-wrap items-end gap-3">
             <div>
-              <div className="text-xs text-[#71717a] mb-1.5">Хугацаа</div>
+              <div className="text-xs text-[#5f5a54] mb-1.5">Хугацаа</div>
               <select value={mode} onChange={e => setMode(e.target.value as Mode)} className={sel}>
                 <option value="month">Сараар</option>
                 <option value="quarter">Улирлаар</option>
@@ -167,7 +167,7 @@ export default function ReportsPage() {
             </div>
             {(mode === 'month' || mode === 'quarter' || mode === 'year') && (
               <div>
-                <div className="text-xs text-[#71717a] mb-1.5">Жил</div>
+                <div className="text-xs text-[#5f5a54] mb-1.5">Жил</div>
                 <select value={year} onChange={e => setYear(Number(e.target.value))} className={sel}>
                   {years.map(y => <option key={y} value={y}>{y}</option>)}
                 </select>
@@ -175,7 +175,7 @@ export default function ReportsPage() {
             )}
             {mode === 'month' && (
               <div>
-                <div className="text-xs text-[#71717a] mb-1.5">Сар</div>
+                <div className="text-xs text-[#5f5a54] mb-1.5">Сар</div>
                 <select value={month} onChange={e => setMonth(Number(e.target.value))} className={sel}>
                   {MONTH_NAMES.map((m, i) => <option key={m} value={i + 1}>{m}</option>)}
                 </select>
@@ -183,7 +183,7 @@ export default function ReportsPage() {
             )}
             {mode === 'quarter' && (
               <div>
-                <div className="text-xs text-[#71717a] mb-1.5">Улирал</div>
+                <div className="text-xs text-[#5f5a54] mb-1.5">Улирал</div>
                 <select value={quarter} onChange={e => setQuarter(Number(e.target.value))} className={sel}>
                   {[1, 2, 3, 4].map(q => <option key={q} value={q}>{q}-р улирал</option>)}
                 </select>
@@ -191,11 +191,11 @@ export default function ReportsPage() {
             )}
             {mode === 'custom' && (
               <>
-                <div><div className="text-xs text-[#71717a] mb-1.5">Эхлэх</div><input type="date" value={cf} onChange={e => setCf(e.target.value)} className={sel} /></div>
-                <div><div className="text-xs text-[#71717a] mb-1.5">Дуусах</div><input type="date" value={ct} onChange={e => setCt(e.target.value)} className={sel} /></div>
+                <div><div className="text-xs text-[#5f5a54] mb-1.5">Эхлэх</div><input type="date" value={cf} onChange={e => setCf(e.target.value)} className={sel} /></div>
+                <div><div className="text-xs text-[#5f5a54] mb-1.5">Дуусах</div><input type="date" value={ct} onChange={e => setCt(e.target.value)} className={sel} /></div>
               </>
             )}
-            <div className="text-xs text-[#a1a1aa] pb-2.5">
+            <div className="text-xs text-[#6f6a64] pb-2.5">
               {basis === 'sold' ? 'Зарсан огноогоор' : 'Ирсэн огноогоор'}{range.from && range.to ? ` · ${range.from} - ${range.to}` : ''}
             </div>
           </div>
@@ -207,12 +207,12 @@ export default function ReportsPage() {
       {/* Хураангуй */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-2 sm:gap-3">
         {(loading && !data ? [0, 1, 2, 3] : cards).map((c, i) => typeof c === 'number' ? (
-          <div key={i} className="rounded-sm bg-white border border-zinc-200 border-t-[3px] border-t-brand px-4 py-4"><div className="h-6 w-28 rounded bg-[#f4f4f5] animate-pulse" /></div>
+          <div key={i} className="rounded-sm bg-white border border-zinc-200 border-t-[3px] border-t-brand px-4 py-4"><div className="h-6 w-28 rounded bg-[#f3efe9] animate-pulse" /></div>
         ) : (
           <div key={c.label} className={`rounded-sm bg-white border border-zinc-200 border-t-[3px] border-t-brand px-4 py-3.5 shadow-sm ${loading ? 'opacity-60' : ''}`}>
-            <div className="text-xs text-[#71717a] mb-2">{c.label}</div>
+            <div className="text-xs text-[#5f5a54] mb-2">{c.label}</div>
             <div className="text-xl font-semibold tabular-nums text-[#111] leading-none">{c.value}</div>
-            {c.sub && <div className="text-xs text-[#a1a1aa] mt-1.5">{c.sub}</div>}
+            {c.sub && <div className="text-xs text-[#6f6a64] mt-1.5">{c.sub}</div>}
           </div>
         ))}
       </div>
@@ -220,20 +220,20 @@ export default function ReportsPage() {
       {s && (
         <div className="flex flex-wrap gap-2 text-xs">
           {Object.entries(STATUS).map(([k, l]) => (
-            <span key={k} className="px-3 py-1.5 rounded-full bg-white border border-zinc-200 text-[#52525b]">{l}: <b className="text-[#111] tabular-nums">{s.by_status[k] ?? 0}</b></span>
+            <span key={k} className="px-3 py-1.5 rounded-full bg-white border border-zinc-200 text-[#46413c]">{l}: <b className="text-[#111] tabular-nums">{s.by_status[k] ?? 0}</b></span>
           ))}
         </div>
       )}
 
       {/* Сар сараар */}
       {basis !== 'stock' && data && data.months.length > 1 && (
-        <div className="bg-white border border-[#e4e4e7] rounded-xl overflow-hidden shadow-sm">
-          <div className="px-5 py-3.5 border-b border-[#e4e4e7] text-sm font-semibold text-[#09090b]">Сар сараар</div>
+        <div className="bg-white border border-[#e6e0d8] rounded-xl overflow-hidden shadow-sm">
+          <div className="px-5 py-3.5 border-b border-[#e6e0d8] text-sm font-semibold text-[#1c1917]">Сар сараар</div>
           <table className="w-full text-sm">
-            <thead><tr className="bg-[#fafafa] text-xs text-[#71717a]"><th className="text-left font-medium px-5 py-2.5">Сар</th><th className="text-right font-medium px-5 py-2.5">Зарсан</th><th className="text-right font-medium px-5 py-2.5">Орлого</th><th className="text-right font-medium px-5 py-2.5">Ашиг</th></tr></thead>
+            <thead><tr className="bg-[#faf8f5] text-xs text-[#5f5a54]"><th className="text-left font-medium px-5 py-2.5">Сар</th><th className="text-right font-medium px-5 py-2.5">Зарсан</th><th className="text-right font-medium px-5 py-2.5">Орлого</th><th className="text-right font-medium px-5 py-2.5">Ашиг</th></tr></thead>
             <tbody>
               {data.months.map(m => (
-                <tr key={m.month} className="border-t border-[#f4f4f5]">
+                <tr key={m.month} className="border-t border-[#f3efe9]">
                   <td className="px-5 py-2.5">{m.month}</td>
                   <td className="px-5 py-2.5 text-right tabular-nums">{m.count}</td>
                   <td className="px-5 py-2.5 text-right tabular-nums">{money(m.revenue)}</td>
@@ -246,23 +246,23 @@ export default function ReportsPage() {
       )}
 
       {/* Дэлгэрэнгүй */}
-      <div className="bg-white border border-[#e4e4e7] rounded-xl overflow-hidden shadow-sm">
-        <div className="px-5 py-3.5 border-b border-[#e4e4e7] flex items-center justify-between">
-          <span className="text-sm font-semibold text-[#09090b]">Машины жагсаалт</span>
-          <span className="text-xs text-[#a1a1aa]">{data ? `${data.rows.length} машин` : ''}</span>
+      <div className="bg-white border border-[#e6e0d8] rounded-xl overflow-hidden shadow-sm">
+        <div className="px-5 py-3.5 border-b border-[#e6e0d8] flex items-center justify-between">
+          <span className="text-sm font-semibold text-[#1c1917]">Машины жагсаалт</span>
+          <span className="text-xs text-[#6f6a64]">{data ? `${data.rows.length} машин` : ''}</span>
         </div>
         {loading && !data ? (
-          <div className="p-5 space-y-3">{[0, 1, 2, 3].map(i => <div key={i} className="h-5 rounded bg-[#f4f4f5] animate-pulse" />)}</div>
+          <div className="p-5 space-y-3">{[0, 1, 2, 3].map(i => <div key={i} className="h-5 rounded bg-[#f3efe9] animate-pulse" />)}</div>
         ) : !data || data.rows.length === 0 ? (
           <div className="px-5 py-14 text-center">
-            <div className="text-sm text-[#52525b]">Энэ хугацаанд машин олдсонгүй</div>
-            <div className="text-xs text-[#a1a1aa] mt-1">Өөр хугацаа эсвэл төрөл сонгоно уу</div>
+            <div className="text-sm text-[#46413c]">Энэ хугацаанд машин олдсонгүй</div>
+            <div className="text-xs text-[#6f6a64] mt-1">Өөр хугацаа эсвэл төрөл сонгоно уу</div>
           </div>
         ) : (
           <div className="overflow-x-auto">
             <table className="w-full text-sm min-w-[1100px]">
               <thead>
-                <tr className="bg-[#fafafa] text-xs text-[#71717a]">
+                <tr className="bg-[#faf8f5] text-xs text-[#5f5a54]">
                   {['№', 'Статус', 'Ирсэн', 'Зарсан', 'Хоног', 'Машин', 'Гүйлт', 'Өртөг', 'Зарсан үнэ', 'Ашиг', 'Худалдан авагч', 'Төлбөр'].map((h, i) => (
                     <th key={h} className={`font-medium px-4 py-2.5 whitespace-nowrap ${[7, 8, 9].includes(i) ? 'text-right' : 'text-left'}`}>{h}</th>
                   ))}
@@ -270,26 +270,26 @@ export default function ReportsPage() {
               </thead>
               <tbody>
                 {data.rows.map((r, i) => (
-                  <tr key={r.id} className="border-t border-[#f4f4f5] hover:bg-[#fafafa]">
-                    <td className="px-4 py-2.5 text-[#a1a1aa] tabular-nums">{i + 1}</td>
+                  <tr key={r.id} className="border-t border-[#f3efe9] hover:bg-[#faf8f5]">
+                    <td className="px-4 py-2.5 text-[#6f6a64] tabular-nums">{i + 1}</td>
                     <td className="px-4 py-2.5 whitespace-nowrap"><span className={`px-2 py-0.5 rounded-full text-xs ${r.status === 'SOLD' ? 'bg-zinc-100 text-zinc-600' : r.status === 'PUBLISHED' ? 'bg-brand-soft text-brand' : 'bg-zinc-50 text-zinc-600 border border-zinc-200'}`}>{STATUS[r.status]}</span></td>
-                    <td className="px-4 py-2.5 whitespace-nowrap tabular-nums text-[#52525b]">{r.arrived_at || '-'}</td>
-                    <td className="px-4 py-2.5 whitespace-nowrap tabular-nums text-[#52525b]">{r.sold_at || '-'}</td>
-                    <td className="px-4 py-2.5 tabular-nums text-[#52525b]">{r.days_in_stock ?? '-'}</td>
-                    <td className="px-4 py-2.5"><div className="font-medium text-[#09090b] whitespace-nowrap">{r.brand} {r.model} <span className="font-normal text-[#a1a1aa]">{r.year}</span></div><div className="text-[11px] text-[#a1a1aa] font-mono">{r.vin}</div></td>
-                    <td className="px-4 py-2.5 tabular-nums text-[#52525b] whitespace-nowrap">{r.mileage != null ? `${Number(r.mileage).toLocaleString('en-US')} км` : '-'}</td>
+                    <td className="px-4 py-2.5 whitespace-nowrap tabular-nums text-[#46413c]">{r.arrived_at || '-'}</td>
+                    <td className="px-4 py-2.5 whitespace-nowrap tabular-nums text-[#46413c]">{r.sold_at || '-'}</td>
+                    <td className="px-4 py-2.5 tabular-nums text-[#46413c]">{r.days_in_stock ?? '-'}</td>
+                    <td className="px-4 py-2.5"><div className="font-medium text-[#1c1917] whitespace-nowrap">{r.brand} {r.model} <span className="font-normal text-[#6f6a64]">{r.year}</span></div><div className="text-xs text-[#6f6a64] font-mono">{r.vin}</div></td>
+                    <td className="px-4 py-2.5 tabular-nums text-[#46413c] whitespace-nowrap">{r.mileage != null ? `${Number(r.mileage).toLocaleString('en-US')} км` : '-'}</td>
                     <td className="px-4 py-2.5 text-right tabular-nums">{money(r.total_cost)}</td>
                     <td className="px-4 py-2.5 text-right tabular-nums">{money(r.sale_price)}</td>
                     <td className="px-4 py-2.5 text-right tabular-nums">{r.profit != null ? <span className={Number(r.profit) < 0 ? 'text-brand font-medium' : 'text-[#111] font-medium'}>{money(r.profit)}</span> : '-'}</td>
-                    <td className="px-4 py-2.5"><div className="text-[#09090b] whitespace-nowrap">{r.customer_name || '-'}</div>{r.customer_phone && <div className="text-[11px] text-[#a1a1aa]">{r.customer_phone}</div>}</td>
-                    <td className="px-4 py-2.5 whitespace-nowrap text-[#52525b]">{r.payment_type ? PAYMENT[r.payment_type] : '-'}</td>
+                    <td className="px-4 py-2.5"><div className="text-[#1c1917] whitespace-nowrap">{r.customer_name || '-'}</div>{r.customer_phone && <div className="text-xs text-[#6f6a64]">{r.customer_phone}</div>}</td>
+                    <td className="px-4 py-2.5 whitespace-nowrap text-[#46413c]">{r.payment_type ? PAYMENT[r.payment_type] : '-'}</td>
                   </tr>
                 ))}
               </tbody>
               {s && (
                 <tfoot>
-                  <tr className="border-t-2 border-[#e4e4e7] bg-[#fafafa] font-semibold">
-                    <td colSpan={7} className="px-4 py-3 text-[#09090b]">Нийт</td>
+                  <tr className="border-t-2 border-[#e6e0d8] bg-[#faf8f5] font-semibold">
+                    <td colSpan={7} className="px-4 py-3 text-[#1c1917]">Нийт</td>
                     <td className="px-4 py-3 text-right tabular-nums">{money(data.rows.reduce((a, r) => a + Number(r.total_cost), 0))}</td>
                     <td className="px-4 py-3 text-right tabular-nums">{money(s.revenue)}</td>
                     <td className="px-4 py-3 text-right tabular-nums">{money(s.profit)}</td>

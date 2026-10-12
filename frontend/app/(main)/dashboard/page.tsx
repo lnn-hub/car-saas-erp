@@ -92,15 +92,15 @@ export default function DashboardPage() {
         ].map(c => (
           <div key={c.label} className="rounded-sm bg-white border border-zinc-200 border-t-[3px] border-t-brand px-3 sm:px-5 py-3 sm:py-4 shadow-sm">
             <div className="flex items-center justify-between mb-3">
-              <span className="text-xs font-medium text-[#71717a] sm:tracking-[0.15em] leading-tight">{c.label}</span>
+              <span className="text-xs font-medium text-[#5f5a54] sm:tracking-[0.15em] leading-tight">{c.label}</span>
               <span className="w-8 h-8 rounded-sm bg-brand-soft text-brand flex items-center justify-center">{c.icon}</span>
             </div>
             {(c.label === 'Агуулахын үнэ' ? !vLoaded : summary === null) ? (
-              <div className="h-6 sm:h-7 w-24 rounded bg-[#f4f4f5] animate-pulse" />
+              <div className="h-6 sm:h-7 w-24 rounded bg-[#f3efe9] animate-pulse" />
             ) : (
               <div className="text-xl sm:text-2xl font-bold tabular-nums leading-none text-[#111]">{c.value}</div>
             )}
-            {c.unit && <div className="text-xs text-[#71717a] mt-1.5">{c.unit}</div>}
+            {c.unit && <div className="text-xs text-[#5f5a54] mt-1.5">{c.unit}</div>}
           </div>
         ))}
       </div>
@@ -108,20 +108,20 @@ export default function DashboardPage() {
       <SalesChart sales={sales} />
 
       {/* Status overview */}
-      <div className="bg-white rounded-xl border border-[#e4e4e7] overflow-hidden shadow-sm">
-        <div className="px-5 py-3.5 border-b border-[#e4e4e7]">
-          <span className="text-xs font-medium text-[#09090b]">Агуулахын байдал</span>
+      <div className="bg-white rounded-xl border border-[#e6e0d8] overflow-hidden shadow-sm">
+        <div className="px-5 py-3.5 border-b border-[#e6e0d8]">
+          <span className="text-xs font-medium text-[#1c1917]">Агуулахын байдал</span>
         </div>
-        <div className="grid grid-cols-2 sm:grid-cols-4 divide-x divide-y sm:divide-y-0 divide-[#f4f4f5]">
+        <div className="grid grid-cols-2 sm:grid-cols-4 divide-x divide-y sm:divide-y-0 divide-[#f3efe9]">
           {Object.entries(STATUS).map(([key, val]) => (
             <Link key={key} href={`/vehicles?status=${key}`}
-              className="px-5 py-4 hover:bg-[#fafafa] transition-colors">
+              className="px-5 py-4 hover:bg-[#faf8f5] transition-colors">
               <div className="flex items-center gap-2 mb-2.5">
-                <span className="text-[#a1a1aa]">{STATUS_ICONS[key]}</span>
-                <span className="text-xs text-[#71717a]">{val.label}</span>
+                <span className="text-[#6f6a64]">{STATUS_ICONS[key]}</span>
+                <span className="text-xs text-[#5f5a54]">{val.label}</span>
               </div>
-              <div className="text-2xl font-bold text-[#09090b] tabular-nums">{counts[key as keyof typeof counts]}</div>
-              <div className={`inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-medium mt-1.5 ${val.bg} ${val.text}`}>
+              <div className="text-2xl font-bold text-[#1c1917] tabular-nums">{counts[key as keyof typeof counts]}</div>
+              <div className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium mt-1.5 ${val.bg} ${val.text}`}>
                 {key === 'SOLD' ? 'зарагдсан' : 'агуулахад'}
               </div>
             </Link>
@@ -144,24 +144,24 @@ export default function DashboardPage() {
       {/* Bottom: recent + quick actions */}
       <div className="grid grid-cols-1 lg:grid-cols-[1fr_280px] gap-4">
         {/* Recent vehicles */}
-        <div className="bg-white rounded-xl border border-[#e4e4e7] overflow-hidden shadow-sm">
-          <div className="px-5 py-3.5 border-b border-[#e4e4e7] flex items-center justify-between">
-            <span className="text-xs font-medium text-[#09090b]">Сүүлд нэмэгдсэн</span>
-            <Link href="/vehicles" className="text-xs text-[#a1a1aa] hover:text-[#09090b] transition-colors font-medium">
+        <div className="bg-white rounded-xl border border-[#e6e0d8] overflow-hidden shadow-sm">
+          <div className="px-5 py-3.5 border-b border-[#e6e0d8] flex items-center justify-between">
+            <span className="text-xs font-medium text-[#1c1917]">Сүүлд нэмэгдсэн</span>
+            <Link href="/vehicles" className="text-xs text-[#6f6a64] hover:text-[#1c1917] transition-colors font-medium">
               Бүгд →
             </Link>
           </div>
-          <div className="divide-y divide-[#f4f4f5]">
+          <div className="divide-y divide-[#f3efe9]">
             {recent.map(v => (
               <Link key={v.id} href={`/vehicles/${v.id}`}
-                className="flex items-center gap-4 px-5 py-3 hover:bg-[#fafafa] transition-colors group">
+                className="flex items-center gap-4 px-5 py-3 hover:bg-[#faf8f5] transition-colors group">
                 {/* Car avatar */}
-                <div className="w-9 h-9 rounded-lg bg-[#f4f4f5] flex items-center justify-center shrink-0 text-[#a1a1aa]">
+                <div className="w-9 h-9 rounded-lg bg-[#f3efe9] flex items-center justify-center shrink-0 text-[#6f6a64]">
                   <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.8}><path d="M5 17H3a2 2 0 01-2-2v-4a2 2 0 012-2h16a2 2 0 012 2v4a2 2 0 01-2 2h-2"/><rect x="7" y="17" width="10" height="4" rx="2"/><path d="M5 11L7.5 5h9L19 11"/></svg>
                 </div>
                 <div className="flex-1 min-w-0">
-                  <div className="text-sm font-semibold text-[#09090b]">{v.brand} {v.model} <span className="text-[#a1a1aa] font-normal">{v.year}</span></div>
-                  <div className="text-xs text-[#a1a1aa]">{fmtDate(v.created_at)}</div>
+                  <div className="text-sm font-semibold text-[#1c1917]">{v.brand} {v.model} <span className="text-[#6f6a64] font-normal">{v.year}</span></div>
+                  <div className="text-xs text-[#6f6a64]">{fmtDate(v.created_at)}</div>
                 </div>
                 <span className={`flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium ${STATUS[v.status]?.bg} ${STATUS[v.status]?.text}`}>
                   <span className={`w-1 h-1 rounded-full ${STATUS[v.status]?.dot}`} />
@@ -171,8 +171,8 @@ export default function DashboardPage() {
             ))}
             {!vLoaded && [0, 1, 2].map(i => (
               <div key={i} className="flex items-center gap-4 px-5 py-3">
-                <div className="w-9 h-9 rounded-lg bg-[#f4f4f5] animate-pulse" />
-                <div className="flex-1 space-y-2"><div className="h-3.5 w-40 rounded bg-[#f4f4f5] animate-pulse" /><div className="h-3 w-20 rounded bg-[#f4f4f5] animate-pulse" /></div>
+                <div className="w-9 h-9 rounded-lg bg-[#f3efe9] animate-pulse" />
+                <div className="flex-1 space-y-2"><div className="h-3.5 w-40 rounded bg-[#f3efe9] animate-pulse" /><div className="h-3 w-20 rounded bg-[#f3efe9] animate-pulse" /></div>
               </div>
             ))}
             {vLoaded && recent.length === 0 && (
@@ -180,8 +180,8 @@ export default function DashboardPage() {
                 <div className="w-12 h-12 rounded-full bg-brand-soft text-brand flex items-center justify-center mx-auto mb-3">
                   <svg className="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.6}><path d="M5 17H3a2 2 0 01-2-2v-4a2 2 0 012-2h16a2 2 0 012 2v4a2 2 0 01-2 2h-2"/><rect x="7" y="17" width="10" height="4" rx="2"/><path d="M5 11L7.5 5h9L19 11"/></svg>
                 </div>
-                <div className="text-sm font-medium text-[#09090b]">Машин байхгүй байна</div>
-                <div className="text-xs text-[#a1a1aa] mt-1 mb-4">Эхний машиноо нэмээд вэбсайтад нийтэлнэ үү</div>
+                <div className="text-sm font-medium text-[#1c1917]">Машин байхгүй байна</div>
+                <div className="text-xs text-[#6f6a64] mt-1 mb-4">Эхний машиноо нэмээд вэбсайтад нийтэлнэ үү</div>
                 <Link href="/vehicles/new" className="inline-flex items-center gap-2 bg-brand hover:bg-brand-dark text-white text-sm font-medium px-4 py-2 rounded-md transition-colors">Машин нэмэх</Link>
               </div>
             )}
@@ -190,8 +190,8 @@ export default function DashboardPage() {
 
         {/* Quick actions */}
         <div className="space-y-3">
-          <div className="bg-white rounded-xl border border-[#e4e4e7] p-4 shadow-sm">
-            <div className="text-xs font-medium text-[#a1a1aa] mb-3">Хурдан үйлдэл</div>
+          <div className="bg-white rounded-xl border border-[#e6e0d8] p-4 shadow-sm">
+            <div className="text-xs font-medium text-[#6f6a64] mb-3">Хурдан үйлдэл</div>
             <div className="space-y-1.5">
               {[
                 { href: '/vehicles/new', label: 'Машин нэмэх',  primary: true },
@@ -203,26 +203,26 @@ export default function DashboardPage() {
                   className={`flex items-center justify-between w-full px-3 py-2 rounded-lg text-sm transition-colors ${
                     primary
                       ? 'bg-brand text-white font-medium hover:bg-brand-dark'
-                      : 'text-[#52525b] hover:bg-[#f4f4f5] hover:text-[#09090b]'
+                      : 'text-[#46413c] hover:bg-[#f3efe9] hover:text-[#1c1917]'
                   }`}>
                   {label}
-                  {!primary && <svg className="w-3 h-3 text-[#d4d4d8]" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2}><path d="M9 18l6-6-6-6"/></svg>}
+                  {!primary && <svg className="w-3 h-3 text-[#d4ccc2]" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2}><path d="M9 18l6-6-6-6"/></svg>}
                 </Link>
               ))}
             </div>
           </div>
 
           {/* Mini stat */}
-          <div className="bg-white rounded-xl border border-[#e4e4e7] p-4 shadow-sm">
-            <div className="text-xs font-medium text-[#a1a1aa] mb-3">Нэгж дундаж</div>
+          <div className="bg-white rounded-xl border border-[#e6e0d8] p-4 shadow-sm">
+            <div className="text-xs font-medium text-[#6f6a64] mb-3">Нэгж дундаж</div>
             <div className="space-y-2.5">
               {[
                 { label: 'Нэг машины ашиг', value: fmt(summary?.avg_profit ?? 0) },
                 { label: 'Агуулахад',        value: `${inStock} машин` },
               ].map(({ label, value }) => (
                 <div key={label} className="flex items-center justify-between">
-                  <span className="text-xs text-[#71717a]">{label}</span>
-                  <span className="text-sm font-bold text-[#09090b] tabular-nums">{value}</span>
+                  <span className="text-xs text-[#5f5a54]">{label}</span>
+                  <span className="text-sm font-bold text-[#1c1917] tabular-nums">{value}</span>
                 </div>
               ))}
             </div>

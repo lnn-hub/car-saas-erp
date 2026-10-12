@@ -31,20 +31,20 @@ export default function LoginPage() {
           <div className="w-9 h-9 bg-brand rounded flex items-center justify-center mb-6">
             <span className="text-white font-bold text-lg leading-none">A</span>
           </div>
-          <h1 className="text-xl font-bold text-[#09090b] tracking-tight">Админ нэвтрэх</h1>
-          <p className="text-sm text-[#71717a] mt-1">Машин удирдлагын самбар</p>
+          <h1 className="text-xl font-bold text-[#1c1917] tracking-tight">Админ нэвтрэх</h1>
+          <p className="text-sm text-[#5f5a54] mt-1">Машин удирдлагын самбар</p>
         </div>
         <form onSubmit={handleSubmit} className="space-y-3">
           <div>
-            <label className="text-xs font-medium text-[#3f3f46] block mb-1.5">И-мэйл</label>
+            <label className="text-xs font-medium text-[#46413c] block mb-1.5">И-мэйл</label>
             <input type="email" value={email} onChange={e => setEmail(e.target.value)}
-              className="w-full bg-white border border-[#e4e4e7] rounded-md px-3 py-2 text-sm text-[#09090b] placeholder-[#a1a1aa] focus:outline-none focus:border-brand transition-colors"
+              className="w-full bg-white border border-[#e6e0d8] rounded-md px-3 py-2 text-sm text-[#1c1917] placeholder-[#6f6a64] focus:outline-none focus:border-brand transition-colors"
               required />
           </div>
           <div>
-            <label className="text-xs font-medium text-[#3f3f46] block mb-1.5">Нууц үг</label>
+            <label className="text-xs font-medium text-[#46413c] block mb-1.5">Нууц үг</label>
             <input type="password" value={password} onChange={e => setPassword(e.target.value)}
-              className="w-full bg-white border border-[#e4e4e7] rounded-md px-3 py-2 text-sm text-[#09090b] focus:outline-none focus:border-brand transition-colors"
+              className="w-full bg-white border border-[#e6e0d8] rounded-md px-3 py-2 text-sm text-[#1c1917] focus:outline-none focus:border-brand transition-colors"
               required />
           </div>
           {error && <div className="bg-brand-soft border border-brand/20 rounded-md px-3 py-2 text-xs text-brand">{error}</div>}
@@ -54,7 +54,7 @@ export default function LoginPage() {
           </button>
         </form>
 
-        <p className="text-center text-xs text-[#a1a1aa] mt-6">
+        <p className="text-center text-xs text-[#6f6a64] mt-6">
           <Link href="/" className="hover:text-brand transition-colors">← Вэбсайт руу буцах</Link>
         </p>
       </div>
