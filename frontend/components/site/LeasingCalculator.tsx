@@ -66,7 +66,7 @@ export function LeasingCalculator({ open, onClose, price, carName, phone }: {
   const waText = `Сайн байна уу, ${carName || "машин"}-ийн лизингийн талаар лавлах гэсэн юм. Тооцоолол: үнэ ${fmt(carPrice)}₮, урьдчилгаа ${downPct}%, ${months} сар, сарын хүү ${rate}% -> сарын төлбөр ${fmt(calc.monthly)}₮.`;
 
   return (
-    <div className={`fixed inset-0 z-[90] ${open ? "" : "pointer-events-none"}`} aria-hidden={!open}>
+    <div className={`fixed inset-0 z-[90] overflow-hidden ${open ? "" : "pointer-events-none"}`} aria-hidden={!open}>
       <div onClick={onClose}
         className={`absolute inset-0 bg-black/60 backdrop-blur-sm transition-opacity duration-300 ${open ? "opacity-100" : "opacity-0"}`} />
       <aside role="dialog" aria-label="Лизингийн тооцоолуур"

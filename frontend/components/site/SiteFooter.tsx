@@ -62,14 +62,14 @@ export function SiteFooter({ company }: { company: Company | null }) {
                 <a
                   key={h}
                   href={h}
-                  className="hover:text-white transition-colors"
+                  className="inline-block py-2 hover:text-white transition-colors"
                 >
                   {l}
                 </a>
               ))}
               <Link
                 href="/admin"
-                className="hover:text-white transition-colors"
+                className="inline-block py-2 hover:text-white transition-colors"
               >
                 Нэвтрэх
               </Link>

@@ -208,7 +208,7 @@ export default function NewVehiclePage() {
   return (
     <div className="px-4 sm:px-8 py-5 sm:py-7 max-w-2xl mx-auto">
       <button onClick={() => router.back()}
-        className="flex items-center gap-1.5 text-[#6f6a64] hover:text-[#1c1917] text-sm transition-colors mb-6">
+        className="flex items-center gap-1.5 py-2 pr-3 text-[#6f6a64] hover:text-[#1c1917] text-sm transition-colors mb-6">
         <IconArrowLeft className="w-4 h-4" /> Буцах
       </button>
       <h1 className="text-lg font-semibold text-[#1c1917] mb-6">Машин нэмэх</h1>
@@ -261,7 +261,7 @@ export default function NewVehiclePage() {
               <div className="grid grid-cols-2 gap-1.5">
                 {[['false','Дугааргүй'],['true','Дугаартай']].map(([v, l]) => (
                   <button key={v} type="button" onClick={() => set('has_plates', v === 'true')}
-                    className={`py-2 text-xs rounded-md border transition-colors ${String(form.has_plates) === v ? 'bg-brand text-white border-brand' : 'border-[#e6e0d8] text-[#5f5a54] hover:border-[#d4ccc2]'}`}>
+                    className={`py-2.5 text-xs rounded-md border transition-colors ${String(form.has_plates) === v ? 'bg-brand text-white border-brand' : 'border-[#e6e0d8] text-[#5f5a54] hover:border-[#d4ccc2]'}`}>
                     {l}
                   </button>
                 ))}
@@ -300,7 +300,7 @@ export default function NewVehiclePage() {
               <div className="grid grid-cols-2 gap-1.5">
                 {[['PETROL','Бензин'],['DIESEL','Дизель'],['HYBRID','Хибрид'],['ELECTRIC','Цахилгаан']].map(([v,l]) => (
                   <button key={v} type="button" onClick={() => set('fuel_type', v)}
-                    className={`py-1.5 text-xs rounded-md border transition-colors ${form.fuel_type === v ? 'bg-brand text-white border-brand' : 'border-[#e6e0d8] text-[#5f5a54] hover:border-[#d4ccc2]'}`}>
+                    className={`py-2.5 text-xs rounded-md border transition-colors ${form.fuel_type === v ? 'bg-brand text-white border-brand' : 'border-[#e6e0d8] text-[#5f5a54] hover:border-[#d4ccc2]'}`}>
                     {l}
                   </button>
                 ))}
@@ -311,7 +311,7 @@ export default function NewVehiclePage() {
               <div className="grid grid-cols-2 gap-1.5">
                 {[['AUTO','Автомат'],['MANUAL','Механик']].map(([v,l]) => (
                   <button key={v} type="button" onClick={() => set('transmission', v)}
-                    className={`py-1.5 text-xs rounded-md border transition-colors ${form.transmission === v ? 'bg-brand text-white border-brand' : 'border-[#e6e0d8] text-[#5f5a54] hover:border-[#d4ccc2]'}`}>
+                    className={`py-2.5 text-xs rounded-md border transition-colors ${form.transmission === v ? 'bg-brand text-white border-brand' : 'border-[#e6e0d8] text-[#5f5a54] hover:border-[#d4ccc2]'}`}>
                     {l}
                   </button>
                 ))}

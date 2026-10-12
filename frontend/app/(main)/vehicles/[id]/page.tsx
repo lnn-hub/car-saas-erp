@@ -282,7 +282,7 @@ function VehicleDetailContent() {
     <div className="px-4 sm:px-8 py-5 sm:py-7 max-w-2xl mx-auto space-y-5">
       <button
         onClick={() => router.back()}
-        className="flex items-center gap-1.5 text-[#6f6a64] hover:text-[#1c1917] text-sm transition-colors"
+        className="flex items-center gap-1.5 py-2 pr-3 text-[#6f6a64] hover:text-[#1c1917] text-sm transition-colors"
       >
         <IconArrowLeft className="w-4 h-4" /> Буцах
       </button>
@@ -347,7 +347,7 @@ function VehicleDetailContent() {
             <input ref={photoRef} type="file" accept="image/*" multiple className="hidden"
               onChange={(e) => addPhotos(e.target.files)} />
             <button type="button" onClick={() => photoRef.current?.click()} disabled={!!photoBusy}
-              className="text-xs font-medium text-brand hover:text-brand-dark disabled:opacity-40">
+              className="text-xs font-medium text-brand hover:text-brand-dark disabled:opacity-40 px-3 py-2 -mr-3">
               {photoBusy || "+ Зураг нэмэх"}
             </button>
           </div>
@@ -363,10 +363,10 @@ function VehicleDetailContent() {
                 <div className="absolute inset-x-0 bottom-0 flex gap-1 p-1.5 bg-gradient-to-t from-black/70 to-transparent opacity-100 sm:opacity-0 sm:group-hover:opacity-100 transition-opacity">
                   {!img.is_main && (
                     <button type="button" onClick={() => makeMain(img.id)}
-                      className="flex-1 bg-white/90 hover:bg-white text-[#111] text-xs font-bold py-1 rounded-sm">Үндсэн болгох</button>
+                      className="flex-1 bg-white/90 hover:bg-white text-[#111] text-xs font-bold py-2 rounded-sm">Үндсэн болгох</button>
                   )}
                   <button type="button" onClick={() => removePhoto(img.id)}
-                    className="bg-white/90 hover:bg-brand hover:text-white text-brand text-xs font-bold px-2.5 py-1 rounded-sm">Устгах</button>
+                    className="bg-white/90 hover:bg-brand hover:text-white text-brand text-xs font-bold px-3 py-2 rounded-sm">Устгах</button>
                 </div>
               </div>
             ))}
@@ -411,7 +411,7 @@ function VehicleDetailContent() {
           <span className="text-xs font-medium text-[#6f6a64]">Мэдээлэл засах</span>
           {!editOpen && (
             <button type="button" onClick={openEdit}
-              className="text-xs font-medium text-brand hover:text-brand-dark">Засах</button>
+              className="text-xs font-medium text-brand hover:text-brand-dark px-3 py-2 -mr-3">Засах</button>
           )}
         </div>
         {editOpen && (
@@ -463,7 +463,7 @@ function VehicleDetailContent() {
                 key={s}
                 onClick={() => changeStatus(s)}
                 disabled={vehicle.status === s}
-                className={`px-3 py-1.5 rounded-md text-sm transition-colors border ${
+                className={`px-3.5 py-2.5 rounded-md text-sm transition-colors border ${
                   vehicle.status === s
                     ? "border-[#e6e0d8] bg-[#f3efe9] text-[#6f6a64] cursor-default"
                     : "border-[#e6e0d8] text-[#5f5a54] hover:border-[#d4ccc2] hover:text-[#1c1917]"
@@ -576,7 +576,7 @@ function VehicleDetailContent() {
             </div>
             <button
               type="submit"
-              className="px-3.5 py-1.5 text-sm bg-brand hover:bg-brand-dark text-white rounded-md font-medium transition-colors"
+              className="px-4 py-2.5 text-sm bg-brand hover:bg-brand-dark text-white rounded-md font-medium transition-colors"
             >
               Нэмэх
             </button>

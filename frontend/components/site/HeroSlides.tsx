@@ -47,8 +47,10 @@ export function HeroSlides({ vehicles }: { vehicles: Vehicle[] }) {
                 key={v.id}
                 onClick={() => setI(k)}
                 aria-label={`${k + 1}-р зураг`}
-                className={`h-1.5 rounded-full transition-all ${k === i ? "w-8 bg-white" : "w-3 bg-white/40 hover:bg-white/70"}`}
-              />
+                className="py-3 px-1.5"
+              >
+                <span className={`block h-1.5 rounded-full transition-all ${k === i ? "w-8 bg-white" : "w-3 bg-white/40 hover:bg-white/70"}`} />
+              </button>
             ))}
           </div>
         )}

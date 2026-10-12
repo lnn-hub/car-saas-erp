@@ -104,13 +104,13 @@ export default function VehiclesPage() {
           </div>
           {ALL_STATUSES.map(s => (
             <button key={s} onClick={() => toggleStatus(s)}
-              className={`shrink-0 flex items-center gap-1 px-2 py-1.5 rounded-md text-xs transition-colors border ${
+              className={`shrink-0 flex items-center gap-1.5 px-3 py-2.5 rounded-md text-xs transition-colors border ${
                 statusFilter.includes(s)
                   ? 'border-[#d4ccc2] bg-[#f3efe9] text-[#1c1917]'
                   : 'border-transparent text-[#6f6a64]'
               }`}>
               <span className={`w-1.5 h-1.5 rounded-full ${STATUS[s].dot}`} />
-              <span className="hidden sm:inline">{STATUS[s].label}</span>
+              <span>{STATUS[s].label}</span>
             </button>
           ))}
         </div>

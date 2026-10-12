@@ -40,22 +40,22 @@ export function CompareModal({ vehicles, onClose, onRemove }: {
         </div>
 
         <div className="overflow-auto">
-          <table className="w-full text-sm table-fixed min-w-[520px]">
+          <table className="w-full text-[13px] sm:text-sm table-fixed">
             <thead>
               <tr>
-                <th className="w-28 sm:w-36" />
+                <th className="w-[64px] sm:w-36" />
                 {vehicles.map((v) => {
                   const src = optimizeImg(v.main_image, 480);
                   return (
-                    <th key={v.id} className="p-3 align-top text-left font-normal">
+                    <th key={v.id} className="p-1.5 sm:p-3 align-top text-left font-normal">
                       <div className="aspect-[4/3] bg-zinc-100 rounded-sm overflow-hidden mb-2">
                         {src && <img src={src} alt="" className="w-full h-full object-cover" />}
                       </div>
                       <div className="text-xs text-brand font-medium">{v.brand}</div>
                       <div className="text-sm font-semibold text-[#111] leading-tight">{v.model}</div>
-                      <div className="flex items-center gap-3 mt-1.5">
-                        <Link href={`/vehicle/${v.id}`} className="text-xs text-zinc-600 hover:text-brand underline-offset-2 hover:underline">Дэлгэрэнгүй</Link>
-                        <button onClick={() => onRemove(v.id)} className="text-xs text-zinc-500 hover:text-brand">Хасах</button>
+                      <div className="flex flex-col items-start sm:flex-row sm:items-center gap-0 sm:gap-3 mt-1">
+                        <Link href={`/vehicle/${v.id}`} className="py-1.5 text-xs text-zinc-600 hover:text-brand underline-offset-2 hover:underline">Дэлгэрэнгүй</Link>
+                        <button onClick={() => onRemove(v.id)} className="py-1.5 text-xs text-zinc-500 hover:text-brand">Хасах</button>
                       </div>
                     </th>
                   );
@@ -68,9 +68,9 @@ export function CompareModal({ vehicles, onClose, onRemove }: {
                 const differs = new Set(vals).size > 1;
                 return (
                   <tr key={label} className="border-t border-zinc-100">
-                    <td className="px-3 py-3 text-xs text-zinc-500 align-top">{label}</td>
+                    <td className="px-1.5 sm:px-3 py-3 text-xs text-zinc-500 align-top">{label}</td>
                     {vals.map((val, i) => (
-                      <td key={i} className={`px-3 py-3 align-top ${differs ? "font-semibold text-[#111]" : "text-zinc-600"}`}>{val}</td>
+                      <td key={i} className={`px-1.5 sm:px-3 py-3 align-top break-words ${differs ? "font-semibold text-[#111]" : "text-zinc-600"}`}>{val}</td>
                     ))}
                   </tr>
                 );

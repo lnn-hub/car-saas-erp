@@ -147,7 +147,7 @@ export default function DashboardPage() {
         <div className="bg-white rounded-xl border border-[#e6e0d8] overflow-hidden shadow-sm">
           <div className="px-5 py-3.5 border-b border-[#e6e0d8] flex items-center justify-between">
             <span className="text-xs font-medium text-[#1c1917]">Сүүлд нэмэгдсэн</span>
-            <Link href="/vehicles" className="text-xs text-[#6f6a64] hover:text-[#1c1917] transition-colors font-medium">
+            <Link href="/vehicles" className="text-xs text-[#6f6a64] hover:text-[#1c1917] transition-colors font-medium px-3 py-2.5 -mr-3">
               Бүгд →
             </Link>
           </div>

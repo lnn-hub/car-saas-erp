@@ -55,7 +55,7 @@ export default function LoginPage() {
         </form>
 
         <p className="text-center text-xs text-[#6f6a64] mt-6">
-          <Link href="/" className="hover:text-brand transition-colors">← Вэбсайт руу буцах</Link>
+          <Link href="/" className="inline-block py-3 px-3 hover:text-brand transition-colors">← Вэбсайт руу буцах</Link>
         </p>
       </div>
     </div>

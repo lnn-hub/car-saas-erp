@@ -292,7 +292,7 @@ function HomeContent({ initial }: { initial: SiteInitial | null }) {
             <select
               value={filterBrand}
               onChange={(e) => setBrand(e.target.value)}
-              className="shrink-0 px-3 py-1.5 border border-gray-200 rounded-full text-xs text-gray-600 focus:outline-none focus:border-brand bg-white transition-colors font-semibold"
+              className="shrink-0 px-3 py-2.5 border border-gray-200 rounded-full text-xs text-gray-600 focus:outline-none focus:border-brand bg-white transition-colors font-semibold"
             >
               <option value="">Бүх марк</option>
               {uniqueBrands.map((b) => (
@@ -305,7 +305,7 @@ function HomeContent({ initial }: { initial: SiteInitial | null }) {
               <select
                 value={filterPrice}
                 onChange={(e) => setPrice(e.target.value)}
-                className="shrink-0 px-3 py-1.5 border border-gray-200 rounded-full text-xs text-gray-600 focus:outline-none focus:border-brand bg-white transition-colors font-semibold"
+                className="shrink-0 px-3 py-2.5 border border-gray-200 rounded-full text-xs text-gray-600 focus:outline-none focus:border-brand bg-white transition-colors font-semibold"
               >
                 <option value="">Бүх үнэ</option>
                 {PRICE_RANGES.map((r) => (
@@ -318,7 +318,7 @@ function HomeContent({ initial }: { initial: SiteInitial | null }) {
             <select
               value={sortBy}
               onChange={(e) => setSort(e.target.value)}
-              className="shrink-0 px-3 py-1.5 border border-gray-200 rounded-full text-xs text-gray-600 focus:outline-none focus:border-brand bg-white transition-colors font-semibold"
+              className="shrink-0 px-3 py-2.5 border border-gray-200 rounded-full text-xs text-gray-600 focus:outline-none focus:border-brand bg-white transition-colors font-semibold"
             >
               {SORTS.filter((o) => hasPrices || !o.key.startsWith("price")).map((o) => (
                 <option key={o.key} value={o.key}>
@@ -332,7 +332,7 @@ function HomeContent({ initial }: { initial: SiteInitial | null }) {
               <button
                 key={k}
                 onClick={() => setFilterFuel(filterFuel === k ? "" : k)}
-                className={`shrink-0 px-3 py-1.5 rounded-full text-xs font-semibold border transition-colors ${
+                className={`shrink-0 px-3 py-2.5 rounded-full text-xs font-semibold border transition-colors ${
                   filterFuel === k
                     ? "bg-brand border-brand text-white"
                     : "border-gray-200 text-gray-500"
@@ -352,7 +352,7 @@ function HomeContent({ initial }: { initial: SiteInitial | null }) {
                   <button
                     key={k}
                     onClick={() => setFilterTrans(filterTrans === k ? "" : k)}
-                    className={`shrink-0 px-3 py-1.5 rounded-full text-xs font-semibold border transition-colors ${
+                    className={`shrink-0 px-3 py-2.5 rounded-full text-xs font-semibold border transition-colors ${
                       filterTrans === k
                         ? "bg-[#111] border-[#111] text-white"
                         : "border-gray-200 text-gray-500"
@@ -371,7 +371,7 @@ function HomeContent({ initial }: { initial: SiteInitial | null }) {
                   setBrand("");
                   setPrice("");
                 }}
-                className="shrink-0 ml-auto px-3 py-1.5 rounded-full text-xs text-gray-500 border border-gray-200"
+                className="shrink-0 ml-auto px-3 py-2.5 rounded-full text-xs text-gray-500 border border-gray-200"
               >
                 × Цэвэрлэх
               </button>
@@ -488,7 +488,7 @@ function HomeContent({ initial }: { initial: SiteInitial | null }) {
                       <button
                         type="button"
                         onClick={(e) => { e.preventDefault(); e.stopPropagation(); toggleCompare(v.id); }}
-                        className={`absolute bottom-2 left-2 z-10 flex items-center gap-1.5 text-xs font-medium px-2 py-1 rounded-sm transition-colors ${compare.includes(v.id) ? "bg-brand text-white" : "bg-white/90 text-zinc-700 hover:bg-white"} ${compare.includes(v.id) ? "" : "sm:opacity-0 sm:group-hover:opacity-100"}`}
+                        className={`absolute bottom-2 left-2 z-10 flex items-center gap-1.5 text-xs font-medium px-2.5 py-2 rounded-sm transition-colors ${compare.includes(v.id) ? "bg-brand text-white" : "bg-white/90 text-zinc-700 hover:bg-white"} ${compare.includes(v.id) ? "" : "sm:opacity-0 sm:group-hover:opacity-100"}`}
                       >
                         <span className={`w-3 h-3 rounded-[2px] border flex items-center justify-center ${compare.includes(v.id) ? "border-white bg-white text-brand" : "border-zinc-400"}`}>
                           {compare.includes(v.id) && <svg className="w-2.5 h-2.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={4}><path d="M20 6L9 17l-5-5" /></svg>}
@@ -586,7 +586,7 @@ function HomeContent({ initial }: { initial: SiteInitial | null }) {
         id="contact"
         className="py-16 sm:py-24 px-4 bg-[#f6f3ef] border-t border-zinc-200"
       >
-        <div className="max-w-7xl mx-auto grid lg:grid-cols-[1fr_1.3fr] gap-10 lg:gap-16 items-start">
+        <div className="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-[1fr_1.3fr] gap-10 lg:gap-16 items-start">
           <div>
             <div className="text-xs font-semibold text-brand mb-3">
               Холбоо барих

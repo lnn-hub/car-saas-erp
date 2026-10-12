@@ -49,7 +49,7 @@ export function SalesChart({ sales }: { sales: Sale[] | null }) {
           <div className="text-xs text-[#6f6a64] mt-0.5">Сүүлийн {MONTHS} сар{total > 0 ? ` · нийт ${fmtCompact(total)}₮` : ""}</div>
         </div>
         <button type="button" onClick={() => setTable((v) => !v)}
-          className="text-xs font-medium text-[#5f5a54] hover:text-brand border border-[#e6e0d8] hover:border-brand rounded-md px-3 py-1.5 transition-colors">
+          className="text-xs font-medium text-[#5f5a54] hover:text-brand border border-[#e6e0d8] hover:border-brand rounded-md px-3.5 py-2.5 transition-colors">
           {table ? "График" : "Хүснэгт"}
         </button>
       </div>

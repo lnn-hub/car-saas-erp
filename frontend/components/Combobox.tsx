@@ -54,7 +54,7 @@ export function Combobox({ value, onChange, options, placeholder, className = ''
       />
       <button type="button" tabIndex={-1}
         onClick={() => { setOpen(!open); inputRef.current?.focus(); }}
-        className="absolute right-2.5 top-1/2 -translate-y-1/2 text-[#6f6a64] hover:text-[#1c1917] transition-colors">
+        className="absolute right-0 top-0 h-full w-10 flex items-center justify-center text-[#6f6a64] hover:text-[#1c1917] transition-colors">
         <svg className={`w-4 h-4 transition-transform ${open ? 'rotate-180' : ''}`} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2}><path d="M6 9l6 6 6-6"/></svg>
       </button>
 

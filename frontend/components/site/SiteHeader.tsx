@@ -151,13 +151,13 @@ export function SiteHeader({ company }: { company: Company | null }) {
       <header className="sticky top-0 z-50 bg-white shadow-sm">
         {/* Top bar */}
         <div className="bg-brand text-white text-xs">
-          <div className="max-w-7xl mx-auto px-4 h-8 flex items-center justify-between">
+          <div className="max-w-7xl mx-auto px-4 h-9 flex items-center justify-between">
             <span className="opacity-80 font-mono tracking-wide">{clock}</span>
             <div className="flex items-center gap-4">
               {company?.phone && (
                 <a
                   href={`tel:${company.phone}`}
-                  className="flex items-center gap-1.5 font-semibold"
+                  className="flex items-center gap-1.5 font-semibold h-9"
                 >
                   <IcPhone cls="w-3 h-3" />
                   {company.phone}

@@ -184,7 +184,7 @@ export default function SettingsPage() {
 
       <form onSubmit={handleSubmit} className="space-y-5">
         <Section title="Холбоо барих мэдээлэл" hint="Нүүр хуудсанд харагдана">
-          <div className="p-5 grid sm:grid-cols-2 gap-4">
+          <div className="p-5 grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div className="sm:col-span-2">
               <label className="text-xs text-[#5f5a54] block mb-1.5">Компанийн нэр</label>
               <input value={form.name} onChange={e => set('name', e.target.value)} placeholder="Компанийн нэр" className={inp} required />
@@ -215,7 +215,7 @@ export default function SettingsPage() {
               <div className="text-xs text-[#6f6a64] mt-0.5">Үйлчлүүлэгчид машины үнийг харуулах эсэх</div>
             </div>
             <button type="button" onClick={() => set('show_prices', !form.show_prices)}
-              className={`relative w-11 h-6 rounded-full transition-colors shrink-0 ${form.show_prices ? 'bg-brand' : 'bg-[#e6e0d8]'}`}>
+              className={`relative w-11 h-6 rounded-full transition-colors shrink-0 before:content-[''] before:absolute before:-inset-3 ${form.show_prices ? 'bg-brand' : 'bg-[#e6e0d8]'}`}>
               <span className={`absolute top-1 w-4 h-4 bg-white rounded-full shadow transition-all ${form.show_prices ? 'left-6' : 'left-1'}`} />
             </button>
           </div>
@@ -243,15 +243,15 @@ export default function SettingsPage() {
                 <div className="text-sm font-bold text-[#1c1917] truncate">{m.name}</div>
                 <div className="text-xs text-[#5f5a54] truncate">{m.position || '—'}</div>
               </div>
-              <button onClick={() => openMember(m)} className="text-xs font-semibold text-[#5f5a54] hover:text-brand px-2 py-1">Засах</button>
-              <button onClick={() => removeMember(m)} className="text-xs font-semibold text-[#6f6a64] hover:text-brand px-2 py-1">Хасах</button>
+              <button onClick={() => openMember(m)} className="text-xs font-semibold text-[#5f5a54] hover:text-brand px-3 py-2.5">Засах</button>
+              <button onClick={() => removeMember(m)} className="text-xs font-semibold text-[#6f6a64] hover:text-brand px-3 py-2.5">Хасах</button>
             </div>
           ))}
           {team.length === 0 && <div className="px-5 py-8 text-center text-sm text-[#6f6a64]">Гишүүн нэмээгүй байна</div>}
         </div>
         <div className="p-4 border-t border-[#e6e0d8] bg-[#faf8f5]">
           <button type="button" onClick={() => openMember('new')}
-            className="text-xs font-medium text-brand hover:text-brand-dark">+ Гишүүн нэмэх</button>
+            className="text-xs font-medium text-brand hover:text-brand-dark py-2.5 pr-3">+ Гишүүн нэмэх</button>
         </div>
       </Section>
 

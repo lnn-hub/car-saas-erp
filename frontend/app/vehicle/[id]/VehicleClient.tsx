@@ -161,11 +161,11 @@ function VehicleContent({ id, initial }: { id: string; initial: VehicleDetail | 
       <div className="bg-white border-b border-zinc-200">
         <div className="max-w-7xl mx-auto px-4 h-11 flex items-center gap-3 text-xs font-semibold uppercase tracking-[0.12em] text-zinc-500">
           <button onClick={() => router.back()}
-            className="flex items-center gap-1.5 text-[#111] hover:text-brand transition-colors">
+            className="flex items-center gap-1.5 h-11 text-[#111] hover:text-brand transition-colors">
             {Ic.back} Буцах
           </button>
           <span className="text-zinc-300">|</span>
-          <Link href="/#cars" className="hover:text-brand transition-colors">Машинууд</Link>
+          <Link href="/#cars" className="inline-flex items-center h-11 hover:text-brand transition-colors">Машинууд</Link>
           <span className="text-zinc-300">/</span>
           <span className="text-brand truncate">{v.brand} {v.model}</span>
         </div>
@@ -315,7 +315,7 @@ function VehicleContent({ id, initial }: { id: string; initial: VehicleDetail | 
                   <div className="w-1 h-5 bg-brand rounded-full" />
                   <h2 className="font-semibold text-[#111] text-sm">Онцлох тоноглол</h2>
                 </div>
-                <ul className="grid sm:grid-cols-2 gap-x-6 gap-y-3 p-5">
+                <ul className="grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-3 p-5">
                   {features.map((f) => (
                     <li key={f} className="flex items-start gap-3 text-sm text-gray-700">
                       <span className="mt-0.5 w-5 h-5 shrink-0 bg-brand-soft text-brand rounded-sm flex items-center justify-center">{Ic.check}</span>
@@ -426,7 +426,7 @@ function VehicleContent({ id, initial }: { id: string; initial: VehicleDetail | 
                 <div className="text-xs font-semibold text-brand mb-2">Бусад машинууд</div>
                 <h2 className="text-2xl sm:text-3xl font-bold text-[#111]">Танд таалагдаж магадгүй</h2>
               </div>
-              <Link href="/#cars" className="text-xs font-semibold text-brand hover:text-brand-dark whitespace-nowrap">Бүгдийг үзэх →</Link>
+              <Link href="/#cars" className="py-3 text-xs font-semibold text-brand hover:text-brand-dark whitespace-nowrap">Бүгдийг үзэх →</Link>
             </div>
             <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-5">
               {others.map((o) => {

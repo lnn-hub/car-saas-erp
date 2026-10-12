@@ -26,7 +26,7 @@ function AboutContent({ initial }: { initial: SiteInitial | null }) {
         </div>
         <div className="relative max-w-7xl mx-auto px-4 py-14 sm:py-24">
           <nav className="text-xs font-semibold text-white/50 mb-4">
-            <a href="/" className="hover:text-white transition-colors">Нүүр</a>
+            <a href="/" className="inline-block py-3 pr-1 hover:text-white transition-colors">Нүүр</a>
             <span className="mx-2">/</span>
             <span className="text-brand-light">Бидний тухай</span>
           </nav>
@@ -42,7 +42,7 @@ function AboutContent({ initial }: { initial: SiteInitial | null }) {
         id="about"
         className="py-16 sm:py-24 px-4 bg-white border-t border-zinc-200"
       >
-        <div className="max-w-7xl mx-auto grid lg:grid-cols-2 gap-10 lg:gap-16 items-center">
+        <div className="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-2 gap-10 lg:gap-16 items-center">
           <div>
             <div className="text-xs font-semibold text-brand mb-3">
               Бидний тухай
