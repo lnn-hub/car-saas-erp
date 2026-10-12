@@ -26,9 +26,17 @@ app.use('/api/admin',     require('./routes/admin'));
 app.use('/api/upload',    require('./routes/upload'));
 app.use('/uploads',       require('express').static(require('path').join(__dirname, '../uploads')));
 
-app.get('/health', (_, res) => res.json({ status: 'ok' }));
+const pool = require('./db/pool');
+app.get('/health', async (_, res) => {
+  try { await pool.query('SELECT 1'); res.json({ status: 'ok', db: true }); }
+  catch { res.json({ status: 'ok', db: false }); }
+});
 
 const PORT = process.env.PORT || 4000;
 require('./db/ensureSchema')()
   .catch(err => console.error('Schema шинэчлэхэд алдаа:', err.message))
-  .finally(() => app.listen(PORT, () => console.log(`Server ажиллаж байна: http://localhost:${PORT}`)));
+  .finally(() => {
+    app.listen(PORT, () => console.log(`Server ажиллаж байна: http://localhost:${PORT}`));
+    // Neon үнэгүй сервер 5 минут ажиллаагүй бол унтдаг тул тогтмол сэрээнэ
+    setInterval(() => pool.query('SELECT 1').catch(() => {}), 3 * 60 * 1000);
+  });

@@ -25,22 +25,13 @@ router.get('/', auth, async (req, res) => {
 // GET /api/vehicles/:id — нэг машин + зардлууд
 router.get('/:id', auth, async (req, res) => {
   try {
-    const { rows } = await pool.query(
-      'SELECT * FROM vehicles WHERE id = $1 AND company_id = $2',
-      [req.params.id, req.user.company_id]
-    );
-    if (!rows[0]) return res.status(404).json({ error: 'Машин олдсонгүй' });
-
-    const costs = await pool.query(
-      'SELECT * FROM vehicle_costs WHERE vehicle_id = $1 ORDER BY created_at',
-      [req.params.id]
-    );
-    const images = await pool.query(
-      'SELECT * FROM vehicle_images WHERE vehicle_id = $1 ORDER BY sort_order',
-      [req.params.id]
-    );
-
-    res.json({ ...rows[0], costs: costs.rows, images: images.rows });
+    const [vehicle, costs, images] = await Promise.all([
+      pool.query('SELECT * FROM vehicles WHERE id = $1 AND company_id = $2', [req.params.id, req.user.company_id]),
+      pool.query('SELECT * FROM vehicle_costs WHERE vehicle_id = $1 ORDER BY created_at', [req.params.id]),
+      pool.query('SELECT * FROM vehicle_images WHERE vehicle_id = $1 ORDER BY sort_order', [req.params.id]),
+    ]);
+    if (!vehicle.rows[0]) return res.status(404).json({ error: 'Машин олдсонгүй' });
+    res.json({ ...vehicle.rows[0], costs: costs.rows, images: images.rows });
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
