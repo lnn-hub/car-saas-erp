@@ -1,12 +1,12 @@
 "use client";
 import { useEffect, useState } from "react";
-import { BACKEND, Company, TeamMember, Vehicle } from "./site";
+import { BACKEND, Company, SiteInitial, TeamMember, Vehicle } from "./site";
 
-export function useSiteData() {
-  const [company, setCompany] = useState<Company | null>(null);
-  const [vehicles, setVehicles] = useState<Vehicle[]>([]);
-  const [team, setTeam] = useState<TeamMember[]>([]);
-  const [loading, setLoading] = useState(true);
+export function useSiteData(initial?: SiteInitial | null) {
+  const [company, setCompany] = useState<Company | null>(initial?.company ?? null);
+  const [vehicles, setVehicles] = useState<Vehicle[]>(initial?.vehicles ?? []);
+  const [team, setTeam] = useState<TeamMember[]>(initial?.team ?? []);
+  const [loading, setLoading] = useState(!initial);
   const [retrying, setRetrying] = useState(false);
 
   useEffect(() => {

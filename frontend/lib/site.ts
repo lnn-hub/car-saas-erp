@@ -34,3 +34,27 @@ export function imgUrl(u: string | null) {
   if (!u) return null;
   return u.startsWith("http") ? u : `${BACKEND}${u}`;
 }
+
+export interface SiteInitial {
+  company: Company | null;
+  vehicles: Vehicle[];
+  team: TeamMember[];
+}
+
+export interface VehicleDetail {
+  id: string; brand: string; model: string; year: number; color: string;
+  fuel_type: string; transmission: string; engine_cc: string; mileage: number;
+  description: string; has_plates: boolean; manufactured_date: string | null;
+  total_cost: string | null; images: string[];
+  company: Company;
+}
+
+// Cloudinary зургийг хэрэгтэй хэмжээгээр нь (багаар, auto format) авна
+export function optimizeImg(u: string | null, width: number) {
+  const url = imgUrl(u);
+  if (!url) return null;
+  if (url.includes("res.cloudinary.com") && url.includes("/upload/") && !url.includes("/upload/f_auto")) {
+    return url.replace("/upload/", `/upload/f_auto,q_auto,w_${width}/`);
+  }
+  return url;
+}
