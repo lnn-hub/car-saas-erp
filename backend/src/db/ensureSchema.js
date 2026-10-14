@@ -7,6 +7,22 @@ const DEMO_TEAM = [
   ['Оюунчимэг Дорж', 'Үйлчилгээний зөвлөх', 'Үйлчлүүлэгчийн асуулт, үзэх цаг товлох болон худалдааны дараах үйлчилгээг хариуцна.'],
 ];
 
+// Олон компани, олон зурагтай үед удаашрахаас сэргийлэх индексүүд (дахин ажиллуулахад аюулгүй)
+const INDEXES = [
+  'CREATE INDEX IF NOT EXISTS idx_vehicle_images_vehicle ON vehicle_images(vehicle_id, sort_order)',
+  'CREATE INDEX IF NOT EXISTS idx_vehicles_company_status ON vehicles(company_id, status)',
+  'CREATE INDEX IF NOT EXISTS idx_sales_company_sold_at ON sales(company_id, sold_at)',
+  'CREATE INDEX IF NOT EXISTS idx_customers_company ON customers(company_id)',
+  'CREATE INDEX IF NOT EXISTS idx_team_members_company ON team_members(company_id, sort_order)',
+];
+
+async function ensureIndexes() {
+  for (const sql of INDEXES) {
+    try { await pool.query(sql); }
+    catch (err) { console.error('Индекс үүсгэхэд алдаа:', err.message); }
+  }
+}
+
 async function ensureSchema() {
   await pool.query(`
     ALTER TABLE companies
@@ -54,4 +70,7 @@ async function ensureSchema() {
   }
 }
 
-module.exports = ensureSchema;
+module.exports = async function run() {
+  await ensureSchema();
+  await ensureIndexes();
+};
