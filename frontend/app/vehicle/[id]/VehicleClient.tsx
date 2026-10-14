@@ -2,7 +2,7 @@
 import { useEffect, useState, Suspense } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
-import { BACKEND as API, optimizeImg, VehicleDetail } from '@/lib/site';
+import { BACKEND as API, companyQuery, optimizeImg, VehicleDetail } from '@/lib/site';
 import { useCompany } from '@/lib/useSiteData';
 import { SiteHeader } from '@/components/site/SiteHeader';
 import { SiteFooter } from '@/components/site/SiteFooter';
@@ -60,7 +60,7 @@ function VehicleContent({ id, initial }: { id: string; initial: VehicleDetail | 
     const prevTitle = document.title;
     async function load(retry = 0) {
       try {
-        const r = await fetch(`${BACKEND}/api/public/vehicles/${id}`);
+        const r = await fetch(`${BACKEND}/api/public/vehicles/${id}${companyQuery()}`);
         const d = await r.json();
         if (cancelled) return;
         if (!d.error) {
@@ -75,7 +75,7 @@ function VehicleContent({ id, initial }: { id: string; initial: VehicleDetail | 
       }
     }
     fetch(`${BACKEND}/health`).catch(() => {});
-    fetch(`${API}/api/public/vehicles`)
+    fetch(`${API}/api/public/vehicles${companyQuery()}`)
       .then(r => r.json())
       .then(d => { if (!cancelled) setOthers((d.vehicles || []).filter((x: Other) => x.id !== id).slice(0, 4)); })
       .catch(() => {});
@@ -116,6 +116,7 @@ function VehicleContent({ id, initial }: { id: string; initial: VehicleDetail | 
     </div>
   );
 
+  const leasingOn = v.company?.features?.leasing !== false;
   const fullImgs = v.images?.length ? v.images.map(u => imgSrc(u, 2000)) : [];
   const thumbs = v.images?.length ? v.images.map(u => imgSrc(u, 240)) : [];
   const imgs  = v.images?.length
@@ -353,11 +354,11 @@ function VehicleContent({ id, initial }: { id: string; initial: VehicleDetail | 
               </div>
 
               {/* Leasing calculator */}
-              <button type="button" onClick={() => setCalcOpen(true)}
+              {leasingOn && <button type="button" onClick={() => setCalcOpen(true)}
                 className="w-full mb-4 flex items-center justify-center gap-2 border border-zinc-300 hover:border-brand hover:text-brand text-zinc-700 text-sm font-medium py-2.5 rounded-sm transition-colors">
                 <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.8}><rect x="4" y="2" width="16" height="20" rx="2"/><path d="M8 6h8M8 11h2M14 11h2M8 15h2M14 15h2M8 19h2M14 19h2"/></svg>
                 Лизингийн тооцоолол
-              </button>
+              </button>}
 
               {/* Quick specs */}
               <div className="grid grid-cols-2 gap-2 mb-5">
@@ -454,17 +455,17 @@ function VehicleContent({ id, initial }: { id: string; initial: VehicleDetail | 
 
       <Lightbox images={fullImgs} index={lightbox} onClose={() => setLightbox(null)} onIndex={(i) => { setLightbox(i); setIdx(i); }} />
 
-      <LeasingCalculator open={calcOpen} onClose={() => setCalcOpen(false)}
+      {leasingOn && <LeasingCalculator open={calcOpen} onClose={() => setCalcOpen(false)}
         price={price ? Number(v.total_cost) : null}
-        carName={`${v.year} ${v.brand} ${v.model}`} phone={v.company?.phone} />
+        carName={`${v.year} ${v.brand} ${v.model}`} phone={v.company?.phone} />}
 
       {/* Mobile sticky bottom call bar */}
       {v.company?.phone && (
         <div className="fixed bottom-0 left-0 right-0 z-50 lg:hidden bg-white border-t border-zinc-200 shadow-[0_-4px_16px_rgba(0,0,0,0.08)] px-4 pt-3 pb-[calc(0.75rem+env(safe-area-inset-bottom))] flex gap-2">
-          <button type="button" onClick={() => setCalcOpen(true)} aria-label="Лизингийн тооцоолол"
+          {leasingOn && <button type="button" onClick={() => setCalcOpen(true)} aria-label="Лизингийн тооцоолол"
             className="shrink-0 w-12 flex items-center justify-center border border-zinc-300 text-zinc-700 active:bg-zinc-50 rounded-sm">
             <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.8}><rect x="4" y="2" width="16" height="20" rx="2"/><path d="M8 6h8M8 11h2M14 11h2M8 15h2M14 15h2M8 19h2M14 19h2"/></svg>
-          </button>
+          </button>}
           <a href={`tel:${v.company.phone}`}
             className="flex-1 flex items-center justify-center gap-2 bg-brand active:bg-brand-dark text-white text-sm font-medium py-3 rounded-sm">
             {Ic.phone} Залгах

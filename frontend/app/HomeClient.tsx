@@ -125,6 +125,7 @@ function HomeContent({ initial }: { initial: SiteInitial | null }) {
   const [compareOpen, setCompareOpen] = useState(false);
   const toggleCompare = (id: string) =>
     setCompare((c) => (c.includes(id) ? c.filter((x) => x !== id) : c.length >= 3 ? c : [...c, id]));
+  const compareOn = company?.features?.compare !== false;
   const compared = vehicles.filter((v) => compare.includes(v.id));
   const [sortBy, setSort] = useState("");
 
@@ -485,7 +486,7 @@ function HomeContent({ initial }: { initial: SiteInitial | null }) {
                           </svg>
                         </div>
                       )}
-                      <button
+                      {compareOn && <button
                         type="button"
                         onClick={(e) => { e.preventDefault(); e.stopPropagation(); toggleCompare(v.id); }}
                         className={`absolute bottom-2 left-2 z-10 flex items-center gap-1.5 text-xs font-medium px-2.5 py-2 rounded-sm transition-colors ${compare.includes(v.id) ? "bg-brand text-white" : "bg-white/90 text-zinc-700 hover:bg-white"} ${compare.includes(v.id) ? "" : "sm:opacity-0 sm:group-hover:opacity-100"}`}
@@ -494,7 +495,7 @@ function HomeContent({ initial }: { initial: SiteInitial | null }) {
                           {compare.includes(v.id) && <svg className="w-2.5 h-2.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={4}><path d="M20 6L9 17l-5-5" /></svg>}
                         </span>
                         Харьцуулах
-                      </button>
+                      </button>}
                       {/* Year badge */}
                       <div className="absolute top-2 left-2 bg-[#111]/85 text-white text-xs sm:text-xs font-bold tracking-wider px-2 py-0.5 rounded-sm">
                         {v.year}
@@ -708,7 +709,7 @@ function HomeContent({ initial }: { initial: SiteInitial | null }) {
 
       <SiteCta company={company} />
       <SiteFooter company={company} />
-      {compare.length > 0 && (
+      {compareOn && compare.length > 0 && (
         <div className="fixed left-1/2 -translate-x-1/2 bottom-[88px] lg:bottom-6 z-40 bg-[#111] text-white rounded-sm shadow-2xl flex items-center gap-3 sm:gap-4 pl-4 pr-2 py-2 max-w-[calc(100vw-24px)]">
           <span className="text-sm whitespace-nowrap">{compare.length} машин сонгосон</span>
           <button onClick={() => setCompare([])} className="text-xs text-white/60 hover:text-white whitespace-nowrap">Цэвэрлэх</button>

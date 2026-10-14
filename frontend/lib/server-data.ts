@@ -1,5 +1,5 @@
 import { cacheLife } from "next/cache";
-import type { SiteInitial, VehicleDetail } from "./site";
+import { companyQuery, type SiteInitial, type VehicleDetail } from "./site";
 
 const API = process.env.NEXT_PUBLIC_API_URL || "http://localhost:4000";
 
@@ -17,9 +17,9 @@ export async function getSiteData(): Promise<SiteInitial | null> {
   let data: SiteInitial | null = null;
   try {
     const [company, vehicles, team] = await Promise.all([
-      getJson("/api/public"),
-      getJson("/api/public/vehicles"),
-      getJson("/api/public/team").catch(() => []),
+      getJson(`/api/public${companyQuery()}`),
+      getJson(`/api/public/vehicles${companyQuery()}`),
+      getJson(`/api/public/team${companyQuery()}`).catch(() => []),
     ]);
     data = {
       company: company?.error ? null : company,
@@ -36,7 +36,7 @@ export async function getVehicle(id: string): Promise<VehicleDetail | null> {
   "use cache";
   let data: VehicleDetail | null = null;
   try {
-    const v = await getJson(`/api/public/vehicles/${encodeURIComponent(id)}`);
+    const v = await getJson(`/api/public/vehicles/${encodeURIComponent(id)}${companyQuery()}`);
     data = v?.error ? null : v;
   } catch {}
   if (data) cacheLife({ stale: 30, revalidate: 60, expire: 60 * 60 * 24 });

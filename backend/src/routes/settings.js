@@ -1,15 +1,19 @@
 const router = require('express').Router();
 const pool = require('../db/pool');
 const auth = require('../middleware/auth');
+const { resolveFeatures } = require('../utils/features');
 
 // GET /api/settings — компанийн тохиргоо авах
 router.get('/', auth, async (req, res) => {
   try {
     const { rows } = await pool.query(
-      'SELECT name, slug, phone, address, email, working_hours, logo_url, show_prices FROM companies WHERE id=$1',
+      `SELECT name, slug, phone, address, email, working_hours, logo_url, show_prices, plan, max_vehicles, features,
+              (SELECT COUNT(*)::int FROM vehicles WHERE company_id = $1) AS vehicle_count
+       FROM companies WHERE id=$1`,
       [req.user.company_id]
     );
-    res.json(rows[0] || {});
+    const row = rows[0];
+    res.json(row ? { ...row, features: resolveFeatures(row.features) } : {});
   } catch (err) { res.status(500).json({ error: err.message }); }
 });
 

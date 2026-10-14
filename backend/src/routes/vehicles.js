@@ -39,6 +39,13 @@ router.get('/:id', auth, async (req, res) => {
 
 // POST /api/vehicles — машин нэмэх
 router.post('/', auth, async (req, res) => {
+  try {
+    const { rows: lim } = await pool.query(
+      `SELECT c.max_vehicles, (SELECT COUNT(*)::int FROM vehicles WHERE company_id = c.id) AS cnt
+       FROM companies c WHERE c.id = $1`, [req.user.company_id]);
+    if (lim[0] && lim[0].max_vehicles != null && lim[0].cnt >= lim[0].max_vehicles)
+      return res.status(403).json({ error: `Багцын хязгаарт (${lim[0].max_vehicles} машин) хүрсэн байна. Багцаа ахиулна уу` });
+  } catch (err) { return res.status(500).json({ error: err.message }); }
   const { vin, brand, model, year, mileage, color, fuel_type, transmission, engine_cc, description,
           arrived_at, manufactured_date, has_plates } = req.body;
   if (!vin || !brand || !model || !year)

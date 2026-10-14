@@ -3,10 +3,10 @@ const express = require('express');
 const cors = require('cors');
 
 const app = express();
+// FRONTEND_URL нь таслалаар тусгаарласан олон домэйн байж болно (компани бүрийн нийтийн сайт)
+const allowedOrigins = (process.env.FRONTEND_URL || '').split(',').map(s => s.trim()).filter(Boolean);
 app.use(cors({
-  origin: process.env.FRONTEND_URL
-    ? [process.env.FRONTEND_URL, 'http://localhost:3000']
-    : true,
+  origin: allowedOrigins.length ? [...allowedOrigins, 'http://localhost:3000'] : true,
   credentials: true,
 }));
 app.use(express.json());
@@ -23,6 +23,7 @@ app.use('/api/public',    require('./routes/public'));
 app.use('/api/settings',  require('./routes/settings'));
 app.use('/api/team',      require('./routes/team'));
 app.use('/api/admin',     require('./routes/admin'));
+app.use('/api/super',     require('./routes/super'));
 app.use('/api/upload',    require('./routes/upload'));
 app.use('/uploads',       require('express').static(require('path').join(__dirname, '../uploads')));
 

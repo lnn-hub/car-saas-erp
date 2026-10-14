@@ -1,5 +1,12 @@
 export const BACKEND = process.env.NEXT_PUBLIC_API_URL || "http://localhost:4000";
 
+// Олон компанит серверт: энэ нийтийн сайт аль компанийн өгөгдлийг харуулахыг тодорхойлно.
+// Тохируулаагүй бол анхны компани (нэг компанит байршуулалт).
+export const SITE_COMPANY = process.env.NEXT_PUBLIC_SITE_COMPANY || "";
+export const companyQuery = () => (SITE_COMPANY ? `?company=${encodeURIComponent(SITE_COMPANY)}` : "");
+
+export interface Features { reports?: boolean; sales?: boolean; team?: boolean; leasing?: boolean; compare?: boolean }
+
 export interface TeamMember {
   id: string;
   name: string;
@@ -14,6 +21,7 @@ export interface Company {
   email?: string | null;
   working_hours?: string | null;
   logo_url: string | null;
+  features?: Features;
 }
 export interface Vehicle {
   id: string;

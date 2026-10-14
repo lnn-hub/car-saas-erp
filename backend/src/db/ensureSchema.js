@@ -13,6 +13,7 @@ const INDEXES = [
   'CREATE INDEX IF NOT EXISTS idx_vehicles_company_status ON vehicles(company_id, status)',
   'CREATE INDEX IF NOT EXISTS idx_sales_company_sold_at ON sales(company_id, sold_at)',
   'CREATE INDEX IF NOT EXISTS idx_customers_company ON customers(company_id)',
+  'CREATE UNIQUE INDEX IF NOT EXISTS idx_companies_slug_unique ON companies(slug) WHERE slug IS NOT NULL',
   'CREATE INDEX IF NOT EXISTS idx_team_members_company ON team_members(company_id, sort_order)',
 ];
 
@@ -28,7 +29,11 @@ async function ensureSchema() {
     ALTER TABLE companies
       ADD COLUMN IF NOT EXISTS email         VARCHAR(255),
       ADD COLUMN IF NOT EXISTS working_hours VARCHAR(255),
-      ADD COLUMN IF NOT EXISTS about_text    TEXT
+      ADD COLUMN IF NOT EXISTS about_text    TEXT,
+      ADD COLUMN IF NOT EXISTS is_active      BOOLEAN NOT NULL DEFAULT TRUE,
+      ADD COLUMN IF NOT EXISTS plan           VARCHAR(30) NOT NULL DEFAULT 'basic',
+      ADD COLUMN IF NOT EXISTS max_vehicles   INT,
+      ADD COLUMN IF NOT EXISTS features       JSONB NOT NULL DEFAULT '{}'::jsonb
   `);
   await pool.query(`
     CREATE TABLE IF NOT EXISTS team_members (

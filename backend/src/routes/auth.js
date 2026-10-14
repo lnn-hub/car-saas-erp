@@ -3,8 +3,13 @@ const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const pool = require('../db/pool');
 
+// Олон компанит серверт нийтийн бүртгэл хаалттай. Компанийг суперадмин нэмнэ.
+const superEmails = () => (process.env.SUPERADMIN_EMAILS || '').split(',').map(e => e.trim().toLowerCase()).filter(Boolean);
+
 // POST /api/auth/register — шинэ компани + admin хэрэглэгч үүсгэх
 router.post('/register', async (req, res) => {
+  if (process.env.ALLOW_REGISTRATION !== 'true')
+    return res.status(403).json({ error: 'Бүртгэл хаалттай. Компани нэмэхийг системийн админд хандана уу' });
   const { company_name, name, email, password } = req.body;
   if (!company_name || !name || !email || !password)
     return res.status(400).json({ error: 'Бүх талбарыг бөглөнө үү' });
@@ -66,7 +71,9 @@ router.post('/login', async (req, res) => {
 
   try {
     const { rows } = await pool.query(
-      'SELECT * FROM users WHERE email = $1 AND is_active = TRUE',
+      `SELECT u.*, c.is_active AS company_active, c.name AS company_name
+       FROM users u JOIN companies c ON c.id = u.company_id
+       WHERE u.email = $1 AND u.is_active = TRUE`,
       [email]
     );
     const user = rows[0];
@@ -75,13 +82,17 @@ router.post('/login', async (req, res) => {
     const valid = await bcrypt.compare(password, user.password);
     if (!valid) return res.status(401).json({ error: 'Нууц үг буруу' });
 
+    const superadmin = superEmails().includes(String(user.email).toLowerCase());
+    if (user.company_active === false && !superadmin)
+      return res.status(403).json({ error: 'Танай компанийн эрх түр хаагдсан байна' });
+
     const token = jwt.sign(
-      { id: user.id, company_id: user.company_id, role: user.role },
+      { id: user.id, company_id: user.company_id, role: user.role, ...(superadmin ? { superadmin: true } : {}) },
       process.env.JWT_SECRET,
       { expiresIn: '8h' }
     );
 
-    res.json({ token, user: { id: user.id, name: user.name, role: user.role } });
+    res.json({ token, user: { id: user.id, name: user.name, role: user.role, superadmin, company_name: user.company_name } });
   } catch (err) {
     res.status(500).json({ error: err.message });
   }

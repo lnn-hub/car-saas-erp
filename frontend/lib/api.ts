@@ -149,6 +149,13 @@ export const api = {
     return request(`/upload/image/${imageId}`, { method: 'DELETE' });
   },
 
+  superCompanies: () => request('/super/companies'),
+  superCreateCompany: (data: object) => request('/super/companies', { method: 'POST', body: JSON.stringify(data) }),
+  superUpdateCompany: (id: string, data: object) => request(`/super/companies/${id}`, { method: 'PATCH', body: JSON.stringify(data) }),
+  superCompanyUsers: (id: string) => request(`/super/companies/${id}/users`),
+  superSetPassword: (id: string, user_id: string, password: string) =>
+    request(`/super/companies/${id}/password`, { method: 'POST', body: JSON.stringify({ user_id, password }) }),
+
   getVehicleReport: (qs: string) => request(`/reports/vehicles?${qs}`),
 
   uploadLogo: async (file: File) => {

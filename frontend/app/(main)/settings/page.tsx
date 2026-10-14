@@ -46,6 +46,7 @@ export default function SettingsPage() {
   const fileRef = useRef<HTMLInputElement>(null);
 
   const [logo, setLogo]       = useState<string | null>(null);
+  const [planInfo, setPlanInfo] = useState<{ plan: string; max_vehicles: number | null; vehicle_count: number } | null>(null);
   const [logoBusy, setLogoBusy] = useState(false);
   const [logoErr, setLogoErr]   = useState('');
   const logoRef = useRef<HTMLInputElement>(null);
@@ -96,6 +97,7 @@ export default function SettingsPage() {
         email: d.email || '', working_hours: d.working_hours || '', show_prices: d.show_prices !== false,
       });
       setLogo(d.logo_url || null);
+      setPlanInfo({ plan: d.plan || 'basic', max_vehicles: d.max_vehicles ?? null, vehicle_count: d.vehicle_count ?? 0 });
     }).finally(() => setLoading(false));
     loadTeam();
   }, []);
@@ -156,6 +158,26 @@ export default function SettingsPage() {
         <h1 className="text-base sm:text-lg font-bold text-[#1c1917]">Тохиргоо</h1>
         <p className="text-xs sm:text-sm text-[#5f5a54] mt-0.5">Вэбсайтад харагдах мэдээлэл, манай баг</p>
       </div>
+
+      {planInfo && (
+        <Section title="Багц ба хэрэглээ" hint={`Багц: ${planInfo.plan}`}>
+          <div className="p-5">
+            <div className="flex items-center justify-between text-sm mb-2">
+              <span className="text-[#5f5a54]">Нэмсэн машин</span>
+              <span className="font-semibold tabular-nums text-[#1c1917]">{planInfo.vehicle_count} / {planInfo.max_vehicles ?? 'хязгааргүй'}</span>
+            </div>
+            {planInfo.max_vehicles ? (
+              <div className="h-2 bg-[#f3efe9] rounded-full overflow-hidden">
+                <div className={`h-full ${planInfo.vehicle_count >= planInfo.max_vehicles ? 'bg-brand' : 'bg-[#46413c]'}`}
+                  style={{ width: `${Math.min(100, (planInfo.vehicle_count / planInfo.max_vehicles) * 100)}%` }} />
+              </div>
+            ) : null}
+            {planInfo.max_vehicles && planInfo.vehicle_count >= planInfo.max_vehicles ? (
+              <div className="text-xs text-brand mt-2">Хязгаарт хүрсэн байна. Шинэ машин нэмэхийн тулд багцаа ахиулна уу.</div>
+            ) : null}
+          </div>
+        </Section>
+      )}
 
       <Section title="Компанийн лого" hint="Header дээр харагдана">
         <div className="p-5 flex items-center gap-5">

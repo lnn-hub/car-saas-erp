@@ -1,6 +1,7 @@
 const router = require('express').Router();
 const pool = require('../db/pool');
 const auth = require('../middleware/auth');
+const { requireFeature } = auth;
 
 // Dynamic WHERE clause builder for sales queries (base table alias: s, vehicles alias: v)
 function sf(q, start) {
@@ -16,6 +17,8 @@ function sf(q, start) {
 const COSTS = `cost_agg AS (SELECT vehicle_id, SUM(amount) AS total_cost FROM vehicle_costs GROUP BY vehicle_id)`;
 
 // GET /summary
+router.use(auth, requireFeature('reports'));
+
 // GET /api/reports/vehicles?basis=sold|arrived|stock&from=YYYY-MM-DD&to=YYYY-MM-DD
 // Машин бүр нэг мөр: статус, ирсэн/зарсан огноо, өртөг, үнэ, ашиг. Тайлангийн стандарт баганууд.
 //   sold    - борлуулсан огноогоор шүүнэ (зөвхөн зарагдсан машин)

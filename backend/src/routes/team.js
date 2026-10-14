@@ -1,6 +1,9 @@
 const router = require('express').Router();
 const pool   = require('../db/pool');
 const auth   = require('../middleware/auth');
+const { requireFeature } = auth;
+
+router.use(auth, requireFeature('team'));
 
 const FIELDS = 'id, name, position, bio, photo_url, sort_order';
 

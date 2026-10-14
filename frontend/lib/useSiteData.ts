@@ -1,6 +1,6 @@
 "use client";
 import { useEffect, useState } from "react";
-import { BACKEND, Company, SiteInitial, TeamMember, Vehicle } from "./site";
+import { BACKEND, Company, SiteInitial, TeamMember, Vehicle, companyQuery } from "./site";
 
 export function useSiteData(initial?: SiteInitial | null) {
   const [company, setCompany] = useState<Company | null>(initial?.company ?? null);
@@ -14,9 +14,9 @@ export function useSiteData(initial?: SiteInitial | null) {
     async function load(retry = 0) {
       try {
         const [comp, data, members] = await Promise.all([
-          fetch(`${BACKEND}/api/public`).then((r) => r.json()),
-          fetch(`${BACKEND}/api/public/vehicles`).then((r) => r.json()),
-          fetch(`${BACKEND}/api/public/team`).then((r) => r.json()).catch(() => []),
+          fetch(`${BACKEND}/api/public${companyQuery()}`).then((r) => r.json()),
+          fetch(`${BACKEND}/api/public/vehicles${companyQuery()}`).then((r) => r.json()),
+          fetch(`${BACKEND}/api/public/team${companyQuery()}`).then((r) => r.json()).catch(() => []),
         ]);
         if (cancelled) return;
         if (!comp.error) setCompany(comp);
@@ -48,7 +48,7 @@ export function useSiteData(initial?: SiteInitial | null) {
 export function useCompany() {
   const [company, setCompany] = useState<Company | null>(null);
   useEffect(() => {
-    fetch(`${BACKEND}/api/public`)
+    fetch(`${BACKEND}/api/public${companyQuery()}`)
       .then((r) => r.json())
       .then((c) => { if (!c.error) setCompany(c); })
       .catch(() => {});

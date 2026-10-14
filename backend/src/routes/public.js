@@ -1,22 +1,28 @@
 const router = require('express').Router();
 const pool = require('../db/pool');
 
-// Компанийг slug эсвэл анхны компаниар олох
+const { resolveFeatures } = require('../utils/features');
+
+// Компанийг slug-аар олно. Slug өгөөгүй бол анхны компани (нэг компанит байршуулалт). Идэвхгүй компани харагдахгүй.
+const companyBySlug = (n) => `(SELECT id FROM companies WHERE is_active IS NOT FALSE AND ($${n}::text IS NULL OR slug = $${n}) ORDER BY created_at ASC LIMIT 1)`;
 async function findCompany(slug) {
   const { rows } = await pool.query(
-    `SELECT id, name, phone, address, email, working_hours, logo_url, show_prices
+    `SELECT id, name, phone, address, email, working_hours, logo_url, show_prices, features
      FROM companies
-     WHERE ($1::text IS NULL OR slug=$1 OR TRUE)
+     WHERE is_active IS NOT FALSE AND ($1::text IS NULL OR slug = $1)
      ORDER BY created_at ASC LIMIT 1`,
     [slug || null]
   );
-  return rows[0] || null;
+  const c = rows[0];
+  if (!c) return null;
+  return { ...c, features: resolveFeatures(c.features) };
 }
+const slugOf = (req) => (typeof req.query.company === 'string' && req.query.company ? req.query.company : null);
 
 // GET /api/public  (slug-гүй, анхны компани)
 router.get('/', async (req, res) => {
   try {
-    const comp = await findCompany(null);
+    const comp = await findCompany(slugOf(req));
     if (!comp) return res.status(404).json({ error: 'Компани олдсонгүй' });
     res.json(comp);
   } catch (err) { res.status(500).json({ error: err.message }); }
@@ -25,8 +31,8 @@ router.get('/', async (req, res) => {
 // GET /api/public/team
 router.get('/team', async (req, res) => {
   try {
-    const comp = await findCompany(null);
-    if (!comp) return res.json([]);
+    const comp = await findCompany(slugOf(req));
+    if (!comp || !comp.features.team) return res.json([]);
     const { rows } = await pool.query(
       'SELECT id, name, position, bio, photo_url FROM team_members WHERE company_id=$1 ORDER BY sort_order, created_at',
       [comp.id]
@@ -35,13 +41,11 @@ router.get('/team', async (req, res) => {
   } catch (err) { res.status(500).json({ error: err.message }); }
 });
 
-const FIRST_COMPANY = '(SELECT id FROM companies ORDER BY created_at ASC LIMIT 1)';
-
 // GET /api/public/vehicles  (slug-гүй) - компани ба машинуудыг зэрэг асууна
 router.get('/vehicles', async (req, res) => {
   try {
     const [comp, { rows }] = await Promise.all([
-      findCompany(null),
+      findCompany(slugOf(req)),
       pool.query(
         `SELECT v.id, v.brand, v.model, v.year, v.color, v.fuel_type, v.transmission,
                 v.engine_cc, v.mileage, v.description, v.has_plates, v.manufactured_date,
@@ -50,9 +54,10 @@ router.get('/vehicles', async (req, res) => {
                 ARRAY(SELECT url FROM vehicle_images WHERE vehicle_id = v.id ORDER BY sort_order) AS images
          FROM vehicles v
          LEFT JOIN vehicle_costs vc ON vc.vehicle_id = v.id
-         WHERE v.company_id=${FIRST_COMPANY} AND v.status='PUBLISHED'
+         WHERE v.company_id=${companyBySlug(1)} AND v.status='PUBLISHED'
          GROUP BY v.id
-         ORDER BY v.created_at DESC`
+         ORDER BY v.created_at DESC`,
+        [slugOf(req)]
       ),
     ]);
     if (!comp) return res.status(404).json({ error: 'Компани олдсонгүй' });
@@ -69,15 +74,15 @@ router.get('/vehicles', async (req, res) => {
 router.get('/vehicles/:id', async (req, res) => {
   try {
     const [comp, { rows }] = await Promise.all([
-      findCompany(null),
+      findCompany(slugOf(req)),
       pool.query(
         `SELECT v.*, COALESCE(SUM(vc.amount), 0) AS total_cost,
                 ARRAY(SELECT url FROM vehicle_images WHERE vehicle_id = v.id ORDER BY sort_order) AS images
          FROM vehicles v
          LEFT JOIN vehicle_costs vc ON vc.vehicle_id = v.id
-         WHERE v.id=$1 AND v.company_id=${FIRST_COMPANY} AND v.status='PUBLISHED'
+         WHERE v.id=$1 AND v.company_id=${companyBySlug(2)} AND v.status='PUBLISHED'
          GROUP BY v.id`,
-        [req.params.id]
+        [req.params.id, slugOf(req)]
       ),
     ]);
     if (!comp) return res.status(404).json({ error: 'Компани олдсонгүй' });
