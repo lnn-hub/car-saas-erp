@@ -35,6 +35,7 @@ interface Vehicle {
   engine_cc: number | null;
   has_plates: boolean;
   manufactured_date: string | null;
+  price: string | null;
   images: { id: string; url: string; is_main: boolean }[];
   costs: Cost[];
 }
@@ -91,7 +92,7 @@ function VehicleDetailContent() {
   const [editBusy, setEditBusy] = useState(false);
   const [edit, setEdit] = useState({
     brand: "", model: "", year: "", mileage: "", color: "", fuel_type: "PETROL",
-    transmission: "AUTO", engine_l: "", manufactured_date: "", has_plates: false, description: "",
+    transmission: "AUTO", engine_l: "", manufactured_date: "", has_plates: false, description: "", price: "",
   });
   const photoRef = useRef<HTMLInputElement>(null);
   const [saleSuccess, setSaleSuccess] = useState(false);
@@ -223,6 +224,7 @@ function VehicleDetailContent() {
       engine_l: vehicle.engine_cc ? String(Number(vehicle.engine_cc) / 1000) : "",
       manufactured_date: vehicle.manufactured_date ? vehicle.manufactured_date.slice(0, 10) : "",
       has_plates: !!vehicle.has_plates, description: vehicle.description || "",
+      price: vehicle.price ? String(Number(vehicle.price)) : "",
     });
     setEditOpen(true);
   }
@@ -237,6 +239,7 @@ function VehicleDetailContent() {
         engine_cc: edit.engine_l ? Math.round(Number(edit.engine_l) * 1000) : null,
         manufactured_date: edit.manufactured_date || null, has_plates: edit.has_plates,
         description: edit.description,
+        price: edit.price === "" ? null : Number(edit.price),
       });
       setEditOpen(false);
       setMsg("Мэдээлэл хадгалагдлаа");
@@ -255,7 +258,7 @@ function VehicleDetailContent() {
   function openSaleModal() {
     setShowSale(true);
     setSaleSuccess(false);
-    setSalePrice("");
+    setSalePrice(vehicle?.price ? String(Number(vehicle.price)) : "");
     setPayType("CASH");
     setCustQuery("");
     setCustResults([]);
@@ -394,6 +397,8 @@ function VehicleDetailContent() {
               vehicle.transmission === "AUTO" ? "Автомат" : "Механик",
             ],
             ["Нийт өртөг", fmt(totalCost)],
+            ["Зарах үнэ", vehicle.price ? fmt(Number(vehicle.price)) : "Оруулаагүй"],
+            ...(vehicle.price ? [["Зарах ашиг (төлөвлөсөн)", fmt(Number(vehicle.price) - totalCost)]] : []),
           ].map(([k, v]) => (
             <div key={k}>
               <div className="text-xs text-[#6f6a64] mb-0.5">
@@ -432,6 +437,7 @@ function VehicleDetailContent() {
               <option value="AUTO">Автомат</option>
               <option value="MANUAL">Механик</option>
             </select>
+            <input type="number" min="0" inputMode="numeric" placeholder="Зарах үнэ (₮)" value={edit.price} onChange={(e) => setEdit((p) => ({ ...p, price: e.target.value }))} className={inp} />
             <input type="date" value={edit.manufactured_date} onChange={(e) => setEdit((p) => ({ ...p, manufactured_date: e.target.value }))} className={inp} />
             <label className="flex items-center gap-2 text-sm text-[#46413c]">
               <input type="checkbox" checked={edit.has_plates} onChange={(e) => setEdit((p) => ({ ...p, has_plates: e.target.checked }))} className="accent-[#8b1e2d]" />

@@ -25,7 +25,7 @@ export default function NewVehiclePage() {
     vin: '', brand: '', model: '', year: String(CURRENT_YEAR),
     mileage: '', color: '', fuel_type: 'PETROL', transmission: 'AUTO',
     engine_cc: '', description: '', arrived_at: '',
-    manufactured_date: '', has_plates: false,
+    manufactured_date: '', has_plates: false, price: '',
   });
   const [models, setModels]   = useState<string[]>([]);
   const [images, setImages]     = useState<ImageItem[]>([]);
@@ -57,6 +57,7 @@ export default function NewVehiclePage() {
         ...form,
         year: Number(form.year),
         mileage: Number(form.mileage) || 0,
+        price: form.price ? Number(form.price) : '',
         engine_cc: form.engine_cc ? String(Number(form.engine_cc.replace(/[^\d.]/g, '')) * 1000) : '',
       };
       const created = await api.createVehicle(payload);
@@ -316,6 +317,11 @@ export default function NewVehiclePage() {
                   </button>
                 ))}
               </div>
+            </Field>
+
+            <Field label="Зарах үнэ (₮)">
+              <input type="number" min="0" inputMode="numeric" value={form.price} onChange={e => set('price', e.target.value)}
+                placeholder="85,000,000" className={inp} />
             </Field>
 
             <Field label="Хөдөлгүүр">

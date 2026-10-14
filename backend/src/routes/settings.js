@@ -1,6 +1,8 @@
 const router = require('express').Router();
+const { serverError } = require('../utils/http');
 const pool = require('../db/pool');
 const auth = require('../middleware/auth');
+const { requireAdmin } = auth;
 const { resolveFeatures } = require('../utils/features');
 
 // GET /api/settings — компанийн тохиргоо авах
@@ -14,12 +16,14 @@ router.get('/', auth, async (req, res) => {
     );
     const row = rows[0];
     res.json(row ? { ...row, features: resolveFeatures(row.features) } : {});
-  } catch (err) { res.status(500).json({ error: err.message }); }
+  } catch (err) { serverError(res, err); }
 });
 
 // PATCH /api/settings — тохиргоо хадгалах
-router.patch('/', auth, async (req, res) => {
-  const { name, slug, phone, address, email, working_hours, logo_url, show_prices } = req.body;
+router.patch('/', auth, requireAdmin, async (req, res) => {
+  const { name, phone, address, email, working_hours, logo_url, show_prices } = req.body;
+  // Slug (нийтийн хаяг)-ыг зөвхөн суперадмин өөрчилнө
+  const slug = req.user.superadmin ? req.body.slug : undefined;
 
   if (name !== undefined && !String(name).trim())
     return res.status(400).json({ error: 'Компанийн нэр хоосон байж болохгүй' });
@@ -54,7 +58,7 @@ router.patch('/', auth, async (req, res) => {
        email ?? null, working_hours ?? null, name ? String(name).trim() : null]
     );
     res.json(rows[0]);
-  } catch (err) { res.status(500).json({ error: err.message }); }
+  } catch (err) { serverError(res, err); }
 });
 
 module.exports = router;

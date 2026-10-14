@@ -1,12 +1,5 @@
 const pool = require('./pool');
 
-const DEMO_TEAM = [
-  ['Бат-Эрдэнэ Ганбаатар', 'Гүйцэтгэх захирал', 'Автомашины зах зээлд 15 гаруй жил ажилласан туршлагатай. Компанийн чиглэл, чанарын бодлогыг тодорхойлдог.'],
-  ['Сарнай Баярсайхан', 'Борлуулалтын менежер', 'Худалдан авагч бүрт тохирох машиныг сонгоход тусалж, бүртгэл болон баримт бичгийн ажлыг дэмждэг.'],
-  ['Төмөрбаатар Лхагва', 'Ахлах механик инженер', 'Машин бүрийн техникийн үзлэг, оношилгоог хариуцан борлуулалтын өмнө бүрэн шалгана.'],
-  ['Оюунчимэг Дорж', 'Үйлчилгээний зөвлөх', 'Үйлчлүүлэгчийн асуулт, үзэх цаг товлох болон худалдааны дараах үйлчилгээг хариуцна.'],
-];
-
 // Олон компани, олон зурагтай үед удаашрахаас сэргийлэх индексүүд (дахин ажиллуулахад аюулгүй)
 const INDEXES = [
   'CREATE INDEX IF NOT EXISTS idx_vehicle_images_vehicle ON vehicle_images(vehicle_id, sort_order)',
@@ -15,6 +8,8 @@ const INDEXES = [
   'CREATE INDEX IF NOT EXISTS idx_customers_company ON customers(company_id)',
   'CREATE UNIQUE INDEX IF NOT EXISTS idx_companies_slug_unique ON companies(slug) WHERE slug IS NOT NULL',
   'CREATE INDEX IF NOT EXISTS idx_team_members_company ON team_members(company_id, sort_order)',
+  // Нэг машин олон удаа зарагдахаас хамгаална (давхардал байвал үүсэхгүй, лог руу бичигдэнэ)
+  'CREATE UNIQUE INDEX IF NOT EXISTS idx_sales_vehicle_unique ON sales(vehicle_id)',
 ];
 
 async function ensureIndexes() {
@@ -48,30 +43,18 @@ async function ensureSchema() {
     )
   `);
 
-  const { rows } = await pool.query('SELECT id, phone, address, email, working_hours FROM companies ORDER BY created_at ASC LIMIT 1');
-  const c = rows[0];
-  if (!c) return;
-
-  // Хоосон талбарт жишээ мэдээлэл тавина (Тохиргоо хэсгээс өөрчилж болно)
-  await pool.query(
-    `UPDATE companies SET
-       phone         = COALESCE(NULLIF(phone, ''), '99112233'),
-       address       = COALESCE(NULLIF(address, ''), 'Улаанбаатар хот, Баянгол дүүрэг, 3-р хороолол'),
-       email         = COALESCE(NULLIF(email, ''), 'info@autodealer.mn'),
-       working_hours = COALESCE(NULLIF(working_hours, ''), 'Даваа - Бямба: 09:00 - 19:00')
-     WHERE id = $1`,
-    [c.id]
+  // Машины "зарын үнэ" (public) нь өртгөөс тусдаа талбар. Анх үүсэхэд нэг удаа өмнөх харагдаж байсан
+  // үнийг (өртгийн нийлбэр) хуулж, сайтад үнэ алга болохоос сэргийлнэ. Админ дараа нь засна.
+  const { rows: col } = await pool.query(
+    "SELECT 1 FROM information_schema.columns WHERE table_name='vehicles' AND column_name='price'"
   );
-
-  const { rows: cnt } = await pool.query('SELECT COUNT(*)::int AS n FROM team_members WHERE company_id=$1', [c.id]);
-  if (cnt[0].n === 0) {
-    for (let i = 0; i < DEMO_TEAM.length; i++) {
-      const [name, position, bio] = DEMO_TEAM[i];
-      await pool.query(
-        'INSERT INTO team_members (company_id, name, position, bio, sort_order) VALUES ($1,$2,$3,$4,$5)',
-        [c.id, name, position, bio, i]
-      );
-    }
+  if (!col.length) {
+    await pool.query('ALTER TABLE vehicles ADD COLUMN price NUMERIC(15,2)');
+    await pool.query(
+      `UPDATE vehicles v SET price = c.total
+       FROM (SELECT vehicle_id, SUM(amount) AS total FROM vehicle_costs GROUP BY vehicle_id) c
+       WHERE c.vehicle_id = v.id AND c.total > 0`
+    );
   }
 }
 

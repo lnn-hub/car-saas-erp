@@ -51,7 +51,11 @@ const requireFeature = (key) => async (req, res, next) => {
   } catch (err) { res.status(500).json({ error: err.message }); }
 };
 
+const requireAdmin = (req, res, next) =>
+  (req.user?.role === 'ADMIN' || req.user?.superadmin) ? next() : res.status(403).json({ error: 'Энэ үйлдэлд админ эрх шаардлагатай' });
+
 module.exports = authMiddleware;
+module.exports.requireAdmin = requireAdmin;
 module.exports.requireSuper = requireSuper;
 module.exports.requireFeature = requireFeature;
 module.exports.invalidateCompany = invalidateCompany;

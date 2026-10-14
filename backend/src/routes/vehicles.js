@@ -1,6 +1,8 @@
 const router = require('express').Router();
+const { serverError } = require('../utils/http');
 const pool = require('../db/pool');
 const auth = require('../middleware/auth');
+const { requireAdmin } = auth;
 
 // GET /api/vehicles — бүх машин
 router.get('/', auth, async (req, res) => {
@@ -18,7 +20,7 @@ router.get('/', auth, async (req, res) => {
     );
     res.json(rows);
   } catch (err) {
-    res.status(500).json({ error: err.message });
+    serverError(res, err);
   }
 });
 
@@ -33,7 +35,7 @@ router.get('/:id', auth, async (req, res) => {
     if (!vehicle.rows[0]) return res.status(404).json({ error: 'Машин олдсонгүй' });
     res.json({ ...vehicle.rows[0], costs: costs.rows, images: images.rows });
   } catch (err) {
-    res.status(500).json({ error: err.message });
+    serverError(res, err);
   }
 });
 
@@ -45,32 +47,35 @@ router.post('/', auth, async (req, res) => {
        FROM companies c WHERE c.id = $1`, [req.user.company_id]);
     if (lim[0] && lim[0].max_vehicles != null && lim[0].cnt >= lim[0].max_vehicles)
       return res.status(403).json({ error: `Багцын хязгаарт (${lim[0].max_vehicles} машин) хүрсэн байна. Багцаа ахиулна уу` });
-  } catch (err) { return res.status(500).json({ error: err.message }); }
+  } catch (err) { return serverError(res, err); }
   const { vin, brand, model, year, mileage, color, fuel_type, transmission, engine_cc, description,
-          arrived_at, manufactured_date, has_plates } = req.body;
+          arrived_at, manufactured_date, has_plates, price } = req.body;
   if (!vin || !brand || !model || !year)
     return res.status(400).json({ error: 'VIN, марк, загвар,он заавал шаардлагатай' });
 
   // manufactured_date comes as YYYY-MM from month input — append -01 for full date
   const mfgDate = manufactured_date ? manufactured_date + '-01' : null;
+  const listPrice = price === undefined || price === null || price === '' ? null : Number(price);
+  if (listPrice !== null && (!Number.isFinite(listPrice) || listPrice < 0))
+    return res.status(400).json({ error: 'Зарын үнэ буруу байна' });
 
   try {
     const { rows } = await pool.query(
-      `INSERT INTO vehicles (company_id, vin, brand, model, year, mileage, color, fuel_type, transmission, engine_cc, description, arrived_at, manufactured_date, has_plates, created_by, status)
-       VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15,'PUBLISHED') RETURNING *`,
+      `INSERT INTO vehicles (company_id, vin, brand, model, year, mileage, color, fuel_type, transmission, engine_cc, description, arrived_at, manufactured_date, has_plates, created_by, price, status)
+       VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15,$16,'PUBLISHED') RETURNING *`,
       [req.user.company_id, vin, brand, model, year, mileage || 0, color, fuel_type || 'PETROL', transmission || 'AUTO',
-       engine_cc, description, arrived_at || null, mfgDate, has_plates === true || has_plates === 'true', req.user.id]
+       engine_cc, description, arrived_at || null, mfgDate, has_plates === true || has_plates === 'true', req.user.id, listPrice]
     );
     res.status(201).json(rows[0]);
   } catch (err) {
     if (err.code === '23505') return res.status(400).json({ error: 'VIN давхардсан байна' });
-    res.status(500).json({ error: err.message });
+    serverError(res, err);
   }
 });
 
 // PATCH /api/vehicles/:id — мэдээлэл засах
 const EDITABLE = ['brand', 'model', 'year', 'mileage', 'color', 'fuel_type', 'transmission',
-                  'engine_cc', 'description', 'has_plates', 'manufactured_date', 'arrived_at'];
+                  'engine_cc', 'description', 'has_plates', 'manufactured_date', 'arrived_at', 'price'];
 router.patch('/:id', auth, async (req, res) => {
   const sets = [], vals = [];
   for (const key of EDITABLE) {
@@ -79,6 +84,8 @@ router.patch('/:id', auth, async (req, res) => {
     if (v === '') v = null;
     if (['brand', 'model', 'year'].includes(key) && v === null)
       return res.status(400).json({ error: 'Марк, загвар, он хоосон байж болохгүй' });
+    if (key === 'price' && v !== null && (!Number.isFinite(Number(v)) || Number(v) < 0))
+      return res.status(400).json({ error: 'Зарын үнэ буруу байна' });
     vals.push(v);
     sets.push(`${key} = $${vals.length}`);
   }
@@ -92,11 +99,11 @@ router.patch('/:id', auth, async (req, res) => {
     );
     if (!rows[0]) return res.status(404).json({ error: 'Машин олдсонгүй' });
     res.json(rows[0]);
-  } catch (err) { res.status(500).json({ error: err.message }); }
+  } catch (err) { serverError(res, err); }
 });
 
 // DELETE /api/vehicles/:id — борлуулалтгүй машиныг устгах
-router.delete('/:id', auth, async (req, res) => {
+router.delete('/:id', auth, requireAdmin, async (req, res) => {
   try {
     const { rows } = await pool.query(
       'SELECT id FROM vehicles WHERE id=$1 AND company_id=$2', [req.params.id, req.user.company_id]
@@ -111,7 +118,7 @@ router.delete('/:id', auth, async (req, res) => {
     }
     await pool.query('DELETE FROM vehicles WHERE id=$1', [req.params.id]);
     res.json({ ok: true });
-  } catch (err) { res.status(500).json({ error: err.message }); }
+  } catch (err) { serverError(res, err); }
 });
 
 // PATCH /api/vehicles/:id/status — статус өөрчлөх
@@ -130,25 +137,31 @@ router.patch('/:id/status', auth, async (req, res) => {
     if (!rows[0]) return res.status(404).json({ error: 'Машин олдсонгүй' });
     res.json(rows[0]);
   } catch (err) {
-    res.status(500).json({ error: err.message });
+    serverError(res, err);
   }
 });
 
 // POST /api/vehicles/:id/costs — зардал нэмэх
 router.post('/:id/costs', auth, async (req, res) => {
   const { cost_type, amount, currency, note } = req.body;
-  if (!cost_type || !amount)
+  const amt = Number(amount);
+  if (!cost_type || !Number.isFinite(amt) || amt === 0)
     return res.status(400).json({ error: 'Зардлын төрөл, дүн заавал шаардлагатай' });
 
   try {
+    // Машин нэвтэрсэн компанийнх мөн эсэхийг шалгана
+    const own = await pool.query('SELECT 1 FROM vehicles WHERE id=$1 AND company_id=$2', [req.params.id, req.user.company_id]);
+    if (!own.rowCount) return res.status(404).json({ error: 'Машин олдсонгүй' });
+
     const { rows } = await pool.query(
       `INSERT INTO vehicle_costs (vehicle_id, cost_type, amount, currency, note, created_by)
        VALUES ($1,$2,$3,$4,$5,$6) RETURNING *`,
-      [req.params.id, cost_type, amount, currency || 'MNT', note, req.user.id]
+      [req.params.id, cost_type, amt, currency || 'MNT', note, req.user.id]
     );
     res.status(201).json(rows[0]);
   } catch (err) {
-    res.status(500).json({ error: err.message });
+    if (err.code === '22P02') return res.status(400).json({ error: 'Зардлын төрөл буруу байна' });
+    serverError(res, err);
   }
 });
 

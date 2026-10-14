@@ -1,5 +1,6 @@
 const router = require('express').Router();
 const pool = require('../db/pool');
+const { serverError } = require('../utils/http');
 
 const { resolveFeatures } = require('../utils/features');
 
@@ -25,7 +26,7 @@ router.get('/', async (req, res) => {
     const comp = await findCompany(slugOf(req));
     if (!comp) return res.status(404).json({ error: 'Компани олдсонгүй' });
     res.json(comp);
-  } catch (err) { res.status(500).json({ error: err.message }); }
+  } catch (err) { serverError(res, err); }
 });
 
 // GET /api/public/team
@@ -38,24 +39,24 @@ router.get('/team', async (req, res) => {
       [comp.id]
     );
     res.json(rows);
-  } catch (err) { res.status(500).json({ error: err.message }); }
+  } catch (err) { serverError(res, err); }
 });
 
-// GET /api/public/vehicles  (slug-гүй) - компани ба машинуудыг зэрэг асууна
+// Нийтэд харагдах талбарууд (whitelist). vin, created_by, company_id, status, зардал зэрэг дотоод мэдээлэл ОРОХГҮЙ.
+const PUBLIC_COLS = `v.id, v.brand, v.model, v.year, v.color, v.fuel_type, v.transmission,
+  v.engine_cc, v.mileage, v.description, v.has_plates, v.manufactured_date, v.price`;
+
+// GET /api/public/vehicles
 router.get('/vehicles', async (req, res) => {
   try {
     const [comp, { rows }] = await Promise.all([
       findCompany(slugOf(req)),
       pool.query(
-        `SELECT v.id, v.brand, v.model, v.year, v.color, v.fuel_type, v.transmission,
-                v.engine_cc, v.mileage, v.description, v.has_plates, v.manufactured_date,
-                COALESCE(SUM(vc.amount), 0) AS total_cost,
+        `SELECT ${PUBLIC_COLS},
                 (SELECT url FROM vehicle_images WHERE vehicle_id = v.id AND is_main = TRUE LIMIT 1) AS main_image,
                 ARRAY(SELECT url FROM vehicle_images WHERE vehicle_id = v.id ORDER BY sort_order) AS images
          FROM vehicles v
-         LEFT JOIN vehicle_costs vc ON vc.vehicle_id = v.id
          WHERE v.company_id=${companyBySlug(1)} AND v.status='PUBLISHED'
-         GROUP BY v.id
          ORDER BY v.created_at DESC`,
         [slugOf(req)]
       ),
@@ -65,60 +66,32 @@ router.get('/vehicles', async (req, res) => {
     res.json({
       company_id: comp.id,
       show_prices: comp.show_prices,
-      vehicles: rows.map(v => ({ ...v, total_cost: comp.show_prices ? v.total_cost : null })),
+      vehicles: rows.map(v => ({ ...v, price: comp.show_prices ? v.price : null })),
     });
-  } catch (err) { res.status(500).json({ error: err.message }); }
+  } catch (err) { serverError(res, err); }
 });
 
-// GET /api/public/vehicles/:id  (slug-гүй)
+// GET /api/public/vehicles/:id
 router.get('/vehicles/:id', async (req, res) => {
   try {
     const [comp, { rows }] = await Promise.all([
       findCompany(slugOf(req)),
       pool.query(
-        `SELECT v.*, COALESCE(SUM(vc.amount), 0) AS total_cost,
+        `SELECT ${PUBLIC_COLS},
                 ARRAY(SELECT url FROM vehicle_images WHERE vehicle_id = v.id ORDER BY sort_order) AS images
          FROM vehicles v
-         LEFT JOIN vehicle_costs vc ON vc.vehicle_id = v.id
-         WHERE v.id=$1 AND v.company_id=${companyBySlug(2)} AND v.status='PUBLISHED'
-         GROUP BY v.id`,
+         WHERE v.id=$1 AND v.company_id=${companyBySlug(2)} AND v.status='PUBLISHED'`,
         [req.params.id, slugOf(req)]
       ),
     ]);
     if (!comp) return res.status(404).json({ error: 'Компани олдсонгүй' });
     if (!rows[0]) return res.status(404).json({ error: 'Машин олдсонгүй' });
 
-    res.json({
-      ...rows[0],
-      total_cost: comp.show_prices ? rows[0].total_cost : null,
-      company: comp,
-    });
-  } catch (err) { res.status(500).json({ error: err.message }); }
-});
-
-// GET /api/public/:slug/vehicles/:id
-router.get('/:slug/vehicles/:id', async (req, res) => {
-  try {
-    const comp = await findCompany(req.params.slug);
-    if (!comp) return res.status(404).json({ error: 'Компани олдсонгүй' });
-
-    const { rows } = await pool.query(
-      `SELECT v.*, COALESCE(SUM(vc.amount), 0) AS total_cost,
-              ARRAY(SELECT url FROM vehicle_images WHERE vehicle_id = v.id ORDER BY sort_order) AS images
-       FROM vehicles v
-       LEFT JOIN vehicle_costs vc ON vc.vehicle_id = v.id
-       WHERE v.id=$1 AND v.company_id=$2 AND v.status='PUBLISHED'
-       GROUP BY v.id`,
-      [req.params.id, comp.id]
-    );
-    if (!rows[0]) return res.status(404).json({ error: 'Машин олдсонгүй' });
-
-    res.json({
-      ...rows[0],
-      total_cost: comp.show_prices ? rows[0].total_cost : null,
-      company: comp,
-    });
-  } catch (err) { res.status(500).json({ error: err.message }); }
+    res.json({ ...rows[0], price: comp.show_prices ? rows[0].price : null, company: comp });
+  } catch (err) {
+    if (err.code === '22P02') return res.status(404).json({ error: 'Машин олдсонгүй' });
+    serverError(res, err);
+  }
 });
 
 module.exports = router;

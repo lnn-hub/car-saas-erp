@@ -17,7 +17,7 @@ const TRANS: Record<string,string> = { AUTO:'Автомат', MANUAL:'Механ
 
 interface Other {
   id: string; brand: string; model: string; year: number;
-  mileage: number; fuel_type: string; total_cost: string | null; main_image: string | null;
+  mileage: number; fuel_type: string; price: string | null; main_image: string | null;
 }
 
 function fmtPrice(n: string|number|null) {
@@ -122,7 +122,7 @@ function VehicleContent({ id, initial }: { id: string; initial: VehicleDetail | 
   const imgs  = v.images?.length
     ? v.images.map(u => imgSrc(u))
     : [];
-  const price = fmtPrice(v.total_cost);
+  const price = fmtPrice(v.price);
   const mainImg = imgs[imgIdx] || null;
 
   const highlights = [
@@ -431,7 +431,7 @@ function VehicleContent({ id, initial }: { id: string; initial: VehicleDetail | 
             <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-5">
               {others.map((o) => {
                 const src = o.main_image ? imgSrc(o.main_image, 480) : null;
-                const pr = fmtPrice(o.total_cost);
+                const pr = fmtPrice(o.price);
                 return (
                   <Link key={o.id} href={`/vehicle/${o.id}`}
                     className="group bg-white border border-zinc-200 hover:border-brand/40 hover:shadow-xl transition-all duration-300 overflow-hidden rounded-sm">
@@ -456,7 +456,7 @@ function VehicleContent({ id, initial }: { id: string; initial: VehicleDetail | 
       <Lightbox images={fullImgs} index={lightbox} onClose={() => setLightbox(null)} onIndex={(i) => { setLightbox(i); setIdx(i); }} />
 
       {leasingOn && <LeasingCalculator open={calcOpen} onClose={() => setCalcOpen(false)}
-        price={price ? Number(v.total_cost) : null}
+        price={price ? Number(v.price) : null}
         carName={`${v.year} ${v.brand} ${v.model}`} phone={v.company?.phone} />}
 
       {/* Mobile sticky bottom call bar */}

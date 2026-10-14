@@ -129,10 +129,11 @@ async function seedDemo({ companyId, onProgress = () => {} } = {}) {
     try {
       const { rows: [v] } = await pool.query(
         `INSERT INTO vehicles (company_id, vin, brand, model, year, mileage, color, fuel_type, transmission,
-                               engine_cc, status, description, arrived_at, manufactured_date, has_plates, created_by)
-         VALUES ($1,$2,$3,$4,$5,$6,$7,$8,'AUTO',$9,$10,$11, CURRENT_DATE - $12::int, $13, $14, $15) RETURNING id`,
+                               engine_cc, status, description, arrived_at, manufactured_date, has_plates, created_by, price)
+         VALUES ($1,$2,$3,$4,$5,$6,$7,$8,'AUTO',$9,$10,$11, CURRENT_DATE - $12::int, $13, $14, $15, $16) RETURNING id`,
         [cid, vin, c.brand, c.model, c.year, c.mileage, c.color, c.fuel, c.cc, c.status, description,
-         10 + n * 3, c.mfg, n % 2 === 0, admin?.id || null]
+         10 + n * 3, c.mfg, n % 2 === 0, admin?.id || null,
+         Math.round(c.costs.reduce((t, x) => t + x[1], 0) * 1.12 / 100000) * 100000]
       );
       vehicleId = v.id;
       for (const [type, amount] of c.costs)

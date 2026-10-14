@@ -1,9 +1,11 @@
 const router = require('express').Router();
+const { serverError } = require('../utils/http');
 const pool   = require('../db/pool');
 const auth   = require('../middleware/auth');
-const { requireFeature } = auth;
+const { requireFeature, requireAdmin } = auth;
 
 router.use(auth, requireFeature('team'));
+router.use((req, res, next) => req.method === 'GET' ? next() : requireAdmin(req, res, next));
 
 const FIELDS = 'id, name, position, bio, photo_url, sort_order';
 
@@ -14,7 +16,7 @@ router.get('/', auth, async (req, res) => {
       [req.user.company_id]
     );
     res.json(rows);
-  } catch (err) { res.status(500).json({ error: err.message }); }
+  } catch (err) { serverError(res, err); }
 });
 
 router.post('/', auth, async (req, res) => {
@@ -28,7 +30,7 @@ router.post('/', auth, async (req, res) => {
       [req.user.company_id, name.trim(), position || null, bio || null]
     );
     res.status(201).json(rows[0]);
-  } catch (err) { res.status(500).json({ error: err.message }); }
+  } catch (err) { serverError(res, err); }
 });
 
 router.patch('/:id', auth, async (req, res) => {
@@ -46,14 +48,14 @@ router.patch('/:id', auth, async (req, res) => {
     );
     if (!rows[0]) return res.status(404).json({ error: 'Олдсонгүй' });
     res.json(rows[0]);
-  } catch (err) { res.status(500).json({ error: err.message }); }
+  } catch (err) { serverError(res, err); }
 });
 
 router.delete('/:id', auth, async (req, res) => {
   try {
     await pool.query('DELETE FROM team_members WHERE id=$1 AND company_id=$2', [req.params.id, req.user.company_id]);
     res.json({ ok: true });
-  } catch (err) { res.status(500).json({ error: err.message }); }
+  } catch (err) { serverError(res, err); }
 });
 
 module.exports = router;

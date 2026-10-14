@@ -19,7 +19,7 @@ export function CompareModal({ vehicles, onClose, onRemove }: {
   }, [onClose]);
 
   const rows: [string, (v: Vehicle) => string][] = [
-    ["Үнэ", (v) => price(v.total_cost)],
+    ["Үнэ", (v) => price(v.price)],
     ["Он", (v) => String(v.year)],
     ["Гүйлт", (v) => (v.mileage ? `${Number(v.mileage).toLocaleString("en-US")} км` : "-")],
     ["Түлш", (v) => FUEL[v.fuel_type] || v.fuel_type],

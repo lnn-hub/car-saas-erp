@@ -1,4 +1,5 @@
 const router = require('express').Router();
+const { serverError } = require('../utils/http');
 const pool = require('../db/pool');
 const auth = require('../middleware/auth');
 const { requireFeature } = auth;
@@ -88,7 +89,7 @@ router.get('/vehicles', auth, async (req, res) => {
       months: Object.values(months).sort((a, b) => a.month.localeCompare(b.month)),
       rows,
     });
-  } catch (err) { res.status(500).json({ error: err.message }); }
+  } catch (err) { serverError(res, err); }
 });
 
 router.get('/summary', auth, async (req, res) => {
@@ -114,7 +115,7 @@ router.get('/summary', auth, async (req, res) => {
     const sm = {};
     veh.rows.forEach(r => { sm[r.status] = Number(r.count); });
     res.json({ ...sal.rows[0], status_counts: sm, total_vehicles: Number(tot.rows[0].total) });
-  } catch (err) { res.status(500).json({ error: err.message }); }
+  } catch (err) { serverError(res, err); }
 });
 
 // GET /aging
@@ -139,7 +140,7 @@ router.get('/aging', auth, async (req, res) => {
       else b['90+'].push(r);
     });
     res.json({ rows, buckets: b });
-  } catch (err) { res.status(500).json({ error: err.message }); }
+  } catch (err) { serverError(res, err); }
 });
 
 // GET /daily — sales grouped by day
@@ -162,7 +163,7 @@ router.get('/daily', auth, async (req, res) => {
       GROUP BY day
       ORDER BY day DESC`, [cid, ...v]);
     res.json(rows);
-  } catch (err) { res.status(500).json({ error: err.message }); }
+  } catch (err) { serverError(res, err); }
 });
 
 // GET /monthly — sales grouped by month
@@ -185,7 +186,7 @@ router.get('/monthly', auth, async (req, res) => {
       GROUP BY month
       ORDER BY month ASC`, [cid, ...v]);
     res.json(rows);
-  } catch (err) { res.status(500).json({ error: err.message }); }
+  } catch (err) { serverError(res, err); }
 });
 
 // GET /brands — per-brand performance
@@ -210,7 +211,7 @@ router.get('/brands', auth, async (req, res) => {
       GROUP BY v.brand
       ORDER BY sold_count DESC`, [cid, ...v]);
     res.json(rows);
-  } catch (err) { res.status(500).json({ error: err.message }); }
+  } catch (err) { serverError(res, err); }
 });
 
 // GET /salesperson — per-salesperson performance
@@ -237,7 +238,7 @@ router.get('/salesperson', auth, async (req, res) => {
       GROUP BY u.id, u.name, u.role
       ORDER BY sold_count DESC`, [cid, ...v]);
     res.json(rows);
-  } catch (err) { res.status(500).json({ error: err.message }); }
+  } catch (err) { serverError(res, err); }
 });
 
 // GET /sales-detail — every sale row with full columns
@@ -267,7 +268,7 @@ router.get('/sales-detail', auth, async (req, res) => {
       WHERE s.company_id=$1${w}
       ORDER BY s.sold_at DESC`, [cid, ...v]);
     res.json(rows);
-  } catch (err) { res.status(500).json({ error: err.message }); }
+  } catch (err) { serverError(res, err); }
 });
 
 // GET /activity — хэн юу хийсэн (бүртгэсэн + зарсан) сар бүрээр
@@ -331,7 +332,7 @@ router.get('/activity', auth, async (req, res) => {
       monthly_reg:   monthlyReg.rows,
       monthly_sales: monthlySale.rows,
     });
-  } catch (err) { res.status(500).json({ error: err.message }); }
+  } catch (err) { serverError(res, err); }
 });
 
 // GET /filters — available filter options (brands, salespersons)
@@ -343,7 +344,7 @@ router.get('/filters', auth, async (req, res) => {
       pool.query(`SELECT id, name FROM users WHERE company_id=$1 ORDER BY name`, [cid]),
     ]);
     res.json({ brands: brands.rows.map(r => r.brand), salespersons: users.rows });
-  } catch (err) { res.status(500).json({ error: err.message }); }
+  } catch (err) { serverError(res, err); }
 });
 
 module.exports = router;

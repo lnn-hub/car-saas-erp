@@ -34,7 +34,7 @@ export interface Vehicle {
   engine_cc: string;
   mileage: number;
   has_plates: boolean;
-  total_cost: string | null;
+  price: string | null;
   main_image: string | null;
   images?: string[];
 }
@@ -54,7 +54,7 @@ export interface VehicleDetail {
   id: string; brand: string; model: string; year: number; color: string;
   fuel_type: string; transmission: string; engine_cc: string; mileage: number;
   description: string; has_plates: boolean; manufactured_date: string | null;
-  total_cost: string | null; images: string[];
+  price: string | null; images: string[];
   company: Company;
 }
 

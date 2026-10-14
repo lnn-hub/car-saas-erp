@@ -132,9 +132,9 @@ function HomeContent({ initial }: { initial: SiteInitial | null }) {
   const uniqueBrands = [...new Set(vehicles.map((v) => v.brand))].sort();
   const fuelsInUse = [...new Set(vehicles.map((v) => v.fuel_type))];
 
-  const hasPrices = vehicles.some((v) => Number(v.total_cost) > 0);
+  const hasPrices = vehicles.some((v) => Number(v.price) > 0);
   const range = PRICE_RANGES.find((r) => r.key === filterPrice);
-  const priceOf = (v: (typeof vehicles)[number]) => Number(v.total_cost) || 0;
+  const priceOf = (v: (typeof vehicles)[number]) => Number(v.price) || 0;
 
   const filtered = vehicles
     .filter((v) => {
@@ -435,7 +435,7 @@ function HomeContent({ initial }: { initial: SiteInitial | null }) {
               {filtered.map((v) => {
                 const src = optimizeImg(v.main_image, 640);
                 const src2 = v.images?.[1] ? optimizeImg(v.images[1], 640) : null;
-                const price = fmtPrice(v.total_cost);
+                const price = fmtPrice(v.price);
                 const km = fmtKm(v.mileage);
                 const cc = v.engine_cc
                   ? `${(Number(v.engine_cc) / 1000).toFixed(1)}L`

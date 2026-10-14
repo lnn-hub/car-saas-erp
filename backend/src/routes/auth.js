@@ -1,4 +1,5 @@
 const router = require('express').Router();
+const { serverError } = require('../utils/http');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const pool = require('../db/pool');
@@ -57,7 +58,7 @@ router.post('/register', async (req, res) => {
     res.status(201).json({ token, user: { id: user.id, name: user.name, role: user.role } });
   } catch (err) {
     await client.query('ROLLBACK');
-    res.status(500).json({ error: err.message });
+    serverError(res, err);
   } finally {
     client.release();
   }
@@ -77,10 +78,11 @@ router.post('/login', async (req, res) => {
       [email]
     );
     const user = rows[0];
-    if (!user) return res.status(401).json({ error: 'Хэрэглэгч олдсонгүй' });
+    const BAD = { error: 'И-мэйл эсвэл нууц үг буруу байна' };
+    if (!user) { await bcrypt.compare(password, '$2a$10$invalidinvalidinvalidinvalidinvalidinvalidinvalidinvali'); return res.status(401).json(BAD); }
 
     const valid = await bcrypt.compare(password, user.password);
-    if (!valid) return res.status(401).json({ error: 'Нууц үг буруу' });
+    if (!valid) return res.status(401).json(BAD);
 
     const superadmin = superEmails().includes(String(user.email).toLowerCase());
     if (user.company_active === false && !superadmin)
@@ -94,7 +96,7 @@ router.post('/login', async (req, res) => {
 
     res.json({ token, user: { id: user.id, name: user.name, role: user.role, superadmin, company_name: user.company_name } });
   } catch (err) {
-    res.status(500).json({ error: err.message });
+    serverError(res, err);
   }
 });
 

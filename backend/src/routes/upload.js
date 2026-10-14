@@ -1,4 +1,5 @@
 const router     = require('express').Router();
+const { serverError } = require('../utils/http');
 const multer     = require('multer');
 const sharp      = require('sharp');
 const path       = require('path');
@@ -6,6 +7,7 @@ const fs         = require('fs');
 const { v2: cloudinary } = require('cloudinary');
 const pool       = require('../db/pool');
 const auth       = require('../middleware/auth');
+const { requireAdmin } = auth;
 
 // ─── Cloudinary config ───────────────────────────────────────────────────────
 const USE_CLOUDINARY = !!(
@@ -106,11 +108,11 @@ router.post('/vehicle/:id', auth, upload.array('images', 20), async (req, res) =
       saved.push(imgRows[0]);
     }
     res.json(saved);
-  } catch (err) { res.status(500).json({ error: err.message }); }
+  } catch (err) { serverError(res, err); }
 });
 
 // POST /api/upload/team/:id  (гишүүний зураг)
-router.post('/team/:id', auth, upload.single('photo'), async (req, res) => {
+router.post('/team/:id', auth, requireAdmin, upload.single('photo'), async (req, res) => {
   try {
     if (!req.file) return res.status(400).json({ error: 'Зураг сонгоно уу' });
     const { rows } = await pool.query(
@@ -126,11 +128,11 @@ router.post('/team/:id', auth, upload.single('photo'), async (req, res) => {
       [url, req.params.id]
     );
     res.json(upd[0]);
-  } catch (err) { res.status(500).json({ error: err.message }); }
+  } catch (err) { serverError(res, err); }
 });
 
 // POST /api/upload/logo  (компанийн лого)
-router.post('/logo', auth, upload.single('logo'), async (req, res) => {
+router.post('/logo', auth, requireAdmin, upload.single('logo'), async (req, res) => {
   try {
     if (!req.file) return res.status(400).json({ error: 'Зураг сонгоно уу' });
     const { rows } = await pool.query('SELECT logo_url FROM companies WHERE id=$1', [req.user.company_id]);
@@ -138,17 +140,17 @@ router.post('/logo', auth, upload.single('logo'), async (req, res) => {
     if (rows[0]?.logo_url) await deleteImage(rows[0].logo_url);
     await pool.query('UPDATE companies SET logo_url=$1 WHERE id=$2', [url, req.user.company_id]);
     res.json({ logo_url: url });
-  } catch (err) { res.status(500).json({ error: err.message }); }
+  } catch (err) { serverError(res, err); }
 });
 
 // DELETE /api/upload/logo
-router.delete('/logo', auth, async (req, res) => {
+router.delete('/logo', auth, requireAdmin, async (req, res) => {
   try {
     const { rows } = await pool.query('SELECT logo_url FROM companies WHERE id=$1', [req.user.company_id]);
     if (rows[0]?.logo_url) await deleteImage(rows[0].logo_url);
     await pool.query('UPDATE companies SET logo_url=NULL WHERE id=$1', [req.user.company_id]);
     res.json({ ok: true });
-  } catch (err) { res.status(500).json({ error: err.message }); }
+  } catch (err) { serverError(res, err); }
 });
 
 // DELETE /api/upload/image/:imageId
@@ -174,7 +176,7 @@ router.delete('/image/:imageId', auth, async (req, res) => {
       );
     }
     res.json({ ok: true });
-  } catch (err) { res.status(500).json({ error: err.message }); }
+  } catch (err) { serverError(res, err); }
 });
 
 // PATCH /api/upload/image/:imageId/main
@@ -191,7 +193,7 @@ router.patch('/image/:imageId/main', auth, async (req, res) => {
     await pool.query('UPDATE vehicle_images SET is_main=false WHERE vehicle_id=$1', [rows[0].vehicle_id]);
     await pool.query('UPDATE vehicle_images SET is_main=true  WHERE id=$1', [req.params.imageId]);
     res.json({ ok: true });
-  } catch (err) { res.status(500).json({ error: err.message }); }
+  } catch (err) { serverError(res, err); }
 });
 
 router.deleteImage = deleteImage;

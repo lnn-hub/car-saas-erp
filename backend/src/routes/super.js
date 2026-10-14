@@ -1,4 +1,5 @@
 const router = require('express').Router();
+const { serverError } = require('../utils/http');
 const bcrypt = require('bcryptjs');
 const pool   = require('../db/pool');
 const auth   = require('../middleware/auth');
@@ -22,7 +23,7 @@ router.get('/companies', async (req, res) => {
        FROM companies c ORDER BY c.created_at ASC`
     );
     res.json(rows.map(r => ({ ...r, features: resolveFeatures(r.features) })));
-  } catch (err) { res.status(500).json({ error: err.message }); }
+  } catch (err) { serverError(res, err); }
 });
 
 // POST /api/super/companies - шинэ компани + админ хэрэглэгч
@@ -56,7 +57,7 @@ router.post('/companies', async (req, res) => {
     res.status(201).json(company);
   } catch (err) {
     await client.query('ROLLBACK').catch(() => {});
-    res.status(500).json({ error: err.message });
+    serverError(res, err);
   } finally { client.release(); }
 });
 
@@ -85,7 +86,7 @@ router.patch('/companies/:id', async (req, res) => {
     res.json({ ...rows[0], features: resolveFeatures(rows[0].features) });
   } catch (err) {
     if (err.code === '23505') return res.status(409).json({ error: 'Энэ slug аль хэдийн ашиглагдаж байна' });
-    res.status(500).json({ error: err.message });
+    serverError(res, err);
   }
 });
 
@@ -95,7 +96,7 @@ router.get('/companies/:id/users', async (req, res) => {
     const { rows } = await pool.query(
       'SELECT id, name, email, role, is_active FROM users WHERE company_id=$1 ORDER BY created_at', [req.params.id]);
     res.json(rows);
-  } catch (err) { res.status(500).json({ error: err.message }); }
+  } catch (err) { serverError(res, err); }
 });
 
 // POST /api/super/companies/:id/password { user_id, password }
@@ -108,7 +109,7 @@ router.post('/companies/:id/password', async (req, res) => {
     const { rowCount } = await pool.query('UPDATE users SET password=$1 WHERE id=$2 AND company_id=$3', [hash, user_id, req.params.id]);
     if (!rowCount) return res.status(404).json({ error: 'Хэрэглэгч олдсонгүй' });
     res.json({ ok: true });
-  } catch (err) { res.status(500).json({ error: err.message }); }
+  } catch (err) { serverError(res, err); }
 });
 
 module.exports = router;

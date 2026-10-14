@@ -1,4 +1,5 @@
 const router = require('express').Router();
+const { serverError } = require('../utils/http');
 const pool = require('../db/pool');
 const auth = require('../middleware/auth');
 
@@ -15,7 +16,7 @@ router.get('/', auth, async (req, res) => {
   try {
     const { rows } = await pool.query(query, params);
     res.json(rows);
-  } catch (err) { res.status(500).json({ error: err.message }); }
+  } catch (err) { serverError(res, err); }
 });
 
 router.post('/', auth, async (req, res) => {
@@ -29,7 +30,7 @@ router.post('/', auth, async (req, res) => {
     );
     res.status(201).json(rows[0]);
   } catch (err) {
-    res.status(500).json({ error: err.message });
+    serverError(res, err);
   }
 });
 

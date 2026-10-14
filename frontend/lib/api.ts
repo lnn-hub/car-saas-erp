@@ -84,12 +84,6 @@ export const api = {
   register: (data: { company_name: string; name: string; email: string; password: string }) =>
     request('/auth/register', { method: 'POST', body: JSON.stringify(data) }),
 
-  getBillingStatus: () => request('/billing/status', {}, true),
-  createQPayInvoice: (plan: string) =>
-    request('/billing/qpay/invoice', { method: 'POST', body: JSON.stringify({ plan }) }),
-  checkQPayInvoice: (invoice_id: string) =>
-    request(`/billing/qpay/check/${invoice_id}`),
-
   getVehicles: () => request('/vehicles', {}, true),
   getVehicle:  (id: string) => request(`/vehicles/${id}`, {}, true),
   createVehicle: (data: object) => {

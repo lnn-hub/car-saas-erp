@@ -1,4 +1,5 @@
 const router = require('express').Router();
+const { serverError } = require('../utils/http');
 const pool = require('../db/pool');
 const auth = require('../middleware/auth');
 
@@ -25,36 +26,49 @@ router.get('/', auth, async (req, res) => {
     );
     res.json(rows);
   } catch (err) {
-    res.status(500).json({ error: err.message });
+    serverError(res, err);
   }
 });
 
 // POST /api/sales — машин зарах
 router.post('/', auth, async (req, res) => {
-  const { vehicle_id, customer_id, sale_price, payment_type, note } = req.body;
-  if (!vehicle_id || !customer_id || !sale_price)
-    return res.status(400).json({ error: 'Машин, үйлчлүүлэгч, үнэ заавал шаардлагатай' });
+  const { vehicle_id, customer_id, payment_type, note } = req.body;
+  const price = Number(req.body.sale_price);
+  if (!vehicle_id || !customer_id || !Number.isFinite(price) || price <= 0)
+    return res.status(400).json({ error: 'Машин, үйлчлүүлэгч, зөв үнэ заавал шаардлагатай' });
+  if (payment_type && !['CASH', 'LOAN', 'LEASING'].includes(payment_type))
+    return res.status(400).json({ error: 'Төлбөрийн хэлбэр буруу байна' });
 
   const client = await pool.connect();
   try {
     await client.query('BEGIN');
 
+    // Машин, үйлчлүүлэгч хоёул нэвтэрсэн компанийнх мөн эсэхийг шалгаж, машиныг түгжинэ
+    const { rows: [vehicle] } = await client.query(
+      'SELECT id, status FROM vehicles WHERE id=$1 AND company_id=$2 FOR UPDATE', [vehicle_id, req.user.company_id]);
+    if (!vehicle) { await client.query('ROLLBACK'); return res.status(404).json({ error: 'Машин олдсонгүй' }); }
+    if (vehicle.status === 'SOLD') { await client.query('ROLLBACK'); return res.status(409).json({ error: 'Энэ машин аль хэдийн зарагдсан байна' }); }
+
+    const cust = await client.query('SELECT 1 FROM customers WHERE id=$1 AND company_id=$2', [customer_id, req.user.company_id]);
+    if (!cust.rowCount) { await client.query('ROLLBACK'); return res.status(404).json({ error: 'Үйлчлүүлэгч олдсонгүй' }); }
+
     const { rows } = await client.query(
       `INSERT INTO sales (company_id, vehicle_id, customer_id, sold_by, sale_price, payment_type, note)
        VALUES ($1,$2,$3,$4,$5,$6,$7) RETURNING *`,
-      [req.user.company_id, vehicle_id, customer_id, req.user.id, sale_price, payment_type || 'CASH', note]
+      [req.user.company_id, vehicle_id, customer_id, req.user.id, price, payment_type || 'CASH', note]
     );
 
     await client.query(
-      `UPDATE vehicles SET status = 'SOLD', updated_at = NOW() WHERE id = $1`,
-      [vehicle_id]
+      `UPDATE vehicles SET status = 'SOLD', updated_at = NOW() WHERE id = $1 AND company_id = $2`,
+      [vehicle_id, req.user.company_id]
     );
 
     await client.query('COMMIT');
     res.status(201).json(rows[0]);
   } catch (err) {
-    await client.query('ROLLBACK');
-    res.status(500).json({ error: err.message });
+    await client.query('ROLLBACK').catch(() => {});
+    if (err.code === '23505') return res.status(409).json({ error: 'Энэ машин аль хэдийн зарагдсан байна' });
+    serverError(res, err);
   } finally {
     client.release();
   }
@@ -77,7 +91,7 @@ router.get('/summary', auth, async (req, res) => {
     );
     res.json(rows[0]);
   } catch (err) {
-    res.status(500).json({ error: err.message });
+    serverError(res, err);
   }
 });
 

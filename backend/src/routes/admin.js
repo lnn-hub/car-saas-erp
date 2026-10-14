@@ -1,19 +1,15 @@
 const router = require('express').Router();
 const pool   = require('../db/pool');
 const auth   = require('../middleware/auth');
+const { serverError } = require('../utils/http');
 const { seedDemo } = require('../../scripts/seed-demo');
 
 let state = { running: false, done: 0, total: 0, message: '', error: null, failed: [], finishedAt: null };
 
-// Нийтийн сайтад харагддаг (анхны) компанийн админ л ажиллуулна
-async function guard(req, res, next) {
-  try {
-    if (req.user.role !== 'ADMIN') return res.status(403).json({ error: 'Зөвхөн админ' });
-    const { rows } = await pool.query('SELECT id FROM companies ORDER BY created_at ASC LIMIT 1');
-    if (!rows[0] || rows[0].id !== req.user.company_id)
-      return res.status(403).json({ error: 'Зөвхөн нийтийн сайтын компанийн админ ажиллуулна' });
-    next();
-  } catch (err) { res.status(500).json({ error: err.message }); }
+// Зөвхөн суперадмин ажиллуулна
+function guard(req, res, next) {
+  if (!req.user.superadmin) return res.status(403).json({ error: 'Зөвхөн суперадмин' });
+  next();
 }
 
 router.get('/demo-seed', auth, guard, (req, res) => res.json(state));

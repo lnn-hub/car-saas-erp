@@ -25,7 +25,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const v = await getVehicle(id);
   if (!v) return { title: "Машин" };
   const name = `${v.year} ${v.brand} ${v.model}`;
-  const price = Number(v.total_cost) > 0 ? `${Number(v.total_cost).toLocaleString("en-US")}₮ · ` : "";
+  const price = Number(v.price) > 0 ? `${Number(v.price).toLocaleString("en-US")}₮ · ` : "";
   const description = `${price}${v.mileage ? `${Number(v.mileage).toLocaleString("en-US")} км · ` : ""}${v.color || ""}`.replace(/ · $/, "");
   const image = optimizeImg(v.images?.[0] ?? null, 1200);
   return {
