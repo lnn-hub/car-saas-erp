@@ -68,7 +68,7 @@ const PAYMENT_TYPES = [
 ];
 
 const inp =
-  "w-full bg-white border border-[#e6e0d8] rounded-md px-3 py-2 text-sm text-[#1c1917] placeholder-[#6f6a64] focus:outline-none focus:border-brand transition-colors";
+  "w-full bg-white border border-[#e6e0d8] rounded-xl px-3.5 py-2.5 text-sm text-[#1c1917] placeholder-[#6f6a64] focus:outline-none focus:border-brand transition-colors";
 
 function fmt(n: number) {
   if (n >= 1_000_000) return (n / 1_000_000).toFixed(1) + "сая₮";
@@ -293,7 +293,7 @@ function VehicleDetailContent() {
       {/* Header */}
       <div className="flex items-start justify-between">
         <div>
-          <h1 className="text-lg font-semibold text-[#1c1917]">
+          <h1 className="font-display text-2xl font-semibold tracking-[-0.02em] text-ink">
             {vehicle.brand} {vehicle.model}{" "}
             <span className="text-[#6f6a64] font-normal">{vehicle.year}</span>
           </h1>
@@ -318,7 +318,7 @@ function VehicleDetailContent() {
         {vehicle.status !== "SOLD" && (
           <button
             onClick={openSaleModal}
-            className="flex items-center gap-1.5 bg-brand hover:bg-brand-dark text-white text-sm font-medium px-4 py-2 rounded-md transition-colors"
+            className="flex items-center gap-1.5 bg-brand hover:bg-brand-dark text-white text-sm font-medium px-4 py-2 rounded-full transition-colors"
           >
             <svg
               className="w-3.5 h-3.5"
@@ -341,7 +341,7 @@ function VehicleDetailContent() {
       )}
 
       {/* Gallery */}
-      <div className="bg-white border border-[#e6e0d8] rounded-lg overflow-hidden">
+      <div className="bg-white ring-1 ring-ink/[0.06] rounded-2xl overflow-hidden">
         <div className="px-4 py-3 border-b border-[#e6e0d8] flex items-center justify-between gap-3">
           <span className="text-xs font-medium text-[#6f6a64]">
             Зураг ({vehicle.images?.length || 0})
@@ -361,7 +361,7 @@ function VehicleDetailContent() {
               <div key={img.id} className="group relative aspect-[4/3] rounded-md overflow-hidden border border-[#e6e0d8] bg-[#f3efe9]">
                 <img src={fileSrc(img.url)} alt="" className="w-full h-full object-cover" loading="lazy" />
                 {img.is_main && (
-                  <span className="absolute top-2 left-2 bg-brand text-white text-xs font-medium px-2 py-0.5 rounded-sm">Үндсэн</span>
+                  <span className="absolute top-2 left-2 bg-brand text-white text-xs font-medium px-2 py-0.5 rounded-full">Үндсэн</span>
                 )}
                 <div className="absolute inset-x-0 bottom-0 flex gap-1 p-1.5 bg-gradient-to-t from-black/70 to-transparent opacity-100 sm:opacity-0 sm:group-hover:opacity-100 transition-opacity">
                   {!img.is_main && (
@@ -369,7 +369,7 @@ function VehicleDetailContent() {
                       className="flex-1 bg-white/90 hover:bg-white text-[#111] text-xs font-bold py-2 rounded-sm">Үндсэн болгох</button>
                   )}
                   <button type="button" onClick={() => removePhoto(img.id)}
-                    className="bg-white/90 hover:bg-brand hover:text-white text-brand text-xs font-bold px-3 py-2 rounded-sm">Устгах</button>
+                    className="bg-white/90 hover:bg-brand hover:text-white text-brand text-xs font-bold px-3 py-2 rounded-full">Устгах</button>
                 </div>
               </div>
             ))}
@@ -380,7 +380,7 @@ function VehicleDetailContent() {
       </div>
 
       {/* Info grid */}
-      <div className="bg-white border border-[#e6e0d8] rounded-lg overflow-hidden">
+      <div className="bg-white ring-1 ring-ink/[0.06] rounded-2xl overflow-hidden">
         <div className="px-4 py-3 border-b border-[#e6e0d8]">
           <span className="text-xs font-medium text-[#6f6a64]">
             Мэдээлэл
@@ -411,7 +411,7 @@ function VehicleDetailContent() {
       </div>
 
       {/* Edit info */}
-      <div className="bg-white border border-[#e6e0d8] rounded-lg overflow-hidden">
+      <div className="bg-white ring-1 ring-ink/[0.06] rounded-2xl overflow-hidden">
         <div className="px-4 py-3 border-b border-[#e6e0d8] flex items-center justify-between">
           <span className="text-xs font-medium text-[#6f6a64]">Мэдээлэл засах</span>
           {!editOpen && (
@@ -459,7 +459,7 @@ function VehicleDetailContent() {
 
       {/* Status change */}
       {vehicle.status !== "SOLD" && (
-        <div className="bg-white border border-[#e6e0d8] rounded-lg p-4">
+        <div className="bg-white ring-1 ring-ink/[0.06] rounded-2xl p-4">
           <div className="text-xs font-medium text-[#6f6a64] mb-3">
             Статус өөрчлөх
           </div>
@@ -483,7 +483,7 @@ function VehicleDetailContent() {
       )}
 
       {/* Costs */}
-      <div className="bg-white border border-[#e6e0d8] rounded-lg overflow-hidden">
+      <div className="bg-white ring-1 ring-ink/[0.06] rounded-2xl overflow-hidden">
         <div className="px-4 py-3 border-b border-[#e6e0d8] flex items-center justify-between">
           <span className="text-xs font-medium text-[#6f6a64]">
             Зардлууд
@@ -582,7 +582,7 @@ function VehicleDetailContent() {
             </div>
             <button
               type="submit"
-              className="px-4 py-2.5 text-sm bg-brand hover:bg-brand-dark text-white rounded-md font-medium transition-colors"
+              className="px-4 py-2.5 text-sm bg-brand hover:bg-brand-dark text-white rounded-full font-medium transition-colors"
             >
               Нэмэх
             </button>
@@ -597,13 +597,13 @@ function VehicleDetailContent() {
           <div className="text-xs text-[#6f6a64] mt-0.5">Зураг, зардлын хамт бүрмөсөн устна. Борлуулалттай машиныг устгах боломжгүй.</div>
         </div>
         <button type="button" onClick={removeVehicle}
-          className="shrink-0 text-sm text-brand border border-brand/30 hover:bg-brand hover:text-white hover:border-brand px-4 py-2 rounded-md transition-colors font-medium">Устгах</button>
+          className="shrink-0 text-sm text-brand border border-brand/30 hover:bg-brand hover:text-white hover:border-brand px-4 py-2 rounded-full transition-colors font-medium">Устгах</button>
       </div>
 
       {/* ── SALE MODAL ── */}
       {showSale && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 px-4">
-          <div className="bg-white border border-[#e6e0d8] rounded-xl shadow-xl w-full max-w-md overflow-hidden">
+          <div className="bg-white ring-1 ring-ink/[0.06] rounded-[22px] shadow-xl w-full max-w-md overflow-hidden">
             {saleSuccess ? (
               /* Амжилттай */
               <div className="p-8 text-center">
@@ -618,7 +618,7 @@ function VehicleDetailContent() {
                     <path d="M5 13l4 4L19 7" />
                   </svg>
                 </div>
-                <h2 className="text-lg font-semibold text-[#1c1917] mb-1">
+                <h2 className="font-display text-2xl font-semibold tracking-[-0.02em] text-ink mb-1">
                   Амжилттай зарагдлаа!
                 </h2>
                 <p className="text-sm text-[#5f5a54] mb-1">

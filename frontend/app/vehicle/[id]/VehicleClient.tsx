@@ -1,59 +1,56 @@
 'use client';
-import { useEffect, useState, Suspense } from 'react';
+import { useEffect, useRef, useState, Suspense } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
-import { BACKEND as API, companyQuery, optimizeImg, VehicleDetail } from '@/lib/site';
+import { BACKEND, companyQuery, optimizeImg, Vehicle, VehicleDetail } from '@/lib/site';
+import { FUEL, TRANS, fmtEngine, fmtPrice } from '@/lib/format';
 import { useCompany } from '@/lib/useSiteData';
 import { SiteHeader } from '@/components/site/SiteHeader';
 import { SiteFooter } from '@/components/site/SiteFooter';
 import { LeasingCalculator } from '@/components/site/LeasingCalculator';
 import { BrandMark } from '@/components/site/BrandMark';
 import { Lightbox } from '@/components/site/Lightbox';
+import { CarPlaceholder, VehicleCard, VehicleCardSkeleton } from '@/components/site/VehicleCard';
+import { IcPhone, IcWa } from '@/components/site/icons';
 
-const BACKEND = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000';
-
-const FUEL:  Record<string,string> = { PETROL:'Бензин', DIESEL:'Дизель', HYBRID:'Хибрид', ELECTRIC:'Цахилгаан' };
-const TRANS: Record<string,string> = { AUTO:'Автомат', MANUAL:'Механик' };
-
-interface Other {
-  id: string; brand: string; model: string; year: number;
-  mileage: number; fuel_type: string; price: string | null; main_image: string | null;
-}
-
-function fmtPrice(n: string|number|null) {
-  if (!n || Number(n) === 0) return null;
-  const num = Number(n);
-  if (num >= 1_000_000) return (num/1_000_000).toFixed(1)+' сая ₮';
-  return num.toLocaleString('mn-MN')+' ₮';
-}
 function imgSrc(u: string, w = 1400) { return optimizeImg(u, w) || u; }
 
 /* ─── SVG icons ─── */
+const sv = { viewBox: '0 0 24 24', fill: 'none', stroke: 'currentColor', strokeWidth: 1.8, strokeLinecap: 'round' as const, strokeLinejoin: 'round' as const };
 const Ic = {
-  back:   <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2.5}><path d="M19 12H5M12 19l-7-7 7-7"/></svg>,
-  phone:  <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2}><path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07A19.5 19.5 0 013.07 9.81 19.79 19.79 0 01.07 1.18 2 2 0 012.05 0h3a2 2 0 012 1.72c.127.96.361 1.903.7 2.81a2 2 0 01-.45 2.11L6.09 7.91a16 16 0 006 6l1.27-1.27a2 2 0 012.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0122 16.92z"/></svg>,
-  wa:     <svg className="w-4 h-4" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>,
-  fuel:   <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.8}><path d="M3 22V6a2 2 0 012-2h8a2 2 0 012 2v16M3 22h14M13 4h2l2 2v3.5a1.5 1.5 0 003 0V8l-2-2"/><path d="M7 14h4v4H7z"/></svg>,
-  gear:   <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.8}><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83-2.83l.06-.06A1.65 1.65 0 004.68 15a1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 012.83-2.83l.06.06A1.65 1.65 0 009 4.68a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 2.83l-.06.06A1.65 1.65 0 0019.4 9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z"/></svg>,
-  odo:    <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.8}><path d="M12 2a10 10 0 100 20A10 10 0 0012 2z"/><path d="M12 6v6l4 2"/></svg>,
-  engine: <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.8}><rect x="2" y="7" width="20" height="10" rx="2"/><path d="M6 7V5M18 7V5M6 17v2M18 17v2M2 12h2M20 12h2"/></svg>,
-  color:  <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.8}><path d="M12 22C6.477 22 2 17.523 2 12S6.477 2 12 2s10 4.477 10 10-4.477 10-10 10z"/><path d="M12 2v20"/><path d="M2 12h20"/></svg>,
-  plate:  <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.8}><rect x="2" y="6" width="20" height="12" rx="2"/><circle cx="8" cy="12" r="1.5"/><circle cx="16" cy="12" r="1.5"/><line x1="11" y1="9" x2="13" y2="9"/><line x1="11" y1="12" x2="13" y2="12"/><line x1="11" y1="15" x2="13" y2="15"/></svg>,
-  check:  <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2.5}><path d="M20 6L9 17l-5-5"/></svg>,
-  img:    <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.8}><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/></svg>,
+  back:   <svg className="w-4 h-4" {...sv} strokeWidth={2.2}><path d="M19 12H5M12 19l-7-7 7-7"/></svg>,
+  fuel:   <svg className="w-5 h-5" {...sv}><path d="M3 22V6a2 2 0 012-2h8a2 2 0 012 2v16M3 22h14M13 4h2l2 2v3.5a1.5 1.5 0 003 0V8l-2-2"/><path d="M7 14h4v4H7z"/></svg>,
+  gear:   <svg className="w-5 h-5" {...sv}><circle cx="6" cy="6" r="2"/><circle cx="12" cy="6" r="2"/><circle cx="18" cy="6" r="2"/><circle cx="6" cy="18" r="2"/><circle cx="12" cy="18" r="2"/><path d="M6 8v8M12 8v8M18 8v4H6"/></svg>,
+  odo:    <svg className="w-5 h-5" {...sv}><path d="M3.5 17a9 9 0 1117 0"/><path d="M12 13l4-4"/><circle cx="12" cy="13" r="1"/></svg>,
+  engine: <svg className="w-5 h-5" {...sv}><rect x="3" y="8" width="15" height="10" rx="2"/><path d="M7 8V5h6v3M18 11h3v4h-3M3 13H1"/></svg>,
+  check:  <svg className="w-3.5 h-3.5" {...sv} strokeWidth={3}><path d="M20 6L9 17l-5-5"/></svg>,
+  grid:   <svg className="w-4 h-4" {...sv}><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/></svg>,
+  link:   <svg className="w-4 h-4" {...sv} strokeWidth={2}><path d="M10 13a5 5 0 007.07 0l3-3a5 5 0 00-7.07-7.07l-1.5 1.5"/><path d="M14 11a5 5 0 00-7.07 0l-3 3a5 5 0 007.07 7.07l1.5-1.5"/></svg>,
+  calc:   <svg className="w-4 h-4" {...sv}><rect x="4" y="2" width="16" height="20" rx="3"/><path d="M8 6h8M8 11h.01M12 11h.01M16 11h.01M8 15h.01M12 15h.01M16 15h.01M8 19h.01M12 19h.01M16 19h.01"/></svg>,
+  arrow:  <svg className="w-4 h-4" {...sv} strokeWidth={2}><path d="M5 12h14M13 6l6 6-6 6"/></svg>,
 };
+
+function Shell({ company, children }: { company: VehicleDetail['company'] | null; children: React.ReactNode }) {
+  return (
+    <div className="min-h-screen flex flex-col">
+      <SiteHeader company={company} />
+      {children}
+      <SiteFooter company={company} />
+    </div>
+  );
+}
 
 function VehicleContent({ id, initial }: { id: string; initial: VehicleDetail | null }) {
   const router = useRouter();
-
-  const siteCompany        = useCompany();
-  const [v, setV]          = useState<VehicleDetail|null>(initial);
-  const [imgIdx, setIdx]   = useState(0);
-  const [others, setOthers]  = useState<Other[]>([]);
-  const [copied, setCopied]  = useState(false);
+  const siteCompany = useCompany();
+  const [v, setV] = useState<VehicleDetail | null>(initial);
+  const [others, setOthers] = useState<Vehicle[] | null>(null);
+  const [copied, setCopied] = useState(false);
   const [calcOpen, setCalcOpen] = useState(false);
   const [lightbox, setLightbox] = useState<number | null>(null);
+  const [slide, setSlide] = useState(0);
   const [loading, setLoad] = useState(!initial);
+  const stripRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     let cancelled = false;
@@ -74,73 +71,66 @@ function VehicleContent({ id, initial }: { id: string; initial: VehicleDetail | 
         else setLoad(false);
       }
     }
-    fetch(`${BACKEND}/health`).catch(() => {});
-    fetch(`${API}/api/public/vehicles${companyQuery()}`)
+    fetch(`${BACKEND}/api/public/vehicles${companyQuery()}`)
       .then(r => r.json())
-      .then(d => { if (!cancelled) setOthers((d.vehicles || []).filter((x: Other) => x.id !== id).slice(0, 4)); })
-      .catch(() => {});
+      .then(d => { if (!cancelled) setOthers((d.vehicles || []).filter((x: Vehicle) => x.id !== id).slice(0, 4)); })
+      .catch(() => { if (!cancelled) setOthers([]); });
     load();
     return () => { cancelled = true; document.title = prevTitle; };
   }, [id]);
 
   const company = v?.company ?? siteCompany;
 
-  /* ── Loading ── */
   if (loading) return (
-    <div className="min-h-screen bg-[#f6f3ef] flex flex-col">
-      <SiteHeader company={company} />
-      <div className="flex-1 flex items-center justify-center py-24">
-        <div className="text-center">
-          <div className="w-10 h-10 border-[3px] border-brand border-t-transparent rounded-full animate-spin mx-auto mb-3" />
-          <p className="text-sm text-gray-500">Ачааллаж байна...</p>
-        </div>
-      </div>
-      <SiteFooter company={company} />
-    </div>
+    <Shell company={company}>
+      <main className="flex-1 max-w-7xl w-full mx-auto px-4 pt-6 pb-20 animate-pulse">
+        <div className="h-4 w-40 bg-zinc-200 rounded-full mb-6" />
+        <div className="h-12 w-2/3 max-w-md bg-zinc-200 rounded-2xl mb-8" />
+        <div className="aspect-[16/9] lg:aspect-[21/9] bg-zinc-200 rounded-[32px]" />
+      </main>
+    </Shell>
   );
 
-  /* ── 404 ── */
   if (!v) return (
-    <div className="min-h-screen bg-[#f6f3ef] flex flex-col">
-      <SiteHeader company={company} />
-      <div className="flex-1 flex items-center justify-center py-24">
+    <Shell company={company}>
+      <main className="flex-1 flex items-center justify-center px-4 py-24">
         <div className="text-center">
-          <div className="text-7xl font-bold text-gray-200 mb-4">404</div>
-          <p className="text-gray-500 text-sm mb-5">Машин олдсонгүй</p>
-          <Link href="/#cars" className="inline-flex items-center gap-2 text-sm text-brand hover:underline">
-            {Ic.back} Машинууд руу буцах
+          <div className="font-display text-[120px] leading-none font-semibold text-zinc-200 tracking-tighter">404</div>
+          <p className="font-display text-xl font-semibold text-ink mt-2">Машин олдсонгүй</p>
+          <p className="text-zinc-500 text-sm mt-1 mb-7">Зарагдсан эсвэл хасагдсан байж магадгүй.</p>
+          <Link href="/#cars" className="inline-flex items-center gap-2 h-12 px-6 rounded-full bg-ink text-white text-sm font-medium hover:bg-brand transition-colors">
+            {Ic.back} Бүх машин үзэх
           </Link>
         </div>
-      </div>
-      <SiteFooter company={company} />
-    </div>
+      </main>
+    </Shell>
   );
 
   const leasingOn = v.company?.features?.leasing !== false;
-  const fullImgs = v.images?.length ? v.images.map(u => imgSrc(u, 2000)) : [];
-  const thumbs = v.images?.length ? v.images.map(u => imgSrc(u, 240)) : [];
-  const imgs  = v.images?.length
-    ? v.images.map(u => imgSrc(u))
-    : [];
+  const images = v.images || [];
+  const fullImgs = images.map(u => imgSrc(u, 2000));
   const price = fmtPrice(v.price);
-  const mainImg = imgs[imgIdx] || null;
+  const km = v.mileage > 0 ? `${Number(v.mileage).toLocaleString('en-US')} км` : null;
+  const engine = fmtEngine(v.engine_cc);
 
   const highlights = [
-    { icon: Ic.fuel,   label: 'Түлш',        value: FUEL[v.fuel_type] },
-    { icon: Ic.gear,   label: 'Хурдны хайрцаг', value: TRANS[v.transmission] },
-    { icon: Ic.odo,    label: 'Гүйлт',        value: v.mileage > 0 ? `${Number(v.mileage).toLocaleString()} км` : '—' },
-    { icon: Ic.engine, label: 'Хөдөлгүүр',   value: v.engine_cc ? `${(Number(v.engine_cc)/1000).toFixed(1)}L` : '—' },
+    { icon: Ic.odo,    label: 'Гүйлт',          value: km || '—' },
+    { icon: Ic.fuel,   label: 'Түлш',           value: FUEL[v.fuel_type] || '—' },
+    { icon: Ic.gear,   label: 'Хурдны хайрцаг', value: TRANS[v.transmission] || '—' },
+    { icon: Ic.engine, label: 'Хөдөлгүүр',      value: engine || '—' },
   ];
 
   const allSpecs = [
-    { label:'Түлшний төрөл',   value: FUEL[v.fuel_type] },
-    { label:'Хурдны хайрцаг',  value: TRANS[v.transmission] },
-    { label:'Гүйлт',           value: v.mileage > 0 ? `${Number(v.mileage).toLocaleString()} км` : null },
-    { label:'Хөдөлгүүр',       value: v.engine_cc ? `${(Number(v.engine_cc)/1000).toFixed(1)}L` : null },
-    { label:'Өнгө',            value: v.color || null },
-    { label:'Улсын дугаар',    value: v.has_plates ? 'Дугаартай' : 'Дугааргүй' },
-    { label:'Үйлдвэрлэсэн',   value: v.manufactured_date ? v.manufactured_date.slice(0,7) : null },
-    { label:'Он',              value: String(v.year) },
+    { label: 'Марк',            value: v.brand },
+    { label: 'Загвар',          value: v.model },
+    { label: 'Он',              value: String(v.year) },
+    { label: 'Үйлдвэрлэсэн',    value: v.manufactured_date ? v.manufactured_date.slice(0, 7).replace('-', '.') : null },
+    { label: 'Өнгө',            value: v.color || null },
+    { label: 'Гүйлт',           value: km },
+    { label: 'Түлшний төрөл',   value: FUEL[v.fuel_type] },
+    { label: 'Хурдны хайрцаг',  value: TRANS[v.transmission] },
+    { label: 'Хөдөлгүүр',       value: engine },
+    { label: 'Улсын дугаар',    value: v.has_plates ? 'Дугаартай' : 'Дугааргүй' },
   ].filter(s => s.value);
 
   const descLines = (v.description || '').split('\n').map(l => l.trim());
@@ -150,302 +140,228 @@ function VehicleContent({ id, initial }: { id: string; initial: VehicleDetail | 
   const waHref    = v.company?.phone
     ? `https://wa.me/976${v.company.phone.replace(/\D/g, '')}?text=${encodeURIComponent(`Сайн байна уу, ${v.year} оны ${v.brand} ${v.model} машины талаар лавлах гэсэн юм.`)}`
     : '';
+
   async function copyLink() {
-    try { await navigator.clipboard.writeText(window.location.href); setCopied(true); setTimeout(() => setCopied(false), 2000); } catch {}
+    try {
+      if (navigator.share && window.matchMedia('(pointer: coarse)').matches) {
+        await navigator.share({ title: `${v!.year} ${v!.brand} ${v!.model}`, url: window.location.href });
+        return;
+      }
+      await navigator.clipboard.writeText(window.location.href);
+      setCopied(true); setTimeout(() => setCopied(false), 2000);
+    } catch {}
   }
 
-  return (
-    <div className="min-h-screen bg-[#f6f3ef] pb-[76px] lg:pb-0" style={{fontFamily:"'Inter','Segoe UI',sans-serif"}}>
+  const onStripScroll = () => {
+    const el = stripRef.current;
+    if (el) setSlide(Math.round(el.scrollLeft / el.clientWidth));
+  };
 
+  const card = 'bg-white rounded-[28px] ring-1 ring-ink/[0.06] shadow-card';
+
+  return (
+    <div className="min-h-screen pb-28 lg:pb-0">
       <SiteHeader company={company} />
 
-      {/* ── Breadcrumb ── */}
-      <div className="bg-white border-b border-zinc-200">
-        <div className="max-w-7xl mx-auto px-4 h-11 flex items-center gap-3 text-xs font-semibold uppercase tracking-[0.12em] text-zinc-500">
-          <button onClick={() => router.back()}
-            className="flex items-center gap-1.5 h-11 text-[#111] hover:text-brand transition-colors">
-            {Ic.back} Буцах
+      <main className="max-w-7xl mx-auto px-4 pt-2 sm:pt-4">
+        {/* Breadcrumb */}
+        <nav className="flex items-center gap-2 text-sm text-zinc-500 mb-5 sm:mb-7">
+          <button onClick={() => router.back()} aria-label="Буцах"
+            className="w-10 h-10 rounded-full bg-white ring-1 ring-ink/[0.06] flex items-center justify-center text-ink hover:bg-ink hover:text-white transition-colors">
+            {Ic.back}
           </button>
-          <span className="text-zinc-300">|</span>
-          <Link href="/#cars" className="inline-flex items-center h-11 hover:text-brand transition-colors">Машинууд</Link>
+          <Link href="/#cars" className="px-2 py-2 hover:text-ink transition-colors">Машинууд</Link>
           <span className="text-zinc-300">/</span>
-          <span className="text-brand truncate">{v.brand} {v.model}</span>
-        </div>
-      </div>
+          <span className="text-ink font-medium truncate">{v.brand} {v.model}</span>
+        </nav>
 
-      {/* ── HERO image ── */}
-      <div className="relative bg-[#111] overflow-hidden" style={{minHeight:'clamp(280px,55vw,480px)'}}>
-        {mainImg ? (
+        {/* Title */}
+        <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 mb-6 sm:mb-8">
+          <div>
+            <div className="text-xs font-semibold uppercase tracking-[0.14em] text-brand mb-2">{v.brand}</div>
+            <h1 className="font-display text-4xl sm:text-6xl font-semibold tracking-[-0.035em] text-ink leading-[1.02]">
+              {v.model} <span className="text-zinc-400">{v.year}</span>
+            </h1>
+            <div className="flex flex-wrap gap-2 mt-4">
+              {v.has_plates && (
+                <span className="inline-flex items-center gap-1.5 h-8 px-3 rounded-full bg-brand-soft text-brand text-sm font-medium">
+                  {Ic.check} Дугаартай
+                </span>
+              )}
+              {v.color && <span className="inline-flex items-center h-8 px-3 rounded-full bg-white ring-1 ring-ink/[0.08] text-sm text-zinc-700">{v.color}</span>}
+              {km && <span className="inline-flex items-center h-8 px-3 rounded-full bg-white ring-1 ring-ink/[0.08] text-sm text-zinc-700">{km}</span>}
+            </div>
+          </div>
+          <button onClick={copyLink}
+            className="hidden sm:inline-flex items-center gap-2 h-11 px-5 rounded-full bg-white ring-1 ring-ink/[0.08] text-sm font-medium text-ink hover:ring-ink/30 transition-all shrink-0">
+            {Ic.link} {copied ? 'Хуулагдлаа' : 'Хуваалцах'}
+          </button>
+        </div>
+
+        {/* ── Gallery ── */}
+        {images.length > 0 ? (
           <>
-            <img src={mainImg} alt={`${v.brand} ${v.model}`}
-              loading="lazy"
-              className="w-full h-full object-cover absolute inset-0 opacity-70"
-              style={{minHeight:'clamp(280px,55vw,480px)'}} />
-            <div className="absolute inset-0"
-              style={{background:'linear-gradient(to right, rgba(0,0,0,0.75) 0%, rgba(0,0,0,0.3) 50%, rgba(0,0,0,0.1) 100%)'}} />
+            {/* Mobile: гулсуулах */}
+            <div className="sm:hidden relative -mx-4">
+              <div ref={stripRef} onScroll={onStripScroll} className="flex overflow-x-auto snap-x snap-mandatory no-scrollbar px-4 gap-2">
+                {images.map((u, i) => (
+                  <button key={u} onClick={() => setLightbox(i)} className="relative shrink-0 w-full snap-center aspect-[4/3] rounded-[24px] overflow-hidden bg-zinc-100">
+                    <img src={imgSrc(u, 900)} alt={i === 0 ? `${v.brand} ${v.model}` : ''} loading={i === 0 ? 'eager' : 'lazy'} className="w-full h-full object-cover" />
+                  </button>
+                ))}
+              </div>
+              {images.length > 1 && (
+                <div className="absolute bottom-3 right-7 glass-dark text-white text-xs font-medium tabular-nums px-3 py-1.5 rounded-full">
+                  {slide + 1} / {images.length}
+                </div>
+              )}
+            </div>
+
+            {/* Desktop: bento */}
+            <div className={`hidden sm:grid gap-2 sm:gap-3 h-[420px] lg:h-[560px] ${images.length >= 3 ? 'grid-cols-[2fr_1fr] grid-rows-2' : images.length === 2 ? 'grid-cols-2' : 'grid-cols-1'}`}>
+              {images.slice(0, 3).map((u, i) => (
+                <button key={u} onClick={() => setLightbox(i)}
+                  className={`group relative overflow-hidden bg-zinc-100 rounded-[24px] ${i === 0 && images.length >= 3 ? 'row-span-2' : ''} ${i === 0 ? 'lg:rounded-[32px]' : ''}`}>
+                  <img src={imgSrc(u, i === 0 ? 1600 : 900)} alt={i === 0 ? `${v.brand} ${v.model}` : ''} loading={i === 0 ? 'eager' : 'lazy'}
+                    className="w-full h-full object-cover group-hover:scale-[1.03] transition-transform duration-[1.2s] ease-out-expo" />
+                  <span className="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-colors" />
+                  {i === Math.min(2, images.length - 1) && images.length > 1 && (
+                    <span className="absolute bottom-4 right-4 inline-flex items-center gap-2 glass rounded-full px-4 h-10 text-sm font-medium text-ink">
+                      {Ic.grid} Бүх зураг ({images.length})
+                    </span>
+                  )}
+                </button>
+              ))}
+            </div>
           </>
         ) : (
-          <div className="absolute inset-0 flex items-center justify-center opacity-10">
-            <svg viewBox="0 0 400 240" className="w-2/3">
-              <path d="M40 170L80 90Q100 60 130 55L200 50L270 55Q300 60 320 90L360 170Z" fill="white"/>
-              <path d="M130 55L155 15Q165 5 180 4L220 4Q235 5 245 15L270 55Z" fill="white" opacity="0.7"/>
-            </svg>
+          <div className="aspect-[16/9] lg:aspect-[21/9] rounded-[28px] bg-zinc-100 text-zinc-500 flex items-center justify-center">
+            <CarPlaceholder className="w-1/3" />
           </div>
         )}
 
-        <div className="relative max-w-7xl mx-auto px-4 py-10 sm:py-16 flex flex-col justify-end" style={{minHeight:'clamp(280px,55vw,480px)'}}>
-          <div className="max-w-xl">
-            {v.has_plates && (
-              <span className="inline-flex items-center gap-1.5 bg-brand text-white text-xs font-bold px-3 py-1 rounded uppercase tracking-widest mb-4">
-                {Ic.check} Дугаартай
-              </span>
-            )}
-            <div className="text-white/60 text-sm font-semibold mb-1">{v.brand}</div>
-            <h1 className="text-3xl sm:text-5xl font-bold text-white leading-tight mb-2 drop-shadow-lg">
-              {v.model}
-            </h1>
-            <div className="flex items-center gap-3 text-white/70 text-sm">
-              <span className="bg-white/10 border border-white/20 px-3 py-1 rounded-full font-semibold">{v.year} он</span>
-              {imgs.length > 0 && (
-                <span className="flex items-center gap-1.5 bg-white/10 border border-white/20 px-3 py-1 rounded-full">
-                  {Ic.img} {imgs.length} зураг
-                </span>
-              )}
-            </div>
-          </div>
-        </div>
-      </div>
-
-      {/* ── Highlight specs strip ── */}
-      <div className="bg-white border-b border-gray-200 shadow-sm">
-        <div className="max-w-7xl mx-auto px-4">
-          <div className="grid grid-cols-2 sm:grid-cols-4 divide-x divide-y sm:divide-y-0 divide-gray-100">
-            {highlights.map(({ icon, label, value }) => (
-              <div key={label} className="flex items-center gap-2.5 py-3.5 px-3 sm:px-6">
-                <div className="w-10 h-10 bg-brand-soft rounded-xl flex items-center justify-center text-brand shrink-0">
-                  {icon}
+        {/* ── Content ── */}
+        <div className="grid grid-cols-1 lg:grid-cols-[1fr_400px] gap-6 lg:gap-10 mt-6 sm:mt-10">
+          <div className="space-y-6 min-w-0">
+            {/* Key specs */}
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+              {highlights.map(({ icon, label, value }) => (
+                <div key={label} className={`${card} p-4 sm:p-5`}>
+                  <div className="w-10 h-10 rounded-full bg-zinc-100 text-ink flex items-center justify-center">{icon}</div>
+                  <div className="text-xs sm:text-sm text-zinc-500 mt-4">{label}</div>
+                  <div className="font-display text-base sm:text-lg font-semibold text-ink mt-0.5">{value}</div>
                 </div>
-                <div>
-                  <div className="text-xs text-gray-500 font-semibold">{label}</div>
-                  <div className="text-sm font-semibold text-[#111] mt-0.5">{value}</div>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-      </div>
-
-      {/* ── Main content ── */}
-      <main className="max-w-7xl mx-auto px-4 py-8">
-        <div className="grid grid-cols-1 lg:grid-cols-[1fr_360px] gap-6">
-
-          {/* LEFT column */}
-          <div className="space-y-5">
-
-            {/* Gallery */}
-            {imgs.length > 0 && (
-              <div className="bg-white rounded-xl overflow-hidden shadow-sm">
-                {/* Main */}
-                <div className="relative aspect-[16/9] bg-gray-100 overflow-hidden cursor-zoom-in">
-                  <img src={imgs[imgIdx]} alt="" loading="lazy" onClick={() => setLightbox(imgIdx)} className="w-full h-full object-cover" />
-                  {imgs.length > 1 && (
-                    <>
-                      <button onClick={() => setIdx(i => (i - 1 + imgs.length) % imgs.length)}
-                        className="absolute left-3 top-1/2 -translate-y-1/2 w-9 h-9 bg-black/50 hover:bg-black/70 text-white rounded-full flex items-center justify-center transition-colors backdrop-blur-sm">
-                        <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2.5}><path d="M15 18l-6-6 6-6"/></svg>
-                      </button>
-                      <button onClick={() => setIdx(i => (i + 1) % imgs.length)}
-                        className="absolute right-3 top-1/2 -translate-y-1/2 w-9 h-9 bg-black/50 hover:bg-black/70 text-white rounded-full flex items-center justify-center transition-colors backdrop-blur-sm">
-                        <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2.5}><path d="M9 18l6-6-6-6"/></svg>
-                      </button>
-                      <div className="absolute bottom-3 right-3 bg-black/50 text-white text-xs font-bold px-2.5 py-1 rounded-full backdrop-blur-sm">
-                        {imgIdx+1} / {imgs.length}
-                      </div>
-                    </>
-                  )}
-                </div>
-                {/* Thumbs */}
-                {imgs.length > 1 && (
-                  <div className="flex gap-2 p-3 overflow-x-auto bg-gray-50 snap-x snap-mandatory">
-                    {imgs.map((url, i) => (
-                      <button key={i} onClick={() => setIdx(i)}
-                        className={`shrink-0 snap-start w-20 h-14 sm:w-24 sm:h-16 rounded-lg overflow-hidden border-2 transition-all ${
-                          i === imgIdx
-                            ? 'border-brand shadow-md'
-                            : 'border-transparent opacity-55 hover:opacity-100 hover:border-gray-300'
-                        }`}>
-                        <img src={thumbs[i]} alt="" loading="lazy" className="w-full h-full object-cover" />
-                      </button>
-                    ))}
-                  </div>
-                )}
-              </div>
-            )}
-
-            {/* All specs */}
-            <div className="bg-white rounded-xl overflow-hidden shadow-sm">
-              <div className="flex items-center gap-3 px-5 py-4 border-b border-gray-100">
-                <div className="w-1 h-5 bg-brand rounded-full" />
-                <h2 className="font-semibold text-[#111] text-sm">Техникийн үзүүлэлт</h2>
-              </div>
-              <div className="divide-y divide-gray-50">
-                {allSpecs.map(({ label, value }) => (
-                  <div key={label} className="flex items-center px-5 py-3.5 hover:bg-[#faf8f5] transition-colors">
-                    <span className="w-5 h-5 text-brand mr-3 shrink-0">{Ic.check}</span>
-                    <span className="text-sm text-gray-500 w-40 shrink-0">{label}</span>
-                    <span className="text-sm font-bold text-[#111]">{value}</span>
-                  </div>
-                ))}
-              </div>
+              ))}
             </div>
 
-            {/* Description */}
             {intro && (
-              <div className="bg-white rounded-xl overflow-hidden shadow-sm">
-                <div className="flex items-center gap-3 px-5 py-4 border-b border-gray-100">
-                  <div className="w-1 h-5 bg-brand rounded-full" />
-                  <h2 className="font-semibold text-[#111] text-sm">Машины тухай</h2>
-                </div>
-                <p className="px-5 py-5 text-sm sm:text-base text-gray-600 leading-relaxed whitespace-pre-line">{intro}</p>
-              </div>
+              <section className={`${card} p-6 sm:p-8`}>
+                <h2 className="font-display text-xl sm:text-2xl font-semibold text-ink mb-4">Машины тухай</h2>
+                <p className="text-[15px] sm:text-base text-zinc-600 leading-relaxed whitespace-pre-line">{intro}</p>
+              </section>
             )}
 
-            {/* Features */}
             {features.length > 0 && (
-              <div className="bg-white rounded-xl overflow-hidden shadow-sm">
-                <div className="flex items-center gap-3 px-5 py-4 border-b border-gray-100">
-                  <div className="w-1 h-5 bg-brand rounded-full" />
-                  <h2 className="font-semibold text-[#111] text-sm">Онцлох тоноглол</h2>
-                </div>
-                <ul className="grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-3 p-5">
+              <section className={`${card} p-6 sm:p-8`}>
+                <h2 className="font-display text-xl sm:text-2xl font-semibold text-ink mb-5">Онцлох тоноглол</h2>
+                <ul className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                   {features.map((f) => (
-                    <li key={f} className="flex items-start gap-3 text-sm text-gray-700">
-                      <span className="mt-0.5 w-5 h-5 shrink-0 bg-brand-soft text-brand rounded-sm flex items-center justify-center">{Ic.check}</span>
+                    <li key={f} className="flex items-start gap-3 rounded-2xl bg-zinc-50 px-4 py-3.5 text-sm text-zinc-700">
+                      <span className="mt-0.5 w-5 h-5 shrink-0 rounded-full bg-brand text-white flex items-center justify-center">{Ic.check}</span>
                       <span>{f}</span>
                     </li>
                   ))}
                 </ul>
-              </div>
+              </section>
             )}
 
-            {credit && <p className="text-xs text-gray-500 px-1">{credit}</p>}
-          </div>
-
-          {/* RIGHT sidebar */}
-          <div className="lg:sticky lg:top-20 lg:self-start space-y-4">
-
-            {/* Price card */}
-            <div className="bg-white border border-zinc-200 rounded-sm shadow-sm p-5">
-              {/* Title */}
-              <div className="mb-5">
-                <div className="text-xs font-semibold text-brand mb-1">{v.brand}</div>
-                <div className="text-[22px] font-semibold text-[#111] leading-tight">{v.model}</div>
-                <div className="text-zinc-500 text-sm mt-1">{v.year} он{v.color ? ` · ${v.color}` : ''}</div>
-              </div>
-
-              {/* Price field */}
-              <div className="mb-3 border border-zinc-200 rounded-sm px-4 py-3 border-l-[3px] border-l-brand">
-                <div className="text-xs text-zinc-500 mb-0.5">Борлуулах үнэ</div>
-                {price ? (
-                  <div className="text-[26px] font-semibold text-[#111] leading-tight tabular-nums">{price}</div>
-                ) : (
-                  <div className="text-lg font-medium text-zinc-500">Тохиролцоно</div>
-                )}
-              </div>
-
-              {/* Leasing calculator */}
-              {leasingOn && <button type="button" onClick={() => setCalcOpen(true)}
-                className="w-full mb-4 flex items-center justify-center gap-2 border border-zinc-300 hover:border-brand hover:text-brand text-zinc-700 text-sm font-medium py-2.5 rounded-sm transition-colors">
-                <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.8}><rect x="4" y="2" width="16" height="20" rx="2"/><path d="M8 6h8M8 11h2M14 11h2M8 15h2M14 15h2M8 19h2M14 19h2"/></svg>
-                Лизингийн тооцоолол
-              </button>}
-
-              {/* Quick specs */}
-              <div className="grid grid-cols-2 gap-2 mb-5">
-                {[
-                  ['Түлш', FUEL[v.fuel_type]],
-                  ['Хайрцаг', TRANS[v.transmission]],
-                  ['Гүйлт', v.mileage > 0 ? `${Number(v.mileage).toLocaleString()} км` : null],
-                  ['Хөдөлгүүр', v.engine_cc ? `${(Number(v.engine_cc)/1000).toFixed(1)}L` : null],
-                ].filter(([, val]) => val).map(([label, val]) => (
-                  <div key={label as string} className="border border-zinc-200 rounded-sm px-3 py-2">
-                    <div className="text-xs text-zinc-500">{label}</div>
-                    <div className="text-sm font-medium text-[#111] mt-0.5">{val}</div>
+            <section className={`${card} p-6 sm:p-8`}>
+              <h2 className="font-display text-xl sm:text-2xl font-semibold text-ink mb-3">Техникийн үзүүлэлт</h2>
+              <dl className="grid grid-cols-1 sm:grid-cols-2 sm:gap-x-10">
+                {allSpecs.map(({ label, value }) => (
+                  <div key={label} className="flex items-center justify-between gap-4 py-3.5 border-b border-zinc-100">
+                    <dt className="text-sm text-zinc-500">{label}</dt>
+                    <dd className="text-sm font-medium text-ink text-right">{value}</dd>
                   </div>
                 ))}
-              </div>
+              </dl>
+            </section>
 
-              {/* Contact */}
+            {credit && <p className="text-xs text-zinc-500 px-2">{credit}</p>}
+          </div>
+
+          {/* ── Price card ── */}
+          <aside className="order-first lg:order-none lg:sticky lg:top-24 lg:self-start space-y-3">
+            <div className={`${card} p-6 sm:p-7`}>
+              <div className="text-sm text-zinc-500">Үнэ</div>
+              {price ? (
+                <div className="font-display text-4xl sm:text-[44px] font-semibold text-ink tabular-nums tracking-tight leading-tight mt-1">{price}</div>
+              ) : (
+                <div className="font-display text-2xl font-semibold text-ink mt-1">Тохиролцоно</div>
+              )}
+              <div className="text-sm text-zinc-500 mt-2">{v.year} он{v.color ? ` · ${v.color}` : ''}{km ? ` · ${km}` : ''}</div>
+
+              {leasingOn && (
+                <button type="button" onClick={() => setCalcOpen(true)}
+                  className="group w-full mt-5 flex items-center justify-between gap-3 rounded-2xl bg-zinc-50 hover:bg-brand-soft px-4 py-3.5 text-left transition-colors">
+                  <span className="flex items-center gap-3">
+                    <span className="w-9 h-9 rounded-full bg-white ring-1 ring-ink/[0.06] text-brand flex items-center justify-center">{Ic.calc}</span>
+                    <span>
+                      <span className="block text-sm font-medium text-ink">Лизингийн тооцоолол</span>
+                      <span className="block text-xs text-zinc-500">Сарын төлбөрөө тооцоолох</span>
+                    </span>
+                  </span>
+                  <span className="text-zinc-400 group-hover:text-brand group-hover:translate-x-0.5 transition-all">{Ic.arrow}</span>
+                </button>
+              )}
+
               {v.company?.phone && (
-                <div className="space-y-2">
+                <div className="space-y-2 mt-5">
                   <a href={`tel:${v.company.phone}`}
-                    className="flex items-center justify-center gap-2 w-full bg-brand hover:bg-brand-dark text-white text-sm font-medium py-3 rounded-sm transition-colors">
-                    {Ic.phone}
-                    <span>Залгах · {v.company.phone}</span>
+                    className="flex items-center justify-center gap-2 w-full h-14 rounded-full bg-ink hover:bg-brand text-white font-medium transition-colors">
+                    <IcPhone cls="w-4 h-4" /> Залгах · {v.company.phone}
                   </a>
                   <a href={waHref} target="_blank" rel="noreferrer"
-                    className="flex items-center justify-center gap-2 w-full border border-zinc-300 text-zinc-700 hover:border-brand hover:text-brand text-sm font-medium py-3 rounded-sm transition-colors">
-                    {Ic.wa}
-                    <span>WhatsApp-аар бичих</span>
+                    className="flex items-center justify-center gap-2 w-full h-14 rounded-full bg-white ring-1 ring-ink/10 hover:ring-ink/30 text-ink font-medium transition-all">
+                    <IcWa cls="w-4 h-4" /> WhatsApp-аар бичих
                   </a>
                 </div>
               )}
-            </div>
 
-            {/* Dealer info */}
-            <div className="bg-white border border-zinc-200 rounded-sm shadow-sm p-4 flex items-center gap-3">
-              <BrandMark logoUrl={v.company?.logo_url} name={v.company?.name || ""} size={40} showName={false} />
-              <div className="min-w-0">
-                <div className="text-xs text-zinc-500">Дилер</div>
-                <div className="font-semibold text-[#111] text-sm truncate">{v.company?.name}</div>
+              <div className="flex items-center gap-3 mt-6 pt-5 border-t border-zinc-100">
+                <BrandMark logoUrl={v.company?.logo_url} name={v.company?.name || ''} size={40} showName={false} />
+                <div className="min-w-0 flex-1">
+                  <div className="text-xs text-zinc-500">Худалдагч</div>
+                  <div className="font-medium text-ink text-sm truncate">{v.company?.name}</div>
+                </div>
+                <button onClick={copyLink} aria-label="Холбоос хуулах" title={copied ? 'Хуулагдлаа' : 'Холбоос хуулах'}
+                  className="sm:hidden w-10 h-10 rounded-full bg-zinc-100 text-ink flex items-center justify-center">
+                  {Ic.link}
+                </button>
               </div>
             </div>
-
-            {/* Share */}
-            <button onClick={copyLink}
-              className="w-full flex items-center justify-center gap-2 bg-white border border-zinc-200 hover:border-brand hover:text-brand text-zinc-700 text-sm font-medium py-2.5 rounded-sm transition-colors">
-              <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2}><path d="M10 13a5 5 0 007.07 0l3-3a5 5 0 00-7.07-7.07l-1.5 1.5"/><path d="M14 11a5 5 0 00-7.07 0l-3 3a5 5 0 007.07 7.07l1.5-1.5"/></svg>
-              {copied ? 'Хуулагдлаа' : 'Холбоос хуулах'}
-            </button>
-
-            {/* Back */}
-            <Link href="/"
-              className="flex items-center justify-center gap-2 w-full bg-white border border-zinc-200 rounded-sm py-2.5 text-sm text-zinc-500 hover:text-brand hover:border-brand transition-colors font-medium">
-              {Ic.back} Бүх машинуудыг үзэх
-            </Link>
-          </div>
+            {copied && <div className="sm:hidden text-center text-xs text-zinc-500">Холбоос хуулагдлаа</div>}
+          </aside>
         </div>
       </main>
 
       {/* ── Similar vehicles ── */}
-      {others.length > 0 && (
-        <section className="bg-white border-t border-zinc-200 py-12 sm:py-16 px-4">
+      {(others === null || others.length > 0) && (
+        <section className="px-4 pt-16 sm:pt-24 pb-12">
           <div className="max-w-7xl mx-auto">
-            <div className="flex items-end justify-between gap-4 mb-8">
+            <div className="flex items-end justify-between gap-4 mb-6 sm:mb-8">
               <div>
-                <div className="text-xs font-semibold text-brand mb-2">Бусад машинууд</div>
-                <h2 className="text-2xl sm:text-3xl font-bold text-[#111]">Танд таалагдаж магадгүй</h2>
+                <div className="text-xs font-semibold uppercase tracking-[0.14em] text-brand mb-2">Бусад машинууд</div>
+                <h2 className="font-display text-3xl sm:text-4xl font-semibold tracking-[-0.03em] text-ink">Танд таалагдаж магадгүй</h2>
               </div>
-              <Link href="/#cars" className="py-3 text-xs font-semibold text-brand hover:text-brand-dark whitespace-nowrap">Бүгдийг үзэх →</Link>
+              <Link href="/#cars" className="hidden sm:inline-flex items-center gap-2 h-11 px-5 rounded-full bg-white ring-1 ring-ink/[0.08] text-sm font-medium text-ink hover:ring-ink/30 transition-all whitespace-nowrap">
+                Бүгдийг үзэх {Ic.arrow}
+              </Link>
             </div>
-            <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-5">
-              {others.map((o) => {
-                const src = o.main_image ? imgSrc(o.main_image, 480) : null;
-                const pr = fmtPrice(o.price);
-                return (
-                  <Link key={o.id} href={`/vehicle/${o.id}`}
-                    className="group bg-white border border-zinc-200 hover:border-brand/40 hover:shadow-xl transition-all duration-300 overflow-hidden rounded-sm">
-                    <div className="aspect-[4/3] bg-zinc-100 overflow-hidden">
-                      {src && <img src={src} alt={`${o.brand} ${o.model}`} loading="lazy" className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />}
-                    </div>
-                    <div className="p-3 sm:p-4">
-                      <div className="text-xs font-semibold text-brand">{o.brand}</div>
-                      <div className="font-bold text-[#111] text-sm sm:text-base leading-tight">{o.model} <span className="text-gray-500 font-bold">{o.year}</span></div>
-                      <div className="mt-2 text-sm font-bold text-[#111]">{pr || 'Тохиролцоно'}</div>
-                    </div>
-                  </Link>
-                );
-              })}
+            <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-6">
+              {others === null
+                ? [...Array(4)].map((_, i) => <VehicleCardSkeleton key={i} />)
+                : others.map((o) => <div key={o.id} className="reveal flex"><VehicleCard v={o} /></div>)}
             </div>
           </div>
         </section>
@@ -453,30 +369,31 @@ function VehicleContent({ id, initial }: { id: string; initial: VehicleDetail | 
 
       <SiteFooter company={company} />
 
-      <Lightbox images={fullImgs} index={lightbox} onClose={() => setLightbox(null)} onIndex={(i) => { setLightbox(i); setIdx(i); }} />
+      <Lightbox images={fullImgs} index={lightbox} onClose={() => setLightbox(null)} onIndex={(i) => setLightbox(i)} />
 
       {leasingOn && <LeasingCalculator open={calcOpen} onClose={() => setCalcOpen(false)}
         price={price ? Number(v.price) : null}
         carName={`${v.year} ${v.brand} ${v.model}`} phone={v.company?.phone} />}
 
-      {/* Mobile sticky bottom call bar */}
+      {/* Mobile: хөвөгч доод мөр */}
       {v.company?.phone && (
-        <div className="fixed bottom-0 left-0 right-0 z-50 lg:hidden bg-white border-t border-zinc-200 shadow-[0_-4px_16px_rgba(0,0,0,0.08)] px-4 pt-3 pb-[calc(0.75rem+env(safe-area-inset-bottom))] flex gap-2">
-          {leasingOn && <button type="button" onClick={() => setCalcOpen(true)} aria-label="Лизингийн тооцоолол"
-            className="shrink-0 w-12 flex items-center justify-center border border-zinc-300 text-zinc-700 active:bg-zinc-50 rounded-sm">
-            <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.8}><rect x="4" y="2" width="16" height="20" rx="2"/><path d="M8 6h8M8 11h2M14 11h2M8 15h2M14 15h2M8 19h2M14 19h2"/></svg>
-          </button>}
+        <div className="lg:hidden fixed inset-x-3 bottom-[calc(0.75rem+env(safe-area-inset-bottom))] z-40 glass rounded-full p-1.5 flex gap-1.5">
+          {leasingOn && (
+            <button type="button" onClick={() => setCalcOpen(true)} aria-label="Лизингийн тооцоолол"
+              className="shrink-0 w-12 h-12 flex items-center justify-center rounded-full bg-white border border-zinc-200 text-ink">
+              {Ic.calc}
+            </button>
+          )}
           <a href={`tel:${v.company.phone}`}
-            className="flex-1 flex items-center justify-center gap-2 bg-brand active:bg-brand-dark text-white text-sm font-medium py-3 rounded-sm">
-            {Ic.phone} Залгах
+            className="flex-1 flex items-center justify-center gap-2 bg-ink active:bg-brand text-white text-sm font-medium h-12 rounded-full">
+            <IcPhone cls="w-4 h-4" /> Залгах
           </a>
           <a href={waHref} target="_blank" rel="noreferrer"
-            className="flex-1 flex items-center justify-center gap-2 border border-zinc-300 text-zinc-700 active:bg-zinc-50 text-sm font-medium py-3 rounded-sm">
-            {Ic.wa} WhatsApp
+            className="flex-1 flex items-center justify-center gap-2 bg-white border border-zinc-200 text-ink text-sm font-medium h-12 rounded-full">
+            <IcWa cls="w-4 h-4" /> WhatsApp
           </a>
         </div>
       )}
-
     </div>
   );
 }

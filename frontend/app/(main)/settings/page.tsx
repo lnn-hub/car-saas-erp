@@ -8,7 +8,7 @@ interface Settings {
 interface Member { id: string; name: string; position: string | null; bio: string | null; photo_url: string | null; }
 
 const BACKEND = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000';
-const inp = "w-full bg-white border border-[#e6e0d8] rounded-md px-3 py-2 text-sm text-[#1c1917] placeholder-[#6f6a64] focus:outline-none focus:border-brand transition-colors";
+const inp = "w-full bg-white border border-[#e6e0d8] rounded-xl px-3.5 py-2.5 text-sm text-[#1c1917] placeholder-[#6f6a64] focus:outline-none focus:border-brand transition-colors";
 
 function photoSrc(u: string | null) {
   if (!u) return null;
@@ -20,9 +20,9 @@ function initials(name: string) {
 
 function Section({ title, hint, children }: { title: string; hint?: string; children: React.ReactNode }) {
   return (
-    <div className="bg-white border border-[#e6e0d8] rounded-xl overflow-hidden shadow-sm">
+    <div className="bg-white ring-1 ring-ink/[0.06] rounded-[22px] overflow-hidden shadow-card">
       <div className="px-5 py-3.5 border-b border-[#e6e0d8] flex items-center justify-between gap-3">
-        <span className="text-sm font-bold text-[#1c1917]">{title}</span>
+        <span className="font-display text-base font-semibold text-ink">{title}</span>
         {hint && <span className="text-xs text-[#6f6a64]">{hint}</span>}
       </div>
       {children}
@@ -155,7 +155,7 @@ export default function SettingsPage() {
   return (
     <div className="px-4 sm:px-6 py-4 sm:py-6 max-w-3xl mx-auto space-y-5">
       <div>
-        <h1 className="text-base sm:text-lg font-bold text-[#1c1917]">Тохиргоо</h1>
+        <h1 className="font-display text-2xl sm:text-[32px] font-semibold tracking-[-0.03em] text-ink">Тохиргоо</h1>
         <p className="text-xs sm:text-sm text-[#5f5a54] mt-0.5">Вэбсайтад харагдах мэдээлэл, манай баг</p>
       </div>
 
@@ -230,7 +230,7 @@ export default function SettingsPage() {
           </div>
         </Section>
 
-        <div className="bg-white border border-[#e6e0d8] rounded-xl p-5 shadow-sm">
+        <div className="bg-white ring-1 ring-ink/[0.06] rounded-[22px] p-5 shadow-card">
           <div className="flex items-center justify-between gap-4">
             <div>
               <div className="text-sm font-bold text-[#1c1917]">Вэбсайтад үнэ харуулах</div>
@@ -284,7 +284,7 @@ export default function SettingsPage() {
             Нэг минут орчим үргэлжилнэ. Дахин дарахад өмнөх жишээ машинууд шинэчлэгдэнэ, бусад машинд хөндлөнгөөс орохгүй.
           </p>
           <button type="button" onClick={startSeed} disabled={seed?.running}
-            className="px-5 py-2.5 bg-[#111] hover:bg-brand disabled:opacity-50 text-white text-sm rounded-md transition-colors font-medium">
+            className="px-5 py-2.5 bg-[#111] hover:bg-brand disabled:opacity-50 text-white text-sm rounded-full transition-colors font-medium">
             {seed?.running ? 'Оруулж байна...' : 'Жишээ машин оруулах'}
           </button>
           {seed?.running && (

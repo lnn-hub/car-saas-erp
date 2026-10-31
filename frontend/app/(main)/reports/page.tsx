@@ -29,7 +29,7 @@ const MONTH_NAMES = ['1-р сар', '2-р сар', '3-р сар', '4-р сар',
 
 const pad = (n: number) => String(n).padStart(2, '0');
 const money = (n: number | string | null) => (n == null || n === '' ? '-' : Math.round(Number(n)).toLocaleString('en-US') + '₮');
-const sel = 'bg-white border border-[#e6e0d8] rounded-md px-3 py-2 text-sm text-[#1c1917] focus:outline-none focus:border-brand';
+const sel = 'bg-white border border-[#e6e0d8] rounded-xl px-3.5 py-2.5 text-sm text-[#1c1917] focus:outline-none focus:border-brand';
 
 function periodRange(mode: Mode, year: number, month: number, quarter: number, cf: string, ct: string) {
   if (mode === 'month') return { from: `${year}-${pad(month)}-01`, to: `${year}-${pad(month)}-${pad(new Date(year, month, 0).getDate())}` };
@@ -134,18 +134,18 @@ export default function ReportsPage() {
     <div className="px-4 sm:px-6 py-4 sm:py-6 max-w-[1500px] mx-auto w-full space-y-4 sm:space-y-5">
       <div className="flex items-start justify-between gap-3">
         <div>
-          <h1 className="text-base sm:text-lg font-bold text-[#1c1917]">Тайлан</h1>
+          <h1 className="font-display text-2xl sm:text-[32px] font-semibold tracking-[-0.03em] text-ink">Тайлан</h1>
           <p className="text-xs sm:text-sm text-[#5f5a54] mt-0.5">{basisLabel} · {periodLabel}</p>
         </div>
         <button onClick={downloadCsv} disabled={!data || !data.rows.length}
-          className="shrink-0 flex items-center gap-2 bg-brand hover:bg-brand-dark disabled:opacity-40 text-white text-sm font-medium px-4 py-2.5 rounded-md transition-colors">
+          className="shrink-0 flex items-center gap-2 bg-brand hover:bg-brand-dark disabled:opacity-40 text-white text-sm font-medium px-4 py-2.5 rounded-full transition-colors">
           <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2}><path d="M12 3v12m0 0l-4-4m4 4l4-4M4 17v2a2 2 0 002 2h12a2 2 0 002-2v-2" /></svg>
           CSV татах
         </button>
       </div>
 
       {/* Шүүлтүүр */}
-      <div className="bg-white border border-[#e6e0d8] rounded-xl p-4 sm:p-5 shadow-sm space-y-4">
+      <div className="bg-white ring-1 ring-ink/[0.06] rounded-[22px] p-4 sm:p-5 shadow-card space-y-4">
         <div className="flex flex-wrap gap-2">
           {([['sold', 'Борлуулсан'], ['arrived', 'Ирсэн'], ['stock', 'Одоогийн агуулах']] as [Basis, string][]).map(([k, l]) => (
             <button key={k} onClick={() => setBasis(k)}
@@ -207,9 +207,9 @@ export default function ReportsPage() {
       {/* Хураангуй */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-2 sm:gap-3">
         {(loading && !data ? [0, 1, 2, 3] : cards).map((c, i) => typeof c === 'number' ? (
-          <div key={i} className="rounded-sm bg-white border border-zinc-200 border-t-[3px] border-t-brand px-4 py-4"><div className="h-6 w-28 rounded bg-[#f3efe9] animate-pulse" /></div>
+          <div key={i} className="rounded-[22px] bg-white ring-1 ring-ink/[0.06] px-4 py-4"><div className="h-6 w-28 rounded bg-[#f3efe9] animate-pulse" /></div>
         ) : (
-          <div key={c.label} className={`rounded-sm bg-white border border-zinc-200 border-t-[3px] border-t-brand px-4 py-3.5 shadow-sm ${loading ? 'opacity-60' : ''}`}>
+          <div key={c.label} className={`rounded-[22px] bg-white ring-1 ring-ink/[0.06] px-4 py-3.5 shadow-card ${loading ? 'opacity-60' : ''}`}>
             <div className="text-xs text-[#5f5a54] mb-2">{c.label}</div>
             <div className="text-xl font-semibold tabular-nums text-[#111] leading-none">{c.value}</div>
             {c.sub && <div className="text-xs text-[#6f6a64] mt-1.5">{c.sub}</div>}
@@ -227,7 +227,7 @@ export default function ReportsPage() {
 
       {/* Сар сараар */}
       {basis !== 'stock' && data && data.months.length > 1 && (
-        <div className="bg-white border border-[#e6e0d8] rounded-xl overflow-hidden shadow-sm">
+        <div className="bg-white ring-1 ring-ink/[0.06] rounded-[22px] overflow-hidden shadow-card">
           <div className="px-5 py-3.5 border-b border-[#e6e0d8] text-sm font-semibold text-[#1c1917]">Сар сараар</div>
           <table className="w-full text-sm">
             <thead><tr className="bg-[#faf8f5] text-xs text-[#5f5a54]"><th className="text-left font-medium px-5 py-2.5">Сар</th><th className="text-right font-medium px-5 py-2.5">Зарсан</th><th className="text-right font-medium px-5 py-2.5">Орлого</th><th className="text-right font-medium px-5 py-2.5">Ашиг</th></tr></thead>
@@ -246,7 +246,7 @@ export default function ReportsPage() {
       )}
 
       {/* Дэлгэрэнгүй */}
-      <div className="bg-white border border-[#e6e0d8] rounded-xl overflow-hidden shadow-sm">
+      <div className="bg-white ring-1 ring-ink/[0.06] rounded-[22px] overflow-hidden shadow-card">
         <div className="px-5 py-3.5 border-b border-[#e6e0d8] flex items-center justify-between">
           <span className="text-sm font-semibold text-[#1c1917]">Машины жагсаалт</span>
           <span className="text-xs text-[#6f6a64]">{data ? `${data.rows.length} машин` : ''}</span>

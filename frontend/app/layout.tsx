@@ -1,9 +1,13 @@
 import type { Metadata, Viewport } from "next";
+import { Onest, Geologica } from "next/font/google";
 import "./globals.css";
 import { getSiteData } from "@/lib/server-data";
 import { optimizeImg } from "@/lib/site";
 
-export const viewport: Viewport = { width: "device-width", initialScale: 1, viewportFit: "cover" };
+const onest = Onest({ subsets: ["latin", "cyrillic", "cyrillic-ext"], variable: "--font-onest", display: "swap" });
+const geologica = Geologica({ subsets: ["latin", "cyrillic", "cyrillic-ext"], variable: "--font-geologica", display: "swap" });
+
+export const viewport: Viewport = { width: "device-width", initialScale: 1, viewportFit: "cover", themeColor: "#f5f3f0" };
 
 export async function generateMetadata(): Promise<Metadata> {
   const data = await getSiteData();
@@ -31,7 +35,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="mn" className="h-full antialiased">
+    <html lang="mn" className={`h-full antialiased ${onest.variable} ${geologica.variable}`}>
       <body className="min-h-full flex flex-col">{children}</body>
     </html>
   );

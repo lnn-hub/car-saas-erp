@@ -2,59 +2,97 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { optimizeImg, Vehicle } from "@/lib/site";
+import { fmtPrice } from "@/lib/format";
+
+const INTERVAL = 6000;
 
 export function HeroSlides({ vehicles }: { vehicles: Vehicle[] }) {
   const slides = vehicles.filter((v) => v.main_image).slice(0, 5);
   const [i, setI] = useState(0);
+  const [paused, setPaused] = useState(false);
 
   useEffect(() => {
-    if (slides.length < 2) return;
-    const t = setInterval(() => setI((x) => (x + 1) % slides.length), 5500);
-    return () => clearInterval(t);
-  }, [slides.length]);
+    if (slides.length < 2 || paused) return;
+    const t = setTimeout(() => setI((x) => (x + 1) % slides.length), INTERVAL);
+    return () => clearTimeout(t);
+  }, [slides.length, i, paused]);
 
   if (!slides.length) return null;
-  const cur = slides[Math.min(i, slides.length - 1)];
+  const idx = Math.min(i, slides.length - 1);
+  const cur = slides[idx];
+  const price = fmtPrice(cur.price);
 
   return (
     <>
       <div className="absolute inset-0" aria-hidden>
         {slides.map((v, k) => (
-          <img
+          <div
             key={v.id}
-            src={optimizeImg(v.main_image, 1600)!}
-            alt=""
-            loading={k === 0 ? "eager" : "lazy"}
-            className={`absolute inset-0 w-full h-full object-cover transition-opacity duration-1000 ${k === i ? "opacity-100" : "opacity-0"}`}
-          />
+            className={`absolute inset-0 transition-opacity duration-[1.4s] ease-out ${k === idx ? "opacity-100" : "opacity-0"}`}
+          >
+            <img
+              src={optimizeImg(v.main_image, 1800)!}
+              alt=""
+              loading={k === 0 ? "eager" : "lazy"}
+              fetchPriority={k === 0 ? "high" : "auto"}
+              className="w-full h-full object-cover animate-[kenburns_14s_ease-in-out_infinite_alternate]"
+            />
+          </div>
         ))}
-        <div className="absolute inset-0 bg-gradient-to-r from-black/75 via-black/45 to-black/5" />
-        <div className="absolute inset-x-0 bottom-0 h-1/2 bg-gradient-to-t from-black/60 to-transparent" />
+        <div className="absolute inset-0 bg-gradient-to-r from-black/80 via-black/40 to-black/0" />
+        <div className="absolute inset-x-0 bottom-0 h-2/3 bg-gradient-to-t from-black/85 via-black/30 to-transparent" />
+        <div className="absolute inset-x-0 top-0 h-32 bg-gradient-to-b from-black/30 to-transparent" />
       </div>
 
-      <div className="absolute right-4 bottom-4 sm:right-8 sm:bottom-24 z-10 flex flex-col items-end gap-3">
+      {/* Одоо харагдаж буй машин */}
+      <div
+        className="hidden md:block absolute right-6 lg:right-10 bottom-28 z-10 w-[300px]"
+        onMouseEnter={() => setPaused(true)}
+        onMouseLeave={() => setPaused(false)}
+      >
         <Link
           href={`/vehicle/${cur.id}`}
-          className="hidden sm:flex items-center gap-2 bg-black/50 hover:bg-black/70 backdrop-blur-sm border border-white/15 text-white text-sm font-medium px-4 py-2.5 rounded-sm transition-colors"
+          className="group glass-dark rounded-[22px] p-2 pr-4 flex items-center gap-3 text-white hover:bg-black/55 transition-colors"
         >
-          {cur.year} {cur.brand} {cur.model}
-          <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2}><path d="M5 12h14M13 6l6 6-6 6" /></svg>
-        </Link>
-        {slides.length > 1 && (
-          <div className="flex gap-2">
-            {slides.map((v, k) => (
-              <button
-                key={v.id}
-                onClick={() => setI(k)}
-                aria-label={`${k + 1}-р зураг`}
-                className="py-3 px-1.5"
-              >
-                <span className={`block h-1.5 rounded-full transition-all ${k === i ? "w-8 bg-white" : "w-3 bg-white/40 hover:bg-white/70"}`} />
-              </button>
-            ))}
+          <img
+            src={optimizeImg(cur.main_image, 200)!}
+            alt=""
+            className="w-[76px] h-[56px] rounded-[14px] object-cover shrink-0"
+          />
+          <div className="min-w-0 flex-1">
+            <div className="text-[11px] uppercase tracking-[0.12em] text-white/60">{cur.year} · {cur.brand}</div>
+            <div className="font-display font-semibold truncate">{cur.model}</div>
+            {price && <div className="text-sm text-white/80 tabular-nums">{price}</div>}
           </div>
-        )}
+          <span className="w-9 h-9 rounded-full bg-white text-ink flex items-center justify-center shrink-0 group-hover:-rotate-45 transition-transform duration-300">
+            <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2}><path d="M5 12h14M13 6l6 6-6 6" /></svg>
+          </span>
+        </Link>
       </div>
+
+      {slides.length > 1 && (
+        <div className="hidden sm:flex absolute right-6 lg:right-10 bottom-20 z-10 gap-1.5 md:w-[300px]">
+          {slides.map((v, k) => (
+            <button
+              key={v.id}
+              onClick={() => setI(k)}
+              aria-label={`${k + 1}-р зураг`}
+              className="flex-1 py-3 group"
+            >
+              <span className="relative block h-[3px] w-8 md:w-auto rounded-full bg-white/25 overflow-hidden">
+                {k === idx && (
+                  <span
+                    key={`${idx}-${paused}`}
+                    className="absolute inset-0 bg-white origin-left rounded-full"
+                    style={{ animation: paused ? "none" : `progress ${INTERVAL}ms linear both` }}
+                  />
+                )}
+                {k < idx && <span className="absolute inset-0 bg-white/70 rounded-full" />}
+              </span>
+            </button>
+          ))}
+        </div>
+      )}
     </>
   );
 }

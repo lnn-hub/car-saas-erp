@@ -77,16 +77,16 @@ export default function VehiclesPage() {
   return (
     <div className="flex flex-col h-[100dvh] lg:h-screen overflow-hidden">
       {/* Top bar */}
-      <div className="px-4 py-3 border-b border-[#e6e0d8] bg-white shrink-0 space-y-2">
+      <div className="px-4 sm:px-6 pt-4 sm:pt-6 pb-4 shrink-0 space-y-4">
         <div className="flex items-center justify-between gap-2">
           <div>
-            <h1 className="text-base font-semibold text-[#1c1917] leading-none">Машинууд</h1>
-            <p className="text-xs text-[#6f6a64] mt-0.5 hidden sm:block">
+            <h1 className="font-display text-2xl sm:text-[32px] font-semibold tracking-[-0.03em] text-ink leading-none">Машинууд</h1>
+            <p className="text-sm text-zinc-500 mt-2 hidden sm:block">
               {inStock} агуулахад &middot; {soldCount} зарагдсан &middot; {fmt(totalValue)}
             </p>
           </div>
           <Link href="/vehicles/new"
-            className="flex items-center gap-1.5 bg-brand hover:bg-brand-dark text-white text-sm font-medium px-3 py-1.5 rounded-md transition-colors shrink-0">
+            className="flex items-center gap-1.5 bg-ink hover:bg-brand text-white text-sm font-medium h-11 px-4 sm:px-5 rounded-full transition-colors shrink-0">
             <svg className="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2}><path d="M12 5v14M5 12h14"/></svg>
             <span className="hidden sm:inline">Нэмэх</span>
             <span className="sm:hidden">+</span>
@@ -95,19 +95,19 @@ export default function VehiclesPage() {
         {/* Search + filters */}
         <div className="flex items-center gap-2 overflow-x-auto pb-0.5" style={{scrollbarWidth:'none'}}>
           <div className="relative shrink-0">
-            <span className="absolute left-2.5 top-1/2 -translate-y-1/2 text-[#6f6a64]">
+            <span className="absolute left-3.5 top-1/2 -translate-y-1/2 text-zinc-500">
               <svg className="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.5}><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
             </span>
             <input value={search} onChange={e => { setSearch(e.target.value); setPage(1); }}
               placeholder="Хайх..."
-              className="bg-white border border-[#e6e0d8] rounded-md pl-8 pr-3 py-1.5 text-sm text-[#1c1917] placeholder-[#6f6a64] focus:outline-none focus:border-brand w-36 sm:w-52 transition-colors" />
+              className="bg-white border border-zinc-200 rounded-full pl-9 pr-4 h-10 text-sm text-ink placeholder-zinc-500 focus:outline-none focus:border-ink/40 focus:ring-4 focus:ring-ink/5 w-40 sm:w-64 transition" />
           </div>
           {ALL_STATUSES.map(s => (
             <button key={s} onClick={() => toggleStatus(s)}
-              className={`shrink-0 flex items-center gap-1.5 px-3 py-2.5 rounded-md text-xs transition-colors border ${
+              className={`shrink-0 flex items-center gap-2 h-10 px-4 rounded-full text-sm font-medium transition-all border ${
                 statusFilter.includes(s)
-                  ? 'border-[#d4ccc2] bg-[#f3efe9] text-[#1c1917]'
-                  : 'border-transparent text-[#6f6a64]'
+                  ? 'border-ink bg-ink text-white'
+                  : 'border-zinc-200 bg-white text-zinc-600 hover:border-zinc-400'
               }`}>
               <span className={`w-1.5 h-1.5 rounded-full ${STATUS[s].dot}`} />
               <span>{STATUS[s].label}</span>
@@ -116,9 +116,10 @@ export default function VehiclesPage() {
         </div>
       </div>
 
+      <div className="flex-1 min-h-0 sm:mx-6 sm:mb-6 bg-white sm:rounded-[22px] ring-1 ring-ink/[0.06] shadow-card flex flex-col overflow-hidden">
       {/* Table header — desktop only */}
-      <div className="hidden sm:block px-6 border-b border-[#e6e0d8] bg-white shrink-0">
-        <div className="grid grid-cols-[1fr_100px_80px_110px_130px_32px] gap-3 py-2.5 text-xs font-medium text-[#6f6a64]">
+      <div className="hidden sm:block px-6 border-b border-zinc-100 shrink-0">
+        <div className="grid grid-cols-[1fr_100px_80px_110px_130px_32px] gap-3 py-3.5 text-xs font-semibold uppercase tracking-[0.08em] text-zinc-500">
           <span>Машин</span>
           <span>Гүйлт</span>
           <span>Өнгө</span>
@@ -143,7 +144,7 @@ export default function VehiclesPage() {
                 Шүүлтүүр арилгах
               </button>
             ) : (
-              <Link href="/vehicles/new" className="mt-3 inline-flex items-center gap-2 bg-brand hover:bg-brand-dark text-white text-sm font-medium px-4 py-2 rounded-md transition-colors">Машин нэмэх</Link>
+              <Link href="/vehicles/new" className="mt-3 inline-flex items-center gap-2 bg-brand hover:bg-brand-dark text-white text-sm font-medium px-4 py-2 rounded-full transition-colors">Машин нэмэх</Link>
             )}
           </div>
         ) : (
@@ -161,7 +162,7 @@ export default function VehiclesPage() {
                   className="w-full px-6 py-3 flex items-center gap-3 hover:bg-[#faf8f5] transition-colors text-left"
                 >
                   <svg className={`w-3.5 h-3.5 text-[#6f6a64] transition-transform ${isOpen ? 'rotate-90' : ''}`} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2}><path d="M9 18l6-6-6-6"/></svg>
-                  <div className="w-6 h-6 rounded flex items-center justify-center text-xs font-bold text-white shrink-0"
+                  <div className="w-7 h-7 rounded-lg flex items-center justify-center text-[11px] font-bold text-white shrink-0"
                     style={{ backgroundColor: color }}>
                     {brand.slice(0, 2).toUpperCase()}
                   </div>
@@ -250,6 +251,7 @@ export default function VehiclesPage() {
             </div>
           </div>
         )}
+      </div>
       </div>
     </div>
   );

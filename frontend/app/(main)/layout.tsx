@@ -41,7 +41,7 @@ const SIDE_NAV = [
 
 export default function MainLayout({ children }: { children: React.ReactNode }) {
   return (
-    <React.Suspense fallback={<div className="min-h-screen bg-[#f6f3ef]" />}>
+    <React.Suspense fallback={<div className="min-h-screen bg-canvas" />}>
       <MainLayoutInner>{children}</MainLayoutInner>
     </React.Suspense>
   );
@@ -87,25 +87,24 @@ function MainLayoutInner({ children }: { children: React.ReactNode }) {
   const SidebarContent = () => (
     <>
       {/* Компани */}
-      <div className="px-5 py-5 border-b border-white/10">
-        <BrandMark logoUrl={logoUrl} name={companyName || 'Удирдлага'} size={36} onDark nameClassName="text-sm font-bold text-white" />
-        <div className="text-xs font-medium text-white/40 mt-2">Админ самбар</div>
+      <div className="px-5 pt-6 pb-5">
+        <BrandMark logoUrl={logoUrl} name={companyName || 'Удирдлага'} size={36} nameClassName="font-display text-[15px] font-semibold text-ink" />
+        <div className="text-xs text-zinc-500 mt-2.5 pl-0.5">Удирдлагын самбар</div>
       </div>
 
       {/* Nav */}
-      <nav className="flex-1 px-3 py-4 space-y-1 overflow-y-auto">
-        <div className="px-3 pb-2 text-xs font-medium text-white/30">Цэс</div>
+      <nav className="flex-1 px-3 py-2 space-y-0.5 overflow-y-auto">
+        <div className="px-3 pb-2 text-[11px] font-semibold uppercase tracking-[0.12em] text-zinc-400">Цэс</div>
         {navItems.map(({ href, label, Icon }) => {
           const active = isActive(href);
           return (
             <Link key={href} href={href}
-              className={`relative flex items-center gap-3 pl-4 pr-3 py-3 rounded-sm text-[13px] font-semibold transition-all ${
+              className={`group flex items-center gap-3 px-3 h-11 rounded-xl text-sm font-medium transition-all ${
                 active
-                  ? 'bg-white/10 text-white'
-                  : 'text-white/55 hover:text-white hover:bg-white/5'
+                  ? 'bg-white text-ink shadow-card ring-1 ring-ink/[0.05]'
+                  : 'text-zinc-600 hover:text-ink hover:bg-white/60'
               }`}>
-              <span className={`absolute left-0 top-1.5 bottom-1.5 w-[3px] rounded-full transition-colors ${active ? 'bg-brand-light' : 'bg-transparent'}`} />
-              <Icon />
+              <span className={active ? 'text-brand' : 'text-zinc-400 group-hover:text-zinc-600'}><Icon /></span>
               {label}
             </Link>
           );
@@ -115,24 +114,24 @@ function MainLayoutInner({ children }: { children: React.ReactNode }) {
       {/* Вэбсайт */}
       <div className="px-3 pb-3">
         <a href="/" target="_blank" rel="noreferrer"
-          className="flex items-center justify-center gap-2 px-3 py-3 rounded-sm text-sm text-white bg-brand hover:bg-brand-dark transition-colors font-medium">
-          <IcGlobe />
-          Вэбсайт үзэх
+          className="flex items-center justify-between gap-2 px-4 h-11 rounded-xl text-sm text-zinc-700 bg-white/60 hover:bg-white ring-1 ring-ink/[0.06] transition-colors font-medium">
+          <span className="flex items-center gap-2.5"><span className="text-zinc-400"><IcGlobe /></span> Вэбсайт үзэх</span>
+          <svg className="w-3.5 h-3.5 text-zinc-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2}><path d="M7 17L17 7M9 7h8v8"/></svg>
         </a>
       </div>
 
       {/* Хэрэглэгч */}
-      <div className="px-3 pb-3 border-t border-white/10 pt-3">
-        <div className="flex items-center gap-3 px-2 py-2">
-          <div className="w-9 h-9 rounded-full bg-white/10 flex items-center justify-center shrink-0">
-            <span className="text-white text-xs font-bold">{initials || '?'}</span>
+      <div className="px-3 pb-4">
+        <div className="flex items-center gap-3 p-2.5 rounded-2xl bg-white ring-1 ring-ink/[0.06] shadow-card">
+          <div className="w-10 h-10 rounded-full bg-gradient-to-br from-brand to-brand-dark flex items-center justify-center shrink-0">
+            <span className="text-white text-xs font-semibold">{initials || '?'}</span>
           </div>
           <div className="flex-1 min-w-0">
-            <div className="text-xs font-bold text-white truncate">{userName}</div>
-            <div className="text-xs text-white/40">{userRole}</div>
+            <div className="text-sm font-medium text-ink truncate">{userName}</div>
+            <div className="text-xs text-zinc-500">{isSuper ? 'Суперадмин' : userRole === 'ADMIN' ? 'Админ' : userRole}</div>
           </div>
-          <button onClick={logout} title="Гарах"
-            className="text-white/40 hover:text-brand-light transition-colors shrink-0">
+          <button onClick={logout} title="Гарах" aria-label="Гарах"
+            className="w-9 h-9 rounded-full flex items-center justify-center text-zinc-400 hover:text-brand hover:bg-brand-soft transition-colors shrink-0">
             <IcOut />
           </button>
         </div>
@@ -141,20 +140,18 @@ function MainLayoutInner({ children }: { children: React.ReactNode }) {
   );
 
   return (
-    <div className="min-h-screen bg-[#f6f3ef] flex">
+    <div className="min-h-screen bg-canvas flex">
 
       {/* ── Desktop sidebar ── */}
-      <aside className="hidden lg:flex w-60 shrink-0 bg-[#111] flex-col fixed h-full z-30 border-r-4 border-brand">
+      <aside className="hidden lg:flex w-64 shrink-0 flex-col fixed h-full z-30 bg-canvas border-r border-ink/[0.06]">
         <SidebarContent />
       </aside>
 
       {/* ── Mobile top header ── */}
-      <header className="lg:hidden fixed top-0 left-0 right-0 z-40 bg-[#111] border-b-2 border-brand flex items-center justify-between px-4 h-14">
-        <div className="flex items-center gap-2.5">
-          <BrandMark logoUrl={logoUrl} name={companyName || 'Удирдлага'} size={32} onDark nameClassName="text-sm font-bold text-white max-w-[180px]" />
-        </div>
-        <button onClick={() => setDrawer(v => !v)}
-          className="w-9 h-9 flex items-center justify-center rounded-sm hover:bg-white/10 transition-colors text-white">
+      <header className="lg:hidden fixed top-0 left-0 right-0 z-40 h-14 px-4 flex items-center justify-between bg-canvas/80 backdrop-blur-xl border-b border-ink/[0.06]">
+        <BrandMark logoUrl={logoUrl} name={companyName || 'Удирдлага'} size={30} nameClassName="font-display text-sm font-semibold text-ink max-w-[200px]" />
+        <button onClick={() => setDrawer(v => !v)} aria-label="Цэс"
+          className="w-10 h-10 flex items-center justify-center rounded-full bg-white ring-1 ring-ink/[0.08] text-ink">
           {drawerOpen ? <IcX /> : <IcMenu />}
         </button>
       </header>
@@ -162,31 +159,37 @@ function MainLayoutInner({ children }: { children: React.ReactNode }) {
       {/* ── Mobile drawer ── */}
       {drawerOpen && (
         <>
-          <div className="lg:hidden fixed inset-0 z-30 bg-black/60 backdrop-blur-sm" onClick={() => setDrawer(false)} />
-          <aside className="lg:hidden fixed top-14 left-0 bottom-0 w-72 z-40 bg-[#111] shadow-2xl flex flex-col overflow-y-auto">
+          <div className="lg:hidden fixed inset-0 z-30 bg-ink/30 backdrop-blur-sm" onClick={() => setDrawer(false)} />
+          <aside className="lg:hidden fixed top-14 left-0 bottom-0 w-72 z-40 bg-canvas rounded-tr-3xl shadow-lift flex flex-col overflow-y-auto animate-[pageIn_0.2s_ease-out]">
             <SidebarContent />
           </aside>
         </>
       )}
 
       {/* ── Main content ── */}
-      <main className="[&>*]:animate-[pageIn_0.25s_ease-out] flex-1 lg:ml-60 min-w-0 overflow-auto pt-14 lg:pt-0 pb-[calc(5rem+env(safe-area-inset-bottom))] lg:pb-0">
+      <main className="[&>*]:animate-[pageIn_0.25s_ease-out] flex-1 lg:ml-64 min-w-0 overflow-auto pt-14 lg:pt-0 pb-[calc(6rem+env(safe-area-inset-bottom))] lg:pb-0">
         {children}
       </main>
 
       {/* ── Mobile bottom tab bar ── */}
-      <nav className="lg:hidden fixed bottom-0 left-0 right-0 z-40 bg-white border-t border-zinc-200 shadow-[0_-4px_16px_rgba(0,0,0,0.06)] pb-[env(safe-area-inset-bottom)]">
-        <div className="flex items-stretch h-16">
+      <nav className="lg:hidden fixed inset-x-3 bottom-[calc(0.75rem+env(safe-area-inset-bottom))] z-40 glass rounded-full p-1.5">
+        <div className="flex items-center h-14">
           {TAB_NAV.map(({ href, label, Icon }) => {
             const active = isActive(href);
+            if (href === '/vehicles/new') return (
+              <Link key={href} href={href} aria-label={label} className="flex-1 flex items-center justify-center">
+                <span className={`w-12 h-12 rounded-full flex items-center justify-center text-white shadow-lg transition-colors ${active ? 'bg-ink' : 'bg-brand'}`}>
+                  <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2.2} strokeLinecap="round"><path d="M12 5v14M5 12h14"/></svg>
+                </span>
+              </Link>
+            );
             return (
               <Link key={href} href={href}
-                className={`relative flex-1 flex flex-col items-center justify-center gap-0.5 transition-colors ${
+                className={`flex-1 h-full flex flex-col items-center justify-center gap-0.5 rounded-full transition-colors ${
                   active ? 'text-brand' : 'text-zinc-500'
                 }`}>
-                <span className={`absolute top-0 h-[3px] w-8 rounded-b-full transition-colors ${active ? 'bg-brand' : 'bg-transparent'}`} />
                 <Icon />
-                <span className="text-xs font-bold">{label}</span>
+                <span className={`text-[11px] ${active ? 'font-semibold' : 'font-medium'}`}>{label}</span>
               </Link>
             );
           })}

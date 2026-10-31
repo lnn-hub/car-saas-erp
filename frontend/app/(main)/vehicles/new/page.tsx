@@ -7,7 +7,7 @@ import { BRANDS_MODELS, COLORS, getWeekday } from '@/lib/vehicle-data';
 import { Combobox } from '@/components/Combobox';
 
 const BACKEND = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000';
-const inp = "w-full bg-white border border-[#e6e0d8] rounded-md px-3 py-2 text-sm text-[#1c1917] placeholder-[#6f6a64] focus:outline-none focus:border-brand transition-colors pr-8";
+const inp = "w-full bg-white border border-[#e6e0d8] rounded-xl px-3.5 py-2.5 text-sm text-[#1c1917] placeholder-[#6f6a64] focus:outline-none focus:border-brand transition-colors pr-8";
 
 const CURRENT_YEAR = new Date().getFullYear();
 const YEARS = Array.from({ length: CURRENT_YEAR - 1989 }, (_, i) => String(CURRENT_YEAR - i));
@@ -134,7 +134,7 @@ export default function NewVehiclePage() {
   if (step === 'images') {
     return (
       <div className="px-4 sm:px-8 py-5 sm:py-7 max-w-2xl mx-auto">
-        <h1 className="text-lg font-semibold text-[#1c1917] mb-1">Зураг оруулах</h1>
+        <h1 className="font-display text-2xl font-semibold tracking-[-0.02em] text-ink mb-1">Зураг оруулах</h1>
         <p className="text-sm text-[#6f6a64] mb-6">Машины зурагнуудыг оруулна уу. Эхний зураг үндсэн зураг болно.</p>
 
         {/* Drop zone */}
@@ -212,7 +212,7 @@ export default function NewVehiclePage() {
         className="flex items-center gap-1.5 py-2 pr-3 text-[#6f6a64] hover:text-[#1c1917] text-sm transition-colors mb-6">
         <IconArrowLeft className="w-4 h-4" /> Буцах
       </button>
-      <h1 className="text-lg font-semibold text-[#1c1917] mb-6">Машин нэмэх</h1>
+      <h1 className="font-display text-2xl font-semibold tracking-[-0.02em] text-ink mb-6">Машин нэмэх</h1>
 
       <form onSubmit={handleSubmit} className="space-y-5">
         {/* Үндсэн мэдээлэл */}
@@ -349,7 +349,7 @@ export default function NewVehiclePage() {
             Болих
           </button>
           <button type="submit" disabled={loading}
-            className="px-6 py-2 text-sm font-medium bg-brand hover:bg-brand-dark disabled:opacity-40 text-white rounded-md transition-colors">
+            className="px-6 py-2 text-sm font-medium bg-brand hover:bg-brand-dark disabled:opacity-40 text-white rounded-full transition-colors">
             {loading ? 'Хадгалж байна...' : 'Үргэлжлэх — зураг нэмэх →'}
           </button>
         </div>
@@ -360,7 +360,7 @@ export default function NewVehiclePage() {
 
 function Section({ title, children }: { title: string; children: React.ReactNode }) {
   return (
-    <div className="bg-white border border-[#e6e0d8] rounded-lg overflow-hidden">
+    <div className="bg-white ring-1 ring-ink/[0.06] rounded-2xl overflow-hidden">
       <div className="px-4 py-3 border-b border-[#e6e0d8]">
         <span className="text-xs font-medium text-[#6f6a64]">{title}</span>
       </div>

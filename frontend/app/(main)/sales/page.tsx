@@ -40,7 +40,7 @@ export default function SalesPage() {
 
       {/* Header */}
       <div>
-        <h1 className="text-base sm:text-lg font-bold text-[#1c1917]">Борлуулалт</h1>
+        <h1 className="font-display text-2xl sm:text-[32px] font-semibold tracking-[-0.03em] text-ink">Борлуулалт</h1>
         <p className="text-xs sm:text-sm text-[#5f5a54] mt-0.5">{sales.length} борлуулалт нийт</p>
       </div>
 
@@ -52,7 +52,7 @@ export default function SalesPage() {
           { label: 'Цэвэр ашиг',      value: summary ? fmt(summary.total_profit) : '—',  unit: '', },
           { label: 'Дундаж ашиг',     value: summary ? fmt(summary.avg_profit ?? 0) : '—', unit: '', },
         ].map(c => (
-          <div key={c.label} className="rounded-sm bg-white border border-zinc-200 border-t-[3px] border-t-brand px-3 sm:px-5 py-3 sm:py-4 shadow-sm">
+          <div key={c.label} className="rounded-[22px] bg-white ring-1 ring-ink/[0.06] px-3 sm:px-5 py-3 sm:py-4 shadow-card">
             <div className="text-xs text-[#5f5a54] mb-2">{c.label}</div>
             <div className="text-xl sm:text-2xl font-semibold tabular-nums leading-none text-[#111]">{c.value}</div>
             {c.unit && <div className="text-xs text-[#5f5a54] mt-1">{c.unit}</div>}
@@ -61,7 +61,7 @@ export default function SalesPage() {
       </div>
 
       {/* Table — desktop */}
-      <div className="hidden sm:block bg-white border border-[#e6e0d8] rounded-xl overflow-hidden shadow-sm">
+      <div className="hidden sm:block bg-white ring-1 ring-ink/[0.06] rounded-[22px] overflow-hidden shadow-card">
         <div className="px-5 py-3.5 border-b border-[#e6e0d8]">
           <span className="text-sm font-semibold text-[#1c1917]">Борлуулалтын жагсаалт</span>
         </div>
@@ -111,11 +111,11 @@ export default function SalesPage() {
       <div className="sm:hidden space-y-2">
         <div className="text-xs font-medium text-[#6f6a64] px-1">Борлуулалтын жагсаалт</div>
         {loading ? (
-          <div className="bg-white border border-[#e6e0d8] rounded-xl py-10 text-center text-sm text-[#6f6a64]">Ачааллаж байна...</div>
+          <div className="bg-white ring-1 ring-ink/[0.06] rounded-[22px] py-10 text-center text-sm text-[#6f6a64]">Ачааллаж байна...</div>
         ) : sales.length === 0 ? (
-          <div className="bg-white border border-[#e6e0d8] rounded-xl py-10 text-center text-sm text-[#6f6a64]">Борлуулалт байхгүй байна</div>
+          <div className="bg-white ring-1 ring-ink/[0.06] rounded-[22px] py-10 text-center text-sm text-[#6f6a64]">Борлуулалт байхгүй байна</div>
         ) : sales.map(s => (
-          <div key={s.id} className="bg-white border border-[#e6e0d8] rounded-xl p-4 shadow-sm">
+          <div key={s.id} className="bg-white ring-1 ring-ink/[0.06] rounded-[22px] p-4 shadow-card">
             <div className="flex items-start justify-between gap-2 mb-3">
               <div>
                 <div className="text-sm font-semibold text-[#1c1917]">{s.brand} {s.model} <span className="text-[#6f6a64] font-normal">{s.year}</span></div>

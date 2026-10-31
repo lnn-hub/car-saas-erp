@@ -15,7 +15,7 @@ const FEATURE_LABELS: [keyof Features, string][] = [
   ['reports', 'Тайлан'], ['team', 'Манай баг'], ['leasing', 'Лизингийн тооцоолуур'], ['compare', 'Машин харьцуулах'],
 ];
 const PLANS = [['basic', 'Basic'], ['standard', 'Standard'], ['pro', 'Pro']];
-const inp = 'w-full bg-white border border-[#e6e0d8] rounded-md px-3 py-2 text-sm text-[#1c1917] placeholder-[#6f6a64] focus:outline-none focus:border-brand transition-colors';
+const inp = 'w-full bg-white border border-[#e6e0d8] rounded-xl px-3.5 py-2.5 text-sm text-[#1c1917] placeholder-[#6f6a64] focus:outline-none focus:border-brand transition-colors';
 
 function Toggle({ on, onChange, label }: { on: boolean; onChange: (v: boolean) => void; label: string }) {
   return (
@@ -54,7 +54,7 @@ function CompanyCard({ c, onChange, onMsg }: { c: Company; onChange: (c: Company
   const siteEnv = c.slug ? `NEXT_PUBLIC_SITE_COMPANY=${c.slug}` : '';
 
   return (
-    <div className={`bg-white border border-[#e6e0d8] rounded-xl shadow-sm overflow-hidden ${c.is_active ? '' : 'opacity-70'}`}>
+    <div className={`bg-white ring-1 ring-ink/[0.06] rounded-[22px] shadow-card overflow-hidden ${c.is_active ? '' : 'opacity-70'}`}>
       <div className="px-5 py-4 border-b border-[#e6e0d8] flex items-start justify-between gap-3">
         <div className="min-w-0">
           <div className="text-sm font-semibold text-[#1c1917] truncate">{c.name}</div>
@@ -102,18 +102,18 @@ function CompanyCard({ c, onChange, onMsg }: { c: Company; onChange: (c: Company
         </div>
 
         {!c.slug && (
-          <div className="bg-[#faf8f5] border border-[#e6e0d8] rounded-md px-3 py-2.5">
+          <div className="bg-[#faf8f5] border border-[#e6e0d8] rounded-xl px-3.5 py-2.5.5">
             <div className="text-xs text-[#6f6a64] mb-1.5">Slug тохируулах (нийтийн сайтыг таних нэр)</div>
             <div className="flex gap-2">
               <input value={slugIn} onChange={e => setSlugIn(e.target.value.toLowerCase().replace(/[^a-z0-9-]/g, ''))} placeholder="auto-ulaanbaatar" className={inp} />
               <button type="button" disabled={slugIn.length < 3} onClick={() => save({ slug: slugIn })}
-                className="shrink-0 bg-brand hover:bg-brand-dark disabled:opacity-40 text-white text-sm font-medium px-4 rounded-md">Хадгалах</button>
+                className="shrink-0 bg-brand hover:bg-brand-dark disabled:opacity-40 text-white text-sm font-medium px-4 rounded-full">Хадгалах</button>
             </div>
           </div>
         )}
 
         {siteEnv && (
-          <div className="bg-[#faf8f5] border border-[#e6e0d8] rounded-md px-3 py-2.5">
+          <div className="bg-[#faf8f5] border border-[#e6e0d8] rounded-xl px-3.5 py-2.5.5">
             <div className="text-xs text-[#6f6a64] mb-1">Нийтийн сайтын тохиргоо (Vercel Environment)</div>
             <div className="flex items-center justify-between gap-2">
               <code className="text-xs text-[#1c1917] break-all">{siteEnv}</code>
@@ -133,7 +133,7 @@ function CompanyCard({ c, onChange, onMsg }: { c: Company; onChange: (c: Company
               <div className="flex gap-2">
                 <input type="text" value={pw} onChange={e => setPw(e.target.value)} placeholder="Шинэ нууц үг (8+ тэмдэгт)" className={inp} />
                 <button type="button" onClick={setPassword} disabled={!uid || pw.length < 8}
-                  className="shrink-0 bg-brand hover:bg-brand-dark disabled:opacity-40 text-white text-sm font-medium px-4 rounded-md">Хадгалах</button>
+                  className="shrink-0 bg-brand hover:bg-brand-dark disabled:opacity-40 text-white text-sm font-medium px-4 rounded-full">Хадгалах</button>
               </div>
             </div>
           )}
@@ -182,19 +182,19 @@ export default function SuperPage() {
     <div className="px-4 sm:px-6 py-4 sm:py-6 max-w-[1500px] mx-auto w-full space-y-4 sm:space-y-5">
       <div className="flex items-start justify-between gap-3">
         <div>
-          <h1 className="text-base sm:text-lg font-bold text-[#1c1917]">Суперадмин</h1>
+          <h1 className="font-display text-2xl sm:text-[32px] font-semibold tracking-[-0.03em] text-ink">Суперадмин</h1>
           <p className="text-xs sm:text-sm text-[#5f5a54] mt-0.5">Компани нэмэх, багц, боломж, хэрэглээ</p>
         </div>
-        <button onClick={() => setOpen(true)} className="shrink-0 bg-brand hover:bg-brand-dark text-white text-sm font-medium px-4 py-2.5 rounded-md transition-colors">+ Компани нэмэх</button>
+        <button onClick={() => setOpen(true)} className="shrink-0 bg-brand hover:bg-brand-dark text-white text-sm font-medium px-4 py-2.5 rounded-full transition-colors">+ Компани нэмэх</button>
       </div>
 
-      {msg && <div className="fixed top-4 right-4 z-[60] bg-[#1c1917] text-white text-sm px-4 py-2.5 rounded-md shadow-lg">{msg}</div>}
+      {msg && <div className="fixed top-4 right-4 z-[60] bg-[#1c1917] text-white text-sm px-4 py-2.5 rounded-full shadow-lg">{msg}</div>}
       {error && <div className="bg-brand-soft border border-brand/20 rounded-lg px-3 py-2 text-sm text-brand">{error}</div>}
 
       {totals && (
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-2 sm:gap-3">
           {[['Компани', `${totals.active} / ${companies!.length}`, 'идэвхтэй'], ['Нийт машин', String(totals.vehicles), ''], ['Нийт зураг', String(totals.images), 'хадгалалтын хэмжээг заана'], ['Дундаж', companies!.length ? String(Math.round(totals.vehicles / companies!.length)) : '0', 'машин / компани']].map(([l, v, s]) => (
-            <div key={l} className="rounded-sm bg-white border border-zinc-200 border-t-[3px] border-t-brand px-4 py-3.5 shadow-sm">
+            <div key={l} className="rounded-[22px] bg-white ring-1 ring-ink/[0.06] px-4 py-3.5 shadow-card">
               <div className="text-xs text-[#5f5a54] mb-2">{l}</div>
               <div className="text-xl font-semibold tabular-nums text-[#1c1917] leading-none">{v}</div>
               {s && <div className="text-xs text-[#6f6a64] mt-1.5">{s}</div>}

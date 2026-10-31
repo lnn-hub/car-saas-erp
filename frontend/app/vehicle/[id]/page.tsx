@@ -14,7 +14,7 @@ async function Loader({ params }: Props) {
 
 export default function Page({ params }: Props) {
   return (
-    <Suspense fallback={<div className="min-h-screen bg-[#f6f3ef]" />}>
+    <Suspense fallback={<div className="min-h-screen" />}>
       <Loader params={params} />
     </Suspense>
   );

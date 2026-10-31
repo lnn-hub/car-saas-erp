@@ -42,7 +42,7 @@ export function SalesChart({ sales }: { sales: Sale[] | null }) {
   const total = data.reduce((a, d) => a + d.revenue, 0);
 
   return (
-    <div className="bg-white border border-[#e6e0d8] rounded-xl overflow-hidden shadow-sm">
+    <div className="bg-white ring-1 ring-ink/[0.06] rounded-[22px] overflow-hidden shadow-card">
       <div className="px-5 py-3.5 border-b border-[#e6e0d8] flex items-center justify-between gap-3">
         <div>
           <div className="text-sm font-semibold text-[#1c1917]">Борлуулалтын орлого</div>
@@ -103,7 +103,7 @@ export function SalesChart({ sales }: { sales: Sale[] | null }) {
                     )}
                     <div className={`relative w-full max-w-[24px] mx-1 ${d.revenue > 0 ? "bg-brand rounded-t-[4px]" : "bg-[#d4ccc2]"}`}
                       style={{ height: d.revenue > 0 ? `${Math.max(h, 2)}%` : "2px" }} />
-                    <div className="pointer-events-none absolute z-10 left-1/2 -translate-x-1/2 hidden group-hover:block group-focus:block bg-[#1c1917] text-white rounded-md px-3 py-2 shadow-lg whitespace-nowrap"
+                    <div className="pointer-events-none absolute z-10 left-1/2 -translate-x-1/2 hidden group-hover:block group-focus:block bg-[#1c1917] text-white rounded-full px-3 py-2 shadow-lg whitespace-nowrap"
                       style={{ bottom: `calc(${h}% + 28px)` }}>
                       <div className="text-sm font-semibold tabular-nums">{fmtFull(d.revenue)}</div>
                       <div className="text-xs text-white/60 mt-0.5">{d.year} · {d.label} · {d.count} машин</div>

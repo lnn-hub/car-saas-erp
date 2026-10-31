@@ -59,7 +59,7 @@ export function Combobox({ value, onChange, options, placeholder, className = ''
       </button>
 
       {open && filtered.length > 0 && (
-        <div className="absolute z-50 top-full left-0 right-0 mt-1 bg-white border border-[#e6e0d8] rounded-xl shadow-lg max-h-52 overflow-y-auto">
+        <div className="absolute z-50 top-full left-0 right-0 mt-1 bg-white ring-1 ring-ink/[0.06] rounded-[22px] shadow-lg max-h-52 overflow-y-auto">
           {filtered.map(opt => (
             <button key={opt} type="button"
               onMouseDown={e => { e.preventDefault(); select(opt); }}

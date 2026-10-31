@@ -1,21 +1,26 @@
 @import "tailwindcss";
 
 @theme {
+  /* Фонт: Onest (бичвэр), Geologica (гарчиг) — монгол кирилл (Ө, Ү) бүрэн дэмжинэ */
+  --font-sans: var(--font-onest), ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
+  --font-display: var(--font-geologica), var(--font-onest), ui-sans-serif, system-ui, sans-serif;
+
   --color-brand: #8b1e2d;
   --color-brand-dark: #6d1523;
-  --color-brand-light: #d4707e;
-  --color-brand-soft: #f8eeef;
-  --color-ink: #111111;
+  --color-brand-light: #e07a88;
+  --color-brand-soft: #f9eef0;
+  --color-ink: #121010;
+  --color-canvas: #f5f3f0;
 
   /* Дулаан саарал: burgundy-тай зохицно, бичвэр нь WCAG AA (4.5:1+) */
   --color-zinc-50: #faf8f5;
   --color-gray-50: #faf8f5;
-  --color-zinc-100: #f3efe9;
-  --color-gray-100: #f3efe9;
-  --color-zinc-200: #e6e0d8;
-  --color-gray-200: #e6e0d8;
-  --color-zinc-300: #d4ccc2;
-  --color-gray-300: #d4ccc2;
+  --color-zinc-100: #f2eee9;
+  --color-gray-100: #f2eee9;
+  --color-zinc-200: #e7e2db;
+  --color-gray-200: #e7e2db;
+  --color-zinc-300: #d6cfc6;
+  --color-gray-300: #d6cfc6;
   --color-zinc-400: #a39a8f;
   --color-gray-400: #a39a8f;
   --color-zinc-500: #6f6a64;
@@ -31,34 +36,52 @@
   --color-zinc-950: #0f0d0c;
   --color-gray-950: #0f0d0c;
 
-  --radius-sm: 0.125rem;
-  --radius-md: 0.1875rem;
-  --radius-lg: 0.25rem;
-  --radius-xl: 0.3125rem;
-  --radius-2xl: 0.375rem;
+  /* Зөөлөн, орчин үеийн булангууд */
+  --radius-sm: 0.375rem;
+  --radius-md: 0.5rem;
+  --radius-lg: 0.75rem;
+  --radius-xl: 0.875rem;
+  --radius-2xl: 1.125rem;
+  --radius-3xl: 1.5rem;
+  --radius-4xl: 2rem;
+
+  --shadow-card: 0 1px 2px rgb(28 25 23 / 0.04), 0 6px 20px -8px rgb(28 25 23 / 0.08);
+  --shadow-lift: 0 2px 6px rgb(28 25 23 / 0.04), 0 24px 48px -16px rgb(28 25 23 / 0.22);
+  --shadow-glass: 0 1px 0 rgb(255 255 255 / 0.6) inset, 0 8px 32px -8px rgb(28 25 23 / 0.16);
+
+  --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
+
+  --animate-reveal: reveal 0.8s var(--ease-out-expo) both;
 }
 
 * { box-sizing: border-box; }
 
+html {
+  -webkit-text-size-adjust: 100%;
+  scroll-behavior: smooth;
+  scroll-padding-top: 96px;
+}
+
 body {
-  font-family: 'Inter', 'Segoe UI', sans-serif;
-  background: #f6f3ef;
-  color: #09090b;
+  font-family: var(--font-sans);
+  background: var(--color-canvas);
+  color: var(--color-ink);
   -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  font-feature-settings: "ss01", "cv11";
+  text-rendering: optimizeLegibility;
 }
 
-::selection { background: rgba(0,0,0,0.08); }
+h1, h2, h3, .font-display { font-family: var(--font-display); letter-spacing: -0.02em; }
 
-::-webkit-scrollbar { width: 5px; }
+::selection { background: color-mix(in oklab, var(--color-brand) 18%, transparent); }
+
+::-webkit-scrollbar { width: 8px; height: 8px; }
 ::-webkit-scrollbar-track { background: transparent; }
-::-webkit-scrollbar-thumb { background: #d4d4d8; border-radius: 3px; }
+::-webkit-scrollbar-thumb { background: #d6cfc6; border-radius: 8px; border: 2px solid var(--color-canvas); }
 
-@keyframes fadeUp {
-  from { opacity: 0; transform: translateY(12px) scale(0.97); }
-  to   { opacity: 1; transform: translateY(0) scale(1); }
-}
+:focus-visible { outline: 2px solid var(--color-brand); outline-offset: 2px; }
 
-html { -webkit-text-size-adjust: 100%; }
 * { -webkit-tap-highlight-color: transparent; }
 button, a, select { touch-action: manipulation; }
 @media (max-width: 640px) {
@@ -67,11 +90,64 @@ button, a, select { touch-action: manipulation; }
   textarea { font-size: 16px; }
 }
 
-.calc-range { -webkit-appearance: none; appearance: none; height: 4px; padding: 11px 0; box-sizing: content-box; background-clip: content-box; border-radius: 2px; outline: none; cursor: pointer; touch-action: pan-y; }
-.calc-range::-webkit-slider-thumb { -webkit-appearance: none; appearance: none; width: 22px; height: 22px; border-radius: 50%; background: var(--color-brand); border: 3px solid #fff; box-shadow: 0 1px 4px rgba(0,0,0,.35); }
-.calc-range::-moz-range-thumb { width: 18px; height: 18px; border-radius: 50%; background: var(--color-brand); border: 3px solid #fff; box-shadow: 0 1px 4px rgba(0,0,0,.35); }
+/* Шил (glass) гадаргуу — толгой, хөвөгч товчлуурууд */
+@utility glass {
+  background: rgb(255 255 255 / 0.72);
+  -webkit-backdrop-filter: blur(20px) saturate(1.6);
+  backdrop-filter: blur(20px) saturate(1.6);
+  border: 1px solid rgb(255 255 255 / 0.7);
+  box-shadow: var(--shadow-glass);
+}
+@utility glass-dark {
+  background: rgb(18 16 16 / 0.45);
+  -webkit-backdrop-filter: blur(16px) saturate(1.4);
+  backdrop-filter: blur(16px) saturate(1.4);
+  border: 1px solid rgb(255 255 255 / 0.14);
+}
+@utility no-scrollbar {
+  scrollbar-width: none;
+  &::-webkit-scrollbar { display: none; }
+}
 
+/* Гүйлгэхэд аажмаар гарч ирэх (дэмждэг хөтөч дээр л) */
+@keyframes reveal {
+  from { opacity: 0; transform: translateY(28px) scale(0.985); }
+  to   { opacity: 1; transform: none; }
+}
+@supports (animation-timeline: view()) {
+  .reveal {
+    animation: reveal linear both;
+    animation-timeline: view();
+    animation-range: entry 0% entry 60%;
+  }
+}
+
+@keyframes kenburns {
+  from { transform: scale(1.02); }
+  to   { transform: scale(1.12); }
+}
+@keyframes progress {
+  from { transform: scaleX(0); }
+  to   { transform: scaleX(1); }
+}
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(12px) scale(0.97); }
+  to   { opacity: 1; transform: translateY(0) scale(1); }
+}
 @keyframes pageIn {
   from { opacity: 0; transform: translateY(6px); }
   to   { opacity: 1; transform: translateY(0); }
 }
+@keyframes pulseDot {
+  0%, 100% { box-shadow: 0 0 0 0 rgb(74 222 128 / 0.6); }
+  50%      { box-shadow: 0 0 0 6px rgb(74 222 128 / 0); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation-duration: 0.01ms !important; animation-iteration-count: 1 !important; transition-duration: 0.01ms !important; scroll-behavior: auto !important; }
+  .reveal { animation: none; }
+}
+
+.calc-range { -webkit-appearance: none; appearance: none; height: 6px; padding: 10px 0; box-sizing: content-box; background-clip: content-box; background-repeat: no-repeat; border-radius: 6px; outline: none; cursor: pointer; touch-action: pan-y; }
+.calc-range::-webkit-slider-thumb { -webkit-appearance: none; appearance: none; width: 22px; height: 22px; border-radius: 50%; background: var(--color-brand); border: 3px solid #fff; box-shadow: 0 1px 4px rgba(0,0,0,.35); }
+.calc-range::-moz-range-thumb { width: 18px; height: 18px; border-radius: 50%; background: var(--color-brand); border: 3px solid #fff; box-shadow: 0 1px 4px rgba(0,0,0,.35); }

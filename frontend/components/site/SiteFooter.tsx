@@ -1,102 +1,138 @@
 import Link from "next/link";
 import { Company } from "@/lib/site";
-import { IcPhone, IcWa } from "./icons";
+import { IcPhone, IcWa, IcPin } from "./icons";
 import { BrandMark } from "./BrandMark";
 
+const waLink = (phone: string) => `https://wa.me/976${phone.replace(/\D/g, "")}`;
+
 export function SiteCta({ company }: { company: Company | null }) {
-  const cname = company?.name ?? "";
+  if (!company?.phone) return null;
   return (
-    <>
-      {/* ━━━ CTA BANNER ━━━ */}
-      {company?.phone && (
-        <section className="bg-[#ece4da] relative overflow-hidden">
-          <div className="pointer-events-none select-none absolute -top-6 left-1/2 -translate-x-1/2 text-[90px] sm:text-[220px] font-semibold uppercase tracking-tighter text-[#1c1917]/[0.045] whitespace-nowrap">
-            {cname}
-          </div>
-          <div className="relative max-w-7xl mx-auto px-4 py-10 sm:py-14 flex flex-col md:flex-row items-center justify-between gap-6 border-l-4 border-brand">
-            <div className="text-center md:text-left">
-              <div className="text-xs font-semibold text-brand mb-2">
-                Захиалга өгөх
-              </div>
-              <h3 className="text-2xl sm:text-3xl font-bold text-[#1c1917] leading-tight">
-                Хүссэн машинаа хайж олоогүй юу?
-              </h3>
-              <p className="text-sm text-gray-500 mt-2">
-                Бидэнтэй холбогдоорой — таны сонголтод тохирох машиныг олж өгнө.
-              </p>
+    <section className="px-3 sm:px-4 py-6 sm:py-10">
+      <div className="reveal relative max-w-7xl mx-auto overflow-hidden rounded-[28px] sm:rounded-[40px] bg-ink text-white px-6 py-12 sm:px-14 sm:py-16">
+        <div className="pointer-events-none absolute -top-40 -right-24 w-[520px] h-[520px] rounded-full bg-brand/60 blur-[120px]" />
+        <div className="pointer-events-none absolute -bottom-48 left-10 w-[420px] h-[420px] rounded-full bg-brand-light/20 blur-[120px]" />
+        <div
+          className="pointer-events-none absolute inset-0 opacity-[0.08]"
+          style={{ backgroundImage: "radial-gradient(rgb(255 255 255 / 0.6) 1px, transparent 1px)", backgroundSize: "22px 22px" }}
+        />
+        <div className="relative flex flex-col lg:flex-row lg:items-end justify-between gap-8">
+          <div className="max-w-2xl">
+            <div className="inline-flex items-center gap-2 glass-dark rounded-full px-3 py-1.5 text-xs text-white/80 mb-5">
+              <span className="w-1.5 h-1.5 rounded-full bg-brand-light" /> Захиалгаар оруулна
             </div>
+            <h3 className="font-display text-3xl sm:text-5xl font-semibold leading-[1.05] tracking-tight">
+              Хүссэн машинаа олоогүй юу?
+            </h3>
+            <p className="text-white/60 mt-4 sm:text-lg max-w-xl">
+              Бидэнтэй холбогдоорой. Таны төсөв, хэрэгцээнд тохирох машиныг хайж олоод оруулж өгнө.
+            </p>
+          </div>
+          <div className="flex flex-col sm:flex-row gap-3 shrink-0">
             <a
               href={`tel:${company.phone}`}
-              className="shrink-0 flex items-center gap-2 bg-brand hover:bg-brand-dark text-white text-sm px-8 py-4 rounded-sm transition-colors font-medium"
+              className="inline-flex items-center justify-center gap-2.5 bg-white text-ink hover:bg-brand-light hover:text-white h-14 px-7 rounded-full font-medium transition-colors"
             >
               <IcPhone cls="w-4 h-4" /> {company.phone}
             </a>
+            <a
+              href={waLink(company.phone)}
+              target="_blank"
+              rel="noreferrer"
+              className="inline-flex items-center justify-center gap-2.5 glass-dark hover:bg-white/15 h-14 px-7 rounded-full font-medium transition-colors"
+            >
+              <IcWa cls="w-4 h-4" /> WhatsApp
+            </a>
           </div>
-        </section>
-      )}
-    </>
+        </div>
+      </div>
+    </section>
   );
 }
 
 export function SiteFooter({ company }: { company: Company | null }) {
   const cname = company?.name ?? "";
+  const year = new Date().getFullYear();
   return (
-    <>
-      {/* ━━━ FOOTER ━━━ */}
-      <footer className="bg-[#0b0b0b] text-[#8a837a] border-t border-white/10">
-        <div className="max-w-7xl mx-auto px-4 py-8">
-          <div className="flex flex-col sm:flex-row items-center justify-between gap-5 mb-6">
-            <BrandMark logoUrl={company?.logo_url} name={cname} size={36} onDark nameClassName="text-white font-bold text-base" />
-            <div className="flex items-center gap-6 text-xs">
+    <footer className="relative mt-6 bg-ink text-zinc-400 rounded-t-[28px] sm:rounded-t-[40px] overflow-hidden">
+      <div className="relative max-w-7xl mx-auto px-6 sm:px-8 pt-14 sm:pt-20 pb-8">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-[1.4fr_1fr_1fr] gap-10 lg:gap-16">
+          <div className="max-w-sm">
+            <BrandMark logoUrl={company?.logo_url} name={cname} size={40} onDark nameClassName="font-display text-white font-semibold text-lg" />
+            <p className="mt-5 text-sm leading-relaxed text-zinc-400">
+              Чанартай, нягт шалгагдсан машиныг ил тод үнээр. Үзэх, туршиж унах цагаа урьдчилан тохироорой.
+            </p>
+            {company?.phone && (
+              <div className="flex gap-2 mt-6">
+                <a href={`tel:${company.phone}`} aria-label="Залгах" className="w-11 h-11 rounded-full bg-white/[0.07] hover:bg-brand text-white flex items-center justify-center transition-colors">
+                  <IcPhone cls="w-4 h-4" />
+                </a>
+                <a href={waLink(company.phone)} target="_blank" rel="noreferrer" aria-label="WhatsApp" className="w-11 h-11 rounded-full bg-white/[0.07] hover:bg-brand text-white flex items-center justify-center transition-colors">
+                  <IcWa cls="w-4 h-4" />
+                </a>
+              </div>
+            )}
+          </div>
+
+          <div>
+            <div className="text-xs uppercase tracking-[0.14em] text-zinc-500 mb-4">Цэс</div>
+            <ul className="space-y-1 text-sm">
               {[
                 ["/#cars", "Машинууд"],
                 ["/about", "Бидний тухай"],
                 ["/#contact", "Холбоо барих"],
               ].map(([h, l]) => (
-                <a
-                  key={h}
-                  href={h}
-                  className="inline-block py-2 hover:text-white transition-colors"
-                >
-                  {l}
-                </a>
+                <li key={h}>
+                  <a href={h} className="inline-block py-1.5 text-zinc-300 hover:text-white transition-colors">{l}</a>
+                </li>
               ))}
-              <Link
-                href="/admin"
-                className="inline-block py-2 hover:text-white transition-colors"
-              >
-                Нэвтрэх
-              </Link>
-            </div>
+              <li>
+                <Link href="/admin" className="inline-block py-1.5 text-zinc-300 hover:text-white transition-colors">Админ нэвтрэх</Link>
+              </li>
+            </ul>
           </div>
+
           {(company?.address || company?.phone || company?.email || company?.working_hours) && (
-            <div className="flex flex-wrap justify-center gap-x-6 gap-y-1 pb-6 text-xs">
-              {company?.address && <span>{company.address}</span>}
-              {company?.phone && <a href={`tel:${company.phone}`} className="py-1 hover:text-white transition-colors">{company.phone}</a>}
-              {company?.email && <a href={`mailto:${company.email}`} className="py-1 hover:text-white transition-colors">{company.email}</a>}
-              {company?.working_hours && <span>{company.working_hours}</span>}
+            <div>
+              <div className="text-xs uppercase tracking-[0.14em] text-zinc-500 mb-4">Холбоо барих</div>
+              <ul className="space-y-3 text-sm text-zinc-300">
+                {company?.phone && <li><a href={`tel:${company.phone}`} className="hover:text-white transition-colors">{company.phone}</a></li>}
+                {company?.email && <li><a href={`mailto:${company.email}`} className="hover:text-white transition-colors break-all">{company.email}</a></li>}
+                {company?.working_hours && <li>{company.working_hours}</li>}
+                {company?.address && (
+                  <li className="flex items-start gap-2">
+                    <IcPin cls="w-4 h-4 mt-0.5 shrink-0 text-zinc-500" /> {company.address}
+                  </li>
+                )}
+              </ul>
             </div>
           )}
-          <div className="border-t border-white/10 pt-6 text-xs text-center text-[#8a837a]">
-            © {new Date().getFullYear()} {cname}. Бүх эрх хуулиар хамгаалагдсан.
-          </div>
         </div>
-      </footer>
-    </>
+
+        <div className="mt-14 pt-6 border-t border-white/10 flex flex-col sm:flex-row items-center justify-between gap-3 text-xs text-zinc-500">
+          <span>© {year} {cname}. Бүх эрх хуулиар хамгаалагдсан.</span>
+          <a href="#" className="hover:text-white transition-colors py-2">Дээш буцах ↑</a>
+        </div>
+      </div>
+
+      {/* Том нэр (watermark) */}
+      {cname && (
+        <div aria-hidden style={{ fontSize: `${Math.min(18, 150 / Math.max(cname.length, 1))}vw` }} className="pointer-events-none select-none font-display font-semibold text-white/[0.05] leading-[0.8] tracking-tighter whitespace-nowrap text-center -mb-[2vw]">
+          {cname}
+        </div>
+      )}
+    </footer>
   );
 }
 
 export function MobileCallBar({ company }: { company: Company | null }) {
   if (!company?.phone) return null;
-  const digits = company.phone.replace(/\D/g, "");
   return (
-    <div className="lg:hidden fixed bottom-0 left-0 right-0 z-40 bg-white border-t border-zinc-200 shadow-[0_-4px_16px_rgba(0,0,0,0.08)] px-4 pt-3 pb-[calc(0.75rem+env(safe-area-inset-bottom))] flex gap-2.5">
-      <a href={`tel:${company.phone}`}
-        className="flex-1 flex items-center justify-center gap-2 bg-brand active:bg-brand-dark text-white text-sm font-medium py-3 rounded-sm">
+    <div className="lg:hidden fixed inset-x-3 bottom-[calc(0.75rem+env(safe-area-inset-bottom))] z-40 glass rounded-full p-1.5 flex gap-1.5">
+      <a href={`tel:${company.phone}`} className="flex-1 flex items-center justify-center gap-2 bg-ink active:bg-brand text-white text-sm font-medium h-12 rounded-full">
         <IcPhone cls="w-4 h-4" /> Залгах
       </a>
-      <a href={`https://wa.me/976${digits}`} target="_blank" rel="noreferrer"
-        className="flex-1 flex items-center justify-center gap-2 border border-zinc-300 text-zinc-700 active:bg-zinc-50 text-sm font-medium py-3 rounded-sm">
+      <a href={waLink(company.phone)} target="_blank" rel="noreferrer" className="flex-1 flex items-center justify-center gap-2 bg-white text-ink text-sm font-medium h-12 rounded-full border border-zinc-200">
         <IcWa cls="w-4 h-4" /> WhatsApp
       </a>
     </div>

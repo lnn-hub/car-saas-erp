@@ -1,101 +1,34 @@
 "use client";
 import { useState, Suspense } from "react";
-import Link from "next/link";
 import { optimizeImg, SiteInitial } from "@/lib/site";
 import { useSiteData } from "@/lib/useSiteData";
+import { FUEL } from "@/lib/format";
 import { SiteHeader } from "@/components/site/SiteHeader";
 import { MobileCallBar, SiteCta, SiteFooter } from "@/components/site/SiteFooter";
 import { HeroSlides } from "@/components/site/HeroSlides";
 import { CompareModal } from "@/components/site/CompareModal";
+import { VehicleCard, VehicleCardSkeleton } from "@/components/site/VehicleCard";
 import { IcPhone, IcWa, IcPin } from "@/components/site/icons";
 
-
-const FUEL: Record<string, string> = {
-  PETROL: "Бензин",
-  DIESEL: "Дизель",
-  HYBRID: "Хибрид",
-  ELECTRIC: "Цахилгаан",
-};
-
-function fmtPrice(n: string | number | null) {
-  if (!n || Number(n) === 0) return null;
-  const num = Number(n);
-  if (num >= 1_000_000) return (num / 1_000_000).toFixed(1) + " сая ₮";
-  return num.toLocaleString("mn-MN") + " ₮";
-}
-function fmtKm(n: number) {
-  if (!n) return null;
-  return n >= 1000 ? `${(n / 1000).toFixed(0)}k км` : `${n} км`;
-}
-
-/* ─── Icons ─── */
 function IcSearch({ cls = "w-4 h-4" }: { cls?: string }) {
   return (
-    <svg
-      className={cls}
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth={2}
-    >
-      <circle cx="11" cy="11" r="8" />
-      <line x1="21" y1="21" x2="16.65" y2="16.65" />
+    <svg className={cls} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round">
+      <circle cx="11" cy="11" r="7.5" />
+      <path d="M20.5 20.5L16.5 16.5" />
     </svg>
   );
 }
-function IcFuel() {
+function IcArrow({ cls = "w-4 h-4" }: { cls?: string }) {
   return (
-    <svg
-      className="w-3.5 h-3.5"
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth={2}
-    >
-      <path d="M3 22V6a2 2 0 012-2h8a2 2 0 012 2v16M3 22h14M13 4h2l2 2v3.5a1.5 1.5 0 003 0V8l-2-2" />
-      <path d="M7 14h4v4H7z" />
+    <svg className={cls} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2}>
+      <path d="M5 12h14M13 6l6 6-6 6" />
     </svg>
   );
 }
-function IcGear() {
+function IcChevron() {
   return (
-    <svg
-      className="w-3.5 h-3.5"
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth={2}
-    >
-      <circle cx="12" cy="12" r="3" />
-      <path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83-2.83l.06-.06A1.65 1.65 0 004.68 15a1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 012.83-2.83l.06.06A1.65 1.65 0 009 4.68a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 2.83l-.06.06A1.65 1.65 0 0019.4 9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z" />
-    </svg>
-  );
-}
-function IcOdo() {
-  return (
-    <svg
-      className="w-3.5 h-3.5"
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth={2}
-    >
-      <path d="M12 2a10 10 0 100 20A10 10 0 0012 2z" />
-      <path d="M12 6v6l4 2" />
-    </svg>
-  );
-}
-function IcEngine() {
-  return (
-    <svg
-      className="w-3.5 h-3.5"
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth={2}
-    >
-      <rect x="2" y="7" width="20" height="10" rx="2" />
-      <path d="M6 7V5M18 7V5M6 17v2M18 17v2M2 12h2M20 12h2" />
+    <svg className="w-4 h-4 text-zinc-400 pointer-events-none absolute right-4 top-1/2 -translate-y-1/2" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2}>
+      <path d="M6 9l6 6 6-6" />
     </svg>
   );
 }
@@ -107,7 +40,7 @@ const PRICE_RANGES: { key: string; label: string; min: number; max: number }[] =
   { key: "gt200", label: "200 саяас дээш", min: 200_000_000, max: Infinity },
 ];
 const SORTS: { key: string; label: string }[] = [
-  { key: "", label: "Эрэмбэ: Шинэ" },
+  { key: "", label: "Шинээр нэмэгдсэн" },
   { key: "price_asc", label: "Үнэ: багаас их" },
   { key: "price_desc", label: "Үнэ: ихээс бага" },
   { key: "year_desc", label: "Он: шинэ нь эхэнд" },
@@ -121,16 +54,18 @@ function HomeContent({ initial }: { initial: SiteInitial | null }) {
   const [filterTrans, setFilterTrans] = useState("");
   const [filterBrand, setBrand] = useState("");
   const [filterPrice, setPrice] = useState("");
+  const [sortBy, setSort] = useState("");
   const [compare, setCompare] = useState<string[]>([]);
   const [compareOpen, setCompareOpen] = useState(false);
   const toggleCompare = (id: string) =>
     setCompare((c) => (c.includes(id) ? c.filter((x) => x !== id) : c.length >= 3 ? c : [...c, id]));
   const compareOn = company?.features?.compare !== false;
   const compared = vehicles.filter((v) => compare.includes(v.id));
-  const [sortBy, setSort] = useState("");
 
-  const uniqueBrands = [...new Set(vehicles.map((v) => v.brand))].sort();
-  const fuelsInUse = [...new Set(vehicles.map((v) => v.fuel_type))];
+  const brandCounts = vehicles.reduce<Record<string, number>>((m, v) => ((m[v.brand] = (m[v.brand] || 0) + 1), m), {});
+  const uniqueBrands = Object.keys(brandCounts).sort((a, b) => brandCounts[b] - brandCounts[a] || a.localeCompare(b));
+  const fuelsInUse = [...new Set(vehicles.map((v) => v.fuel_type))].filter((f) => FUEL[f]);
+  const transInUse = (["AUTO", "MANUAL"] as const).filter((k) => vehicles.some((v) => v.transmission === k));
 
   const hasPrices = vehicles.some((v) => Number(v.price) > 0);
   const range = PRICE_RANGES.find((r) => r.key === filterPrice);
@@ -138,7 +73,7 @@ function HomeContent({ initial }: { initial: SiteInitial | null }) {
 
   const filtered = vehicles
     .filter((v) => {
-      const q = search.toLowerCase();
+      const q = search.trim().toLowerCase();
       return (
         (!q || `${v.brand} ${v.model} ${v.year}`.toLowerCase().includes(q)) &&
         (!filterFuel || v.fuel_type === filterFuel) &&
@@ -161,569 +96,329 @@ function HomeContent({ initial }: { initial: SiteInitial | null }) {
       return 0;
     });
 
-  const hasFilter = search || filterFuel || filterTrans || filterBrand || filterPrice;
-  const cname = company?.name ?? "";
+  const hasFilter = !!(search || filterFuel || filterTrans || filterBrand || filterPrice);
+  const clearAll = () => {
+    setSearch("");
+    setFilterFuel("");
+    setFilterTrans("");
+    setBrand("");
+    setPrice("");
+  };
+  const goCars = () => document.getElementById("cars")?.scrollIntoView({ behavior: "smooth" });
+
+  const stats = [
+    { n: loading ? "—" : vehicles.length, l: "Машин худалдаанд" },
+    { n: loading ? "—" : uniqueBrands.length, l: "Брэнд" },
+    { n: loading ? "—" : vehicles.filter((v) => v.has_plates).length, l: "Дугаартай" },
+  ];
+
+  const chip = (active: boolean) =>
+    `shrink-0 h-10 px-4 rounded-full text-sm font-medium border transition-all ${
+      active ? "bg-ink border-ink text-white shadow-card" : "bg-white border-zinc-200 text-zinc-700 hover:border-zinc-400"
+    }`;
+
+  const contacts = [
+    company?.phone && { key: "wa", href: `https://wa.me/976${company.phone.replace(/\D/g, "")}`, label: "WhatsApp", value: "Мессеж бичих", icon: <IcWa cls="w-5 h-5" />, ext: true },
+    company?.email && {
+      key: "mail", href: `mailto:${company.email}`, label: "И-мэйл", value: company.email, ext: false,
+      icon: <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.8}><rect x="2" y="4" width="20" height="16" rx="3" /><path d="M22 7l-10 6L2 7" /></svg>,
+    },
+    company?.working_hours && {
+      key: "hours", href: "", label: "Ажлын цаг", value: company.working_hours, ext: false,
+      icon: <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.8}><circle cx="12" cy="12" r="9" /><path d="M12 7v5l3 2" /></svg>,
+    },
+    company?.address && { key: "addr", href: `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(company.address)}`, label: "Байршил", value: company.address, icon: <IcPin cls="w-5 h-5" />, ext: true },
+  ].filter(Boolean) as { key: string; href: string; label: string; value: string; icon: React.ReactNode; ext: boolean }[];
 
   return (
-    <div
-      className="min-h-screen bg-[#f6f3ef] pb-[76px] lg:pb-0"
-      style={{ fontFamily: "'Inter','Segoe UI',sans-serif" }}
-    >
+    <div className="min-h-screen pb-24 lg:pb-0">
       <SiteHeader company={company} />
 
       {/* ━━━ HERO ━━━ */}
-      <section className="relative bg-[#111] text-white overflow-hidden">
-        <div
-          className="absolute inset-0"
-          style={{
-            backgroundImage:
-              "linear-gradient(135deg,#2a0a10 0%,#111 55%,#0d0d0d 100%)",
-          }}
-        />
-        <HeroSlides vehicles={vehicles} />
-        <div
-          className="absolute inset-0 opacity-[0.06]"
-          style={{
-            backgroundImage:
-              "repeating-linear-gradient(0deg,transparent,transparent 39px,rgba(255,255,255,0.5) 39px,rgba(255,255,255,0.5) 40px),repeating-linear-gradient(90deg,transparent,transparent 39px,rgba(255,255,255,0.5) 39px,rgba(255,255,255,0.5) 40px)",
-          }}
-        />
-        <div className="pointer-events-none select-none absolute top-6 left-1/2 -translate-x-1/2 text-[72px] sm:text-[200px] font-semibold uppercase tracking-tighter text-white/[0.03] whitespace-nowrap">
-          {cname}
-        </div>
-        <div className="relative max-w-7xl mx-auto px-4 py-12 sm:py-28">
-          <div className="max-w-2xl">
-            <div className="inline-flex items-center gap-2 bg-white/5 border border-white/15 text-white/80 text-xs font-semibold px-3 py-1.5 rounded-sm mb-4 sm:mb-6 tracking-[0.18em] uppercase">
-              <span
-                className={`w-1.5 h-1.5 bg-red-400 rounded-full ${loading || retrying ? "animate-pulse" : ""}`}
-              />
-              {retrying
-                ? "Сервер асаж байна, түр хүлээнэ үү..."
-                : loading
-                  ? "Ачааллаж байна"
-                  : `${vehicles.length} машин зарагдаж байна`}
+      <section className="px-3 sm:px-4">
+        <div className="relative max-w-[1400px] mx-auto rounded-[28px] sm:rounded-[40px] overflow-hidden bg-ink text-white min-h-[560px] sm:min-h-[640px] lg:min-h-[700px] flex flex-col justify-end">
+          <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,#5a1420_0%,#121010_60%)]" />
+          <HeroSlides vehicles={vehicles} />
+
+          <div className="relative px-6 sm:px-12 lg:px-16 pt-24 pb-24 sm:pb-28 max-w-4xl">
+            <div className="inline-flex items-center gap-2.5 glass-dark rounded-full pl-2.5 pr-4 py-1.5 text-[13px] text-white/85 mb-6 sm:mb-8">
+              <span className={`w-2 h-2 rounded-full ${loading || retrying ? "bg-amber-300 animate-pulse" : "bg-green-400 animate-[pulseDot_2s_ease-in-out_infinite]"}`} />
+              {retrying ? "Сервер асаж байна, түр хүлээнэ үү..." : loading ? "Ачааллаж байна" : `${vehicles.length} машин худалдаанд байна`}
             </div>
-            <h1 className="text-3xl sm:text-6xl font-bold leading-tight tracking-tight mb-3 sm:mb-5">
-              Чанартай машин
-              <span className="text-brand-light"> шууд таны гарт</span>
+            <h1 className="font-display text-[42px] leading-[1.02] sm:text-7xl lg:text-[88px] font-semibold tracking-[-0.04em]">
+              Чанартай машин,
+              <br />
+              <span className="text-brand-light">шууд таны гарт.</span>
             </h1>
-            <p className="text-gray-400 text-sm sm:text-lg leading-relaxed mb-6 sm:mb-10 max-w-xl">
+            <p className="text-white/70 text-base sm:text-lg leading-relaxed mt-5 sm:mt-7 max-w-xl">
               {company?.address
-                ? `${company.address} — бүх машин техникийн бүрэн үзлэгт тэнцсэн.`
+                ? `${company.address}. Бүх машин техникийн бүрэн үзлэгт тэнцсэн.`
                 : "Бүх машин техникийн бүрэн үзлэгт тэнцсэн, нягт шалгагдсан."}
             </p>
-            <div className="flex flex-wrap gap-3">
-              <a
-                href="#cars"
-                className="bg-brand hover:bg-white hover:text-[#111] text-white px-6 sm:px-8 py-3.5 rounded-sm transition-colors text-sm font-medium"
+            <div className="flex flex-wrap gap-3 mt-8 sm:mt-10">
+              <button
+                onClick={goCars}
+                className="group inline-flex items-center gap-3 bg-white text-ink pl-6 pr-2 h-14 rounded-full font-medium hover:bg-brand-soft transition-colors"
               >
-                Машинуудыг үзэх
-              </a>
+                Машинууд үзэх
+                <span className="w-10 h-10 rounded-full bg-ink text-white flex items-center justify-center group-hover:bg-brand transition-colors">
+                  <IcArrow />
+                </span>
+              </button>
               {company?.phone && (
-                <a
-                  href={`tel:${company.phone}`}
-                  className="border border-white/25 hover:border-white text-white px-6 sm:px-8 py-3.5 rounded-sm transition-colors text-sm font-medium"
-                >
-                  <span className="flex items-center gap-2">
-                    <IcPhone cls="w-3.5 h-3.5" />
-                    {company.phone}
-                  </span>
+                <a href={`tel:${company.phone}`} className="inline-flex items-center gap-2.5 glass-dark hover:bg-white/15 px-6 h-14 rounded-full font-medium transition-colors">
+                  <IcPhone cls="w-4 h-4" /> {company.phone}
                 </a>
               )}
             </div>
-          </div>
-        </div>
-        {/* Stats */}
-        <div className="relative border-t border-white/10">
-          <div className="max-w-7xl mx-auto px-4">
-            <div className="grid grid-cols-3 divide-x divide-white/10">
-              {[
-                { n: loading ? "—" : vehicles.length, l: "Нийт машин" },
-                {
-                  n: loading
-                    ? "—"
-                    : [...new Set(vehicles.map((v) => v.brand))].length,
-                  l: "Брэнд",
-                },
-                {
-                  n: `${new Date().getFullYear() - 2010}+`,
-                  l: "Жилийн туршлага",
-                },
-              ].map(({ n, l }) => (
-                <div key={l} className="py-4 sm:py-5 text-center">
-                  <div className="text-xl sm:text-3xl font-bold text-white tabular-nums">
-                    {n}
-                  </div>
-                  <div className="text-xs text-gray-500 mt-0.5 sm:mt-1">
-                    {l}
-                  </div>
+            <dl className="hidden sm:flex gap-10 mt-12">
+              {stats.map(({ n, l }) => (
+                <div key={l}>
+                  <dt className="sr-only">{l}</dt>
+                  <dd className="font-display text-4xl font-semibold tabular-nums tracking-tight">{n}</dd>
+                  <div className="text-sm text-white/55 mt-1">{l}</div>
                 </div>
               ))}
-            </div>
+            </dl>
           </div>
         </div>
-      </section>
 
-      {/* ━━━ FILTER BAR ━━━ */}
-      <section
-        id="cars"
-        className="bg-white border-b border-gray-200 sticky top-[96px] z-40 shadow-sm"
-      >
-        <div className="max-w-7xl mx-auto">
-          {/* Search row – full width on mobile */}
-          <div className="px-4 pt-3 pb-2">
-            <div className="relative">
-              <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500 pointer-events-none">
-                <IcSearch cls="w-3.5 h-3.5" />
-              </span>
-              <input
-                value={search}
-                onChange={(e) => setSearch(e.target.value)}
-                placeholder="Марк, загвар хайх..."
-                className="w-full pl-8 pr-3 py-2.5 border border-gray-200 rounded-lg text-sm focus:outline-none focus:border-brand transition-colors"
-              />
-            </div>
-          </div>
-          {/* Chips row – horizontal scroll on mobile */}
-          <div
-            className="flex items-center gap-2 px-4 pb-3 overflow-x-auto scrollbar-none"
-            style={{ scrollbarWidth: "none" }}
+        {/* Хайлтын самбар */}
+        <div className="relative z-10 -mt-10 sm:-mt-12 px-2 sm:px-8">
+          <form
+            onSubmit={(e) => {
+              e.preventDefault();
+              goCars();
+            }}
+            className="max-w-5xl mx-auto bg-white rounded-[26px] md:rounded-full shadow-lift ring-1 ring-ink/5 p-2 grid grid-cols-2 md:grid-cols-[1.6fr_1fr_1fr_auto] gap-1 md:gap-0"
           >
-            {/* Brand */}
-            <select
-              value={filterBrand}
-              onChange={(e) => setBrand(e.target.value)}
-              className="shrink-0 px-3 py-2.5 border border-gray-200 rounded-full text-xs text-gray-600 focus:outline-none focus:border-brand bg-white transition-colors font-semibold"
-            >
-              <option value="">Бүх марк</option>
-              {uniqueBrands.map((b) => (
-                <option key={b} value={b}>
-                  {b}
-                </option>
-              ))}
-            </select>
-            {hasPrices && (
-              <select
-                value={filterPrice}
-                onChange={(e) => setPrice(e.target.value)}
-                className="shrink-0 px-3 py-2.5 border border-gray-200 rounded-full text-xs text-gray-600 focus:outline-none focus:border-brand bg-white transition-colors font-semibold"
-              >
-                <option value="">Бүх үнэ</option>
-                {PRICE_RANGES.map((r) => (
-                  <option key={r.key} value={r.key}>
-                    {r.label}
-                  </option>
+            <label className="col-span-2 md:col-span-1 flex items-center gap-3 px-4 md:px-6 h-14 md:h-16 rounded-full hover:bg-zinc-50 focus-within:bg-zinc-50 transition-colors cursor-text">
+              <IcSearch cls="w-5 h-5 text-zinc-500 shrink-0" />
+              <span className="flex-1 min-w-0">
+                <span className="block text-[11px] font-semibold uppercase tracking-[0.1em] text-zinc-500">Хайх</span>
+                <input
+                  value={search}
+                  onChange={(e) => setSearch(e.target.value)}
+                  placeholder="Марк, загвар, он..."
+                  className="w-full bg-transparent text-[15px] text-ink placeholder:text-zinc-400 focus:outline-none"
+                />
+              </span>
+            </label>
+            <label className="relative flex flex-col justify-center px-4 md:px-6 h-14 md:h-16 rounded-full hover:bg-zinc-50 transition-colors md:border-l border-zinc-100 cursor-pointer">
+              <span className="text-[11px] font-semibold uppercase tracking-[0.1em] text-zinc-500">Марк</span>
+              <select value={filterBrand} onChange={(e) => setBrand(e.target.value)} className="appearance-none bg-transparent text-[15px] text-ink focus:outline-none pr-6 cursor-pointer">
+                <option value="">Бүх марк</option>
+                {uniqueBrands.map((b) => (
+                  <option key={b} value={b}>{b}</option>
                 ))}
               </select>
-            )}
-            <select
-              value={sortBy}
-              onChange={(e) => setSort(e.target.value)}
-              className="shrink-0 px-3 py-2.5 border border-gray-200 rounded-full text-xs text-gray-600 focus:outline-none focus:border-brand bg-white transition-colors font-semibold"
-            >
-              {SORTS.filter((o) => hasPrices || !o.key.startsWith("price")).map((o) => (
-                <option key={o.key} value={o.key}>
-                  {o.label}
-                </option>
-              ))}
-            </select>
-            <div className="w-px h-5 bg-gray-200 shrink-0" />
-            {/* Fuel chips */}
-            {fuelsInUse.map((k) => (
-              <button
-                key={k}
-                onClick={() => setFilterFuel(filterFuel === k ? "" : k)}
-                className={`shrink-0 px-3 py-2.5 rounded-full text-xs font-semibold border transition-colors ${
-                  filterFuel === k
-                    ? "bg-brand border-brand text-white"
-                    : "border-gray-200 text-gray-500"
-                }`}
-              >
-                {FUEL[k]}
-              </button>
-            ))}
-            <div className="w-px h-5 bg-gray-200 shrink-0" />
-            {/* Trans chips */}
-            {[
-              ["AUTO", "Автомат"],
-              ["MANUAL", "Механик"],
-            ].map(
-              ([k, l]) =>
-                vehicles.some((v) => v.transmission === k) && (
-                  <button
-                    key={k}
-                    onClick={() => setFilterTrans(filterTrans === k ? "" : k)}
-                    className={`shrink-0 px-3 py-2.5 rounded-full text-xs font-semibold border transition-colors ${
-                      filterTrans === k
-                        ? "bg-[#111] border-[#111] text-white"
-                        : "border-gray-200 text-gray-500"
-                    }`}
-                  >
-                    {l}
-                  </button>
-                ),
-            )}
-            {hasFilter && (
-              <button
-                onClick={() => {
-                  setSearch("");
-                  setFilterFuel("");
-                  setFilterTrans("");
-                  setBrand("");
-                  setPrice("");
-                }}
-                className="shrink-0 ml-auto px-3 py-2.5 rounded-full text-xs text-gray-500 border border-gray-200"
-              >
-                × Цэвэрлэх
-              </button>
-            )}
-          </div>
+              <IcChevron />
+            </label>
+            <label className={`relative flex flex-col justify-center px-4 md:px-6 h-14 md:h-16 rounded-full hover:bg-zinc-50 transition-colors md:border-l border-zinc-100 cursor-pointer ${hasPrices ? "" : "opacity-50"}`}>
+              <span className="text-[11px] font-semibold uppercase tracking-[0.1em] text-zinc-500">Үнэ</span>
+              <select value={filterPrice} onChange={(e) => setPrice(e.target.value)} disabled={!hasPrices} className="appearance-none bg-transparent text-[15px] text-ink focus:outline-none pr-6 cursor-pointer">
+                <option value="">Бүх үнэ</option>
+                {PRICE_RANGES.map((r) => (
+                  <option key={r.key} value={r.key}>{r.label}</option>
+                ))}
+              </select>
+              <IcChevron />
+            </label>
+            <button type="submit" className="col-span-2 md:col-span-1 flex items-center justify-center gap-2 bg-brand hover:bg-brand-dark text-white h-14 md:h-16 md:w-16 lg:w-auto lg:px-8 rounded-full font-medium transition-colors">
+              <IcSearch cls="w-5 h-5" />
+              <span className="md:hidden lg:inline">{hasFilter ? `${filtered.length} машин` : "Хайх"}</span>
+            </button>
+          </form>
         </div>
       </section>
 
-      {/* ━━━ CAR GRID ━━━ */}
-      <section className="py-5 sm:py-8 px-3 sm:px-4">
+      {/* ━━━ МАШИНУУД ━━━ */}
+      <section id="cars" className="px-4 pt-16 sm:pt-24 pb-12 sm:pb-20">
         <div className="max-w-7xl mx-auto">
-          {loading ? (
-            <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3 sm:gap-5">
-              {[...Array(8)].map((_, i) => (
-                <div
-                  key={i}
-                  className="bg-white rounded-xl overflow-hidden animate-pulse shadow-sm"
+          <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-5 mb-6 sm:mb-8">
+            <div>
+              <div className="text-xs font-semibold uppercase tracking-[0.14em] text-brand mb-3">Худалдаанд байгаа</div>
+              <h2 className="font-display text-4xl sm:text-5xl font-semibold tracking-[-0.03em] text-ink flex items-baseline gap-3">
+                Машинууд
+                <span className="text-zinc-400 text-2xl sm:text-3xl tabular-nums">{loading ? "" : filtered.length}</span>
+              </h2>
+            </div>
+            <div className="flex items-center gap-2">
+              {hasFilter && (
+                <button onClick={clearAll} className="h-11 px-4 rounded-full text-sm text-zinc-600 hover:text-ink hover:bg-white transition-colors">
+                  Цэвэрлэх
+                </button>
+              )}
+              <label className="relative">
+                <span className="sr-only">Эрэмбэлэх</span>
+                <select
+                  value={sortBy}
+                  onChange={(e) => setSort(e.target.value)}
+                  className="appearance-none h-11 pl-4 pr-10 rounded-full bg-white border border-zinc-200 text-sm font-medium text-ink focus:outline-none focus:border-ink/40 cursor-pointer"
                 >
-                  <div className="aspect-[16/10] bg-gray-100" />
-                  <div className="p-3 sm:p-4 space-y-2">
-                    <div className="h-4 bg-gray-100 rounded w-3/4" />
-                    <div className="h-3 bg-gray-100 rounded w-1/2" />
-                    <div className="h-3 bg-gray-100 rounded w-full mt-2" />
-                    <div className="h-6 bg-gray-100 rounded w-1/3 mt-3" />
-                  </div>
-                </div>
+                  {SORTS.filter((o) => hasPrices || !o.key.startsWith("price")).map((o) => (
+                    <option key={o.key} value={o.key}>{o.label}</option>
+                  ))}
+                </select>
+                <IcChevron />
+              </label>
+            </div>
+          </div>
+
+          {/* Шүүлтүүр чипүүд */}
+          <div className="-mx-4 px-4 flex items-center gap-2 overflow-x-auto no-scrollbar pb-1 mb-6 sm:mb-8">
+            <button onClick={() => setBrand("")} className={chip(!filterBrand)}>
+              Бүгд <span className="ml-1 opacity-60 tabular-nums">{vehicles.length}</span>
+            </button>
+            {uniqueBrands.map((b) => (
+              <button key={b} onClick={() => setBrand(filterBrand === b ? "" : b)} className={chip(filterBrand === b)}>
+                {b} <span className="ml-1 opacity-60 tabular-nums">{brandCounts[b]}</span>
+              </button>
+            ))}
+            {(fuelsInUse.length > 1 || transInUse.length > 1) && <span className="w-px h-6 bg-zinc-200 shrink-0 mx-1" />}
+            {fuelsInUse.length > 1 &&
+              fuelsInUse.map((k) => (
+                <button key={k} onClick={() => setFilterFuel(filterFuel === k ? "" : k)} className={chip(filterFuel === k)}>
+                  {FUEL[k]}
+                </button>
+              ))}
+            {transInUse.length > 1 &&
+              transInUse.map((k) => (
+                <button key={k} onClick={() => setFilterTrans(filterTrans === k ? "" : k)} className={chip(filterTrans === k)}>
+                  {k === "AUTO" ? "Автомат" : "Механик"}
+                </button>
+              ))}
+          </div>
+
+          {loading ? (
+            <div className="grid grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3 sm:gap-6">
+              {[...Array(8)].map((_, i) => (
+                <VehicleCardSkeleton key={i} />
               ))}
             </div>
           ) : filtered.length === 0 ? (
-            <div className="text-center py-24">
-              <div className="w-14 h-14 rounded-xl bg-white shadow-sm flex items-center justify-center mx-auto mb-4">
-                <svg
-                  className="w-7 h-7 text-gray-300"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth={1.5}
-                >
-                  <path d="M5 17H3a2 2 0 01-2-2v-4a2 2 0 012-2h16a2 2 0 012 2v4a2 2 0 01-2 2h-2" />
-                  <rect x="7" y="17" width="10" height="4" rx="2" />
-                  <path d="M5 11L7.5 5h9L19 11" />
-                </svg>
+            <div className="text-center py-20 sm:py-28 bg-white rounded-[32px] ring-1 ring-ink/5">
+              <div className="w-16 h-16 rounded-full bg-zinc-100 flex items-center justify-center mx-auto mb-5 text-zinc-400">
+                <IcSearch cls="w-7 h-7" />
               </div>
-              <p className="text-gray-500 text-sm mb-3">Машин олдсонгүй</p>
-              <button
-                onClick={() => {
-                  setSearch("");
-                  setFilterFuel("");
-                  setFilterTrans("");
-                  setBrand("");
-                  setPrice("");
-                }}
-                className="text-sm text-brand hover:underline"
-              >
+              <p className="font-display text-xl font-semibold text-ink">Машин олдсонгүй</p>
+              <p className="text-zinc-500 text-sm mt-1.5 mb-6">Шүүлтүүрээ өөрчлөөд дахин оролдоно уу</p>
+              <button onClick={clearAll} className="h-11 px-6 rounded-full bg-ink text-white text-sm font-medium hover:bg-brand transition-colors">
                 Шүүлтийг цэвэрлэх
               </button>
             </div>
           ) : (
-            <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3 sm:gap-5">
-              {filtered.map((v) => {
-                const src = optimizeImg(v.main_image, 640);
-                const src2 = v.images?.[1] ? optimizeImg(v.images[1], 640) : null;
-                const price = fmtPrice(v.price);
-                const km = fmtKm(v.mileage);
-                const cc = v.engine_cc
-                  ? `${(Number(v.engine_cc) / 1000).toFixed(1)}L`
-                  : null;
-                return (
-                  <Link
-                    key={v.id}
-                    href={`/vehicle/${v.id}`}
-                    className="group bg-white rounded-sm overflow-hidden shadow-sm hover:shadow-xl transition-all duration-300 flex flex-col border border-zinc-200 hover:border-brand/40"
-                  >
-                    {/* Image */}
-                    <div className="relative aspect-[4/3] sm:aspect-[16/10] bg-gray-100 overflow-hidden">
-                      {src ? (
-                        <>
-                        <img
-                          src={src}
-                          alt={`${v.brand} ${v.model}`}
-                          loading="lazy"
-                          className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-                        />
-                          {src2 && (
-                            <img
-                              src={src2}
-                              alt=""
-                              loading="lazy"
-                              className="hidden sm:block absolute inset-0 w-full h-full object-cover opacity-0 group-hover:opacity-100 transition-opacity duration-500"
-                            />
-                          )}
-                        </>
-                      ) : (
-                        <div className="w-full h-full flex items-center justify-center">
-                          <svg
-                            viewBox="0 0 200 130"
-                            className="w-3/4 opacity-20"
-                          >
-                            <path
-                              d="M30 90 L42 55 Q50 38 68 34 L100 30 L132 34 Q150 38 158 55 L170 90 Z"
-                              fill="#999"
-                            />
-                            <path
-                              d="M68 34 L76 14 Q80 8 90 7 L110 7 Q120 8 124 14 L132 34 Z"
-                              fill="#bbb"
-                            />
-                            <circle cx="60" cy="98" r="16" fill="#666" />
-                            <circle cx="60" cy="98" r="10" fill="#999" />
-                            <circle cx="140" cy="98" r="16" fill="#666" />
-                            <circle cx="140" cy="98" r="10" fill="#999" />
-                          </svg>
-                        </div>
-                      )}
-                      {compareOn && <button
-                        type="button"
-                        onClick={(e) => { e.preventDefault(); e.stopPropagation(); toggleCompare(v.id); }}
-                        className={`absolute bottom-2 left-2 z-10 flex items-center gap-1.5 text-xs font-medium px-2.5 py-2 rounded-sm transition-colors ${compare.includes(v.id) ? "bg-brand text-white" : "bg-white/90 text-zinc-700 hover:bg-white"} ${compare.includes(v.id) ? "" : "sm:opacity-0 sm:group-hover:opacity-100"}`}
-                      >
-                        <span className={`w-3 h-3 rounded-[2px] border flex items-center justify-center ${compare.includes(v.id) ? "border-white bg-white text-brand" : "border-zinc-400"}`}>
-                          {compare.includes(v.id) && <svg className="w-2.5 h-2.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={4}><path d="M20 6L9 17l-5-5" /></svg>}
-                        </span>
-                        Харьцуулах
-                      </button>}
-                      {/* Year badge */}
-                      <div className="absolute top-2 left-2 bg-[#111]/85 text-white text-xs sm:text-xs font-bold tracking-wider px-2 py-0.5 rounded-sm">
-                        {v.year}
-                      </div>
-                      {v.has_plates && (
-                        <div className="absolute top-2 right-2 bg-brand text-white text-xs sm:text-xs font-semibold px-1.5 py-0.5 rounded-sm uppercase tracking-widest">
-                          Дугаартай
-                        </div>
-                      )}
-                      {/* Red hover line */}
-                      <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-brand scale-x-0 group-hover:scale-x-100 transition-transform duration-300 origin-left" />
-                    </div>
-
-                    {/* Info */}
-                    <div className="p-3 sm:p-4 flex flex-col flex-1">
-                      {/* Name */}
-                      <div className="mb-2 sm:mb-3">
-                        <div className="text-xs sm:text-xs font-semibold text-brand mb-0.5">
-                          {v.brand}
-                        </div>
-                        <h3 className="font-semibold text-[#111] text-[13px] sm:text-[15px] leading-tight">
-                          {v.model}
-                        </h3>
-                      </div>
-
-                      {/* Specs – 2 items only on mobile, 4 on desktop */}
-                      <div className="grid grid-cols-2 gap-x-2 gap-y-1 mb-3 sm:mb-4">
-                        <div className="flex items-center gap-1 text-xs sm:text-[12px] text-gray-500">
-                          <span className="text-gray-500">
-                            <IcFuel />
-                          </span>
-                          {FUEL[v.fuel_type]}
-                        </div>
-                        <div className="flex items-center gap-1 text-xs sm:text-[12px] text-gray-500">
-                          <span className="text-gray-500">
-                            <IcGear />
-                          </span>
-                          {v.transmission === "AUTO" ? "Авт" : "Мех"}
-                        </div>
-                        {km && (
-                          <div className="hidden sm:flex items-center gap-1.5 text-[12px] text-gray-500">
-                            <span className="text-gray-500">
-                              <IcOdo />
-                            </span>
-                            {km}
-                          </div>
-                        )}
-                        {cc && (
-                          <div className="hidden sm:flex items-center gap-1.5 text-[12px] text-gray-500">
-                            <span className="text-gray-500">
-                              <IcEngine />
-                            </span>
-                            {cc}
-                          </div>
-                        )}
-                      </div>
-
-                      {/* Price + CTA */}
-                      <div className="mt-auto pt-2.5 sm:pt-3 border-t border-gray-100 flex items-center justify-between gap-1.5">
-                        {price ? (
-                          <div>
-                            <div className="hidden sm:block text-xs text-gray-500">
-                              Үнэ
-                            </div>
-                            <div className="text-[13px] sm:text-[16px] font-bold text-[#111] leading-tight">
-                              {price}
-                            </div>
-                          </div>
-                        ) : (
-                          <div className="text-xs sm:text-sm text-gray-500 italic">
-                            Тохиролцоно
-                          </div>
-                        )}
-                        <span className="shrink-0 bg-[#111] group-hover:bg-brand text-white text-sm sm:text-xs px-2.5 sm:px-3.5 py-2 rounded-sm transition-colors whitespace-nowrap font-medium">
-                          Үзэх →
-                        </span>
-                      </div>
-                    </div>
-                  </Link>
-                );
-              })}
+            <div className="grid grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3 sm:gap-6">
+              {filtered.map((v, i) => (
+                <div key={v.id} className="reveal flex">
+                  <VehicleCard
+                    v={v}
+                    priority={i < 4}
+                    compareOn={compareOn}
+                    compared={compare.includes(v.id)}
+                    onCompare={toggleCompare}
+                  />
+                </div>
+              ))}
             </div>
           )}
         </div>
       </section>
 
-      {/* ━━━ CONTACT ━━━ */}
-      <section
-        id="contact"
-        className="py-16 sm:py-24 px-4 bg-[#f6f3ef] border-t border-zinc-200"
-      >
-        <div className="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-[1fr_1.3fr] gap-10 lg:gap-16 items-start">
-          <div>
-            <div className="text-xs font-semibold text-brand mb-3">
-              Холбоо барих
-            </div>
-            <h2 className="text-3xl sm:text-4xl font-bold text-[#111] leading-tight border-l-4 border-brand pl-4 mb-5">
-              Бидэнтэй
-              <br />
-              холбогдоорой
-            </h2>
-            <p className="text-gray-500 text-sm sm:text-base leading-relaxed max-w-md">
-              Машин сонирхсон, үнэ болон үзэх цагийн талаар асуух зүйл байвал
-              доорх сувгуудаар шууд холбогдоорой.
+      {/* ━━━ ХОЛБОО БАРИХ ━━━ */}
+      <section id="contact" className="px-4 py-12 sm:py-20">
+        <div className="max-w-7xl mx-auto">
+          <div className="max-w-2xl mb-8 sm:mb-12">
+            <div className="text-xs font-semibold uppercase tracking-[0.14em] text-brand mb-3">Холбоо барих</div>
+            <h2 className="font-display text-4xl sm:text-5xl font-semibold tracking-[-0.03em] text-ink leading-[1.05]">Бидэнтэй холбогдоорой</h2>
+            <p className="text-zinc-600 sm:text-lg mt-4 leading-relaxed">
+              Машин сонирхсон, үнэ болон үзэх цагийн талаар асуух зүйл байвал шууд холбогдоорой.
             </p>
           </div>
 
-          <div className="space-y-3">
-            {[
-              company?.phone && {
-                href: `tel:${company.phone}`,
-                label: "Утас",
-                value: company.phone,
-                icon: <IcPhone cls="w-5 h-5" />,
-                bg: "bg-brand",
-                ext: false,
-              },
-              company?.phone && {
-                href: `https://wa.me/976${company.phone.replace(/\D/g, "")}`,
-                label: "WhatsApp",
-                value: "Мессеж бичих",
-                icon: <IcWa cls="w-5 h-5" />,
-                bg: "bg-brand",
-                ext: true,
-              },
-              company?.email && {
-                href: `mailto:${company.email}`,
-                label: "И-мэйл",
-                value: company.email,
-                icon: (
-                  <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2}>
-                    <rect x="2" y="4" width="20" height="16" rx="2" />
-                    <path d="M22 7l-10 6L2 7" />
-                  </svg>
-                ),
-                bg: "bg-brand",
-                ext: false,
-              },
-              company?.working_hours && {
-                href: "#contact",
-                label: "Ажлын цаг",
-                value: company.working_hours,
-                icon: (
-                  <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2}>
-                    <circle cx="12" cy="12" r="10" />
-                    <path d="M12 6v6l4 2" />
-                  </svg>
-                ),
-                bg: "bg-brand",
-                ext: false,
-              },
-              company?.address && {
-                href: `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(company.address)}`,
-                label: "Байршил",
-                value: company.address,
-                icon: <IcPin cls="w-5 h-5" />,
-                bg: "bg-brand",
-                ext: true,
-              },
-            ]
-              .filter(Boolean)
-              .map((c) => {
-                const it = c as {
-                  href: string;
-                  label: string;
-                  value: string;
-                  icon: React.ReactNode;
-                  bg: string;
-                  ext: boolean;
-                };
-                return (
-                  <a
-                    key={it.label}
-                    href={it.href}
-                    {...(it.ext ? { target: "_blank", rel: "noreferrer" } : {})}
-                    className="group flex items-center gap-4 bg-white border border-zinc-200 border-l-4 border-l-zinc-300 hover:border-l-brand p-4 sm:p-5 transition-all hover:shadow-md"
-                  >
-                    <div
-                      className={`w-12 h-12 ${it.bg} rounded-sm flex items-center justify-center text-white shrink-0`}
-                    >
-                      {it.icon}
+          {company?.phone || contacts.length ? (
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
+              {company?.phone && (
+                <a
+                  href={`tel:${company.phone}`}
+                  className="reveal group relative overflow-hidden sm:col-span-2 lg:row-span-2 bg-brand text-white rounded-[28px] p-7 sm:p-10 flex flex-col justify-between min-h-[260px] sm:min-h-[340px]"
+                >
+                  <div className="pointer-events-none absolute -right-20 -top-20 w-80 h-80 rounded-full bg-white/10 blur-3xl" />
+                  <div className="relative w-14 h-14 rounded-full bg-white/15 flex items-center justify-center">
+                    <IcPhone cls="w-6 h-6" />
+                  </div>
+                  <div className="relative">
+                    <div className="text-white/70 text-sm mb-2">Утсаар шууд</div>
+                    <div className="font-display text-4xl sm:text-6xl font-semibold tracking-tight tabular-nums">{company.phone}</div>
+                    <div className="mt-6 inline-flex items-center gap-3 bg-white text-ink pl-5 pr-1.5 h-12 rounded-full text-sm font-medium">
+                      Залгах
+                      <span className="w-9 h-9 rounded-full bg-ink text-white flex items-center justify-center group-hover:-rotate-45 transition-transform duration-300">
+                        <IcArrow />
+                      </span>
                     </div>
-                    <div className="flex-1 min-w-0">
-                      <div className="text-xs font-semibold text-gray-500 mb-0.5">
-                        {it.label}
-                      </div>
-                      <div className="font-bold text-[#111] text-base sm:text-lg truncate">
-                        {it.value}
-                      </div>
+                  </div>
+                </a>
+              )}
+              {contacts.map((c) => {
+                const inner = (
+                  <>
+                    <div className="w-12 h-12 rounded-full bg-zinc-100 text-ink flex items-center justify-center group-hover:bg-brand group-hover:text-white transition-colors">
+                      {c.icon}
                     </div>
-                    <svg
-                      className="w-5 h-5 text-zinc-300 group-hover:text-brand group-hover:translate-x-1 transition-all shrink-0"
-                      viewBox="0 0 24 24"
-                      fill="none"
-                      stroke="currentColor"
-                      strokeWidth={2}
-                    >
-                      <path d="M5 12h14M13 6l6 6-6 6" />
-                    </svg>
+                    <div className="mt-6 min-w-0">
+                      <div className="text-sm text-zinc-500">{c.label}</div>
+                      <div className="font-display text-lg font-semibold text-ink mt-0.5 break-words">{c.value}</div>
+                    </div>
+                  </>
+                );
+                const cls = "reveal group bg-white rounded-[28px] p-6 sm:p-7 ring-1 ring-ink/[0.06] shadow-card flex flex-col justify-between min-h-[160px] transition-all duration-500 ease-out-expo";
+                return c.href ? (
+                  <a key={c.key} href={c.href} {...(c.ext ? { target: "_blank", rel: "noreferrer" } : {})} className={`${cls} hover:shadow-lift hover:-translate-y-1`}>
+                    {inner}
                   </a>
+                ) : (
+                  <div key={c.key} className={cls}>{inner}</div>
                 );
               })}
-            {!company?.phone && !company?.address && (
-              <div className="bg-white border border-zinc-200 p-6 text-sm text-gray-500">
-                Холбоо барих мэдээлэл удахгүй нэмэгдэнэ.
-              </div>
-            )}
-          </div>
+            </div>
+          ) : (
+            <div className="bg-white rounded-[28px] ring-1 ring-ink/5 p-8 text-sm text-zinc-500">Холбоо барих мэдээлэл удахгүй нэмэгдэнэ.</div>
+          )}
         </div>
       </section>
 
       <SiteCta company={company} />
       <SiteFooter company={company} />
+
       {compareOn && compare.length > 0 && (
-        <div className="fixed left-1/2 -translate-x-1/2 bottom-[88px] lg:bottom-6 z-40 bg-[#111] text-white rounded-sm shadow-2xl flex items-center gap-3 sm:gap-4 pl-4 pr-2 py-2 max-w-[calc(100vw-24px)]">
-          <span className="text-sm whitespace-nowrap">{compare.length} машин сонгосон</span>
-          <button onClick={() => setCompare([])} className="text-xs text-white/60 hover:text-white whitespace-nowrap">Цэвэрлэх</button>
+        <div className="fixed left-1/2 -translate-x-1/2 bottom-[calc(5.5rem+env(safe-area-inset-bottom))] lg:bottom-6 z-40 bg-ink/90 backdrop-blur-xl text-white rounded-full shadow-lift flex items-center gap-2 sm:gap-3 pl-2 pr-2 py-2 max-w-[calc(100vw-24px)] animate-[fadeUp_0.3s_var(--ease-out-expo)]">
+          <div className="flex -space-x-2 pl-1">
+            {compared.map((v) => (
+              <span key={v.id} className="w-8 h-8 rounded-full ring-2 ring-ink bg-zinc-700 overflow-hidden">
+                {v.main_image && <img src={optimizeImg(v.main_image, 96)!} alt="" className="w-full h-full object-cover" />}
+              </span>
+            ))}
+          </div>
+          <span className="text-sm whitespace-nowrap px-1">{compare.length}/3</span>
+          <button onClick={() => setCompare([])} className="text-sm text-white/60 hover:text-white whitespace-nowrap px-2 h-10">Цэвэрлэх</button>
           <button
             onClick={() => setCompareOpen(true)}
             disabled={compare.length < 2}
-            className="bg-brand hover:bg-brand-light disabled:bg-white/10 disabled:text-white/40 text-white text-sm font-medium px-4 py-2 rounded-sm transition-colors whitespace-nowrap"
+            className="bg-white text-ink hover:bg-brand-soft disabled:bg-white/10 disabled:text-white/40 text-sm font-medium px-5 h-10 rounded-full transition-colors whitespace-nowrap"
           >
             {compare.length < 2 ? "2+ сонгоно уу" : "Харьцуулах"}
           </button>
         </div>
       )}
       {compareOpen && compared.length >= 2 && (
-        <CompareModal vehicles={compared} onClose={() => setCompareOpen(false)} onRemove={(id) => { toggleCompare(id); if (compare.length <= 2) setCompareOpen(false); }} />
+        <CompareModal
+          vehicles={compared}
+          onClose={() => setCompareOpen(false)}
+          onRemove={(id) => {
+            toggleCompare(id);
+            if (compare.length <= 2) setCompareOpen(false);
+          }}
+        />
       )}
       <MobileCallBar company={company} />
     </div>

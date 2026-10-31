@@ -25,7 +25,7 @@ export function BrandMark({ logoUrl, name, size = 40, showName = true, onDark = 
         alt={name}
         onLoad={(e) => setRatio(e.currentTarget.naturalWidth / (e.currentTarget.naturalHeight || 1))}
         style={{ height: size }}
-        className={`object-contain max-w-[180px] ${onDark ? "bg-white rounded-sm p-1 box-content" : ""}`}
+        className={`object-contain max-w-[180px] ${onDark ? "bg-white rounded-lg p-1 box-content" : ""}`}
       />
     );
     return (
@@ -39,8 +39,8 @@ export function BrandMark({ logoUrl, name, size = 40, showName = true, onDark = 
   return (
     <span className="inline-flex items-center gap-2.5 min-w-0">
       <span
-        style={{ width: size, height: size }}
-        className="bg-brand rounded-sm flex items-center justify-center shrink-0 text-white font-bold"
+        style={{ width: size, height: size, borderRadius: size * 0.3 }}
+        className="bg-gradient-to-br from-brand to-brand-dark flex items-center justify-center shrink-0 text-white font-display font-semibold shadow-[inset_0_1px_0_rgb(255_255_255/0.2)]"
       >
         <span style={{ fontSize: size * 0.45 }} className="leading-none">{name?.[0] || ""}</span>
       </span>
