@@ -9,10 +9,10 @@ interface Vehicle {
 }
 
 const STATUS: Record<string, { label: string; dot: string; text: string }> = {
-  ARRIVED:   { label: 'Ирсэн',        dot: 'bg-zinc-400',   text: 'text-zinc-600' },
-  PUBLISHED: { label: 'Нийтлэгдсэн',  dot: 'bg-brand',    text: 'text-brand' },
-  RESERVED:  { label: 'Захиалгатай',  dot: 'bg-zinc-700',  text: 'text-zinc-800' },
-  SOLD:      { label: 'Зарагдсан',    dot: 'bg-zinc-300', text: 'text-[#111]' },
+  ARRIVED:   { label: 'Ирсэн',        dot: 'bg-sky-500',     text: 'text-sky-700' },
+  PUBLISHED: { label: 'Нийтлэгдсэн',  dot: 'bg-emerald-500', text: 'text-emerald-700' },
+  RESERVED:  { label: 'Захиалгатай',  dot: 'bg-amber-500',   text: 'text-amber-700' },
+  SOLD:      { label: 'Зарагдсан',    dot: 'bg-zinc-400',    text: 'text-zinc-600' },
 };
 const ALL_STATUSES = ['ARRIVED', 'PUBLISHED', 'RESERVED', 'SOLD'];
 

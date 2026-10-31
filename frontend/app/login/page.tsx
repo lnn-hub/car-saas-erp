@@ -52,7 +52,7 @@ export default function LoginPage() {
                 <label className="text-sm font-medium text-zinc-700 block mb-2">Нууц үг</label>
                 <input type="password" value={password} onChange={e => setPassword(e.target.value)} autoComplete="current-password" placeholder="••••••••" className={field} required />
               </div>
-              {error && <div className="bg-brand-soft border border-brand/15 rounded-2xl px-4 py-3 text-sm text-brand">{error}</div>}
+              {error && <div className="bg-danger-soft border border-danger-line rounded-2xl px-4 py-3 text-sm text-danger">{error}</div>}
               <button type="submit" disabled={loading}
                 className="w-full h-12 bg-ink hover:bg-brand disabled:opacity-40 text-white font-medium rounded-full transition-colors !mt-6">
                 {loading ? 'Нэвтэрж байна...' : 'Нэвтрэх'}

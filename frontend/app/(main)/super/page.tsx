@@ -189,7 +189,7 @@ export default function SuperPage() {
       </div>
 
       {msg && <div className="fixed top-4 right-4 z-[60] bg-[#1c1917] text-white text-sm px-4 py-2.5 rounded-full shadow-lg">{msg}</div>}
-      {error && <div className="bg-brand-soft border border-brand/20 rounded-lg px-3 py-2 text-sm text-brand">{error}</div>}
+      {error && <div className="bg-danger-soft border border-danger-line rounded-lg px-3 py-2 text-sm text-danger">{error}</div>}
 
       {totals && (
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-2 sm:gap-3">
@@ -232,7 +232,7 @@ export default function SuperPage() {
               <div><div className="text-xs text-[#5f5a54] mb-1.5">Нэр *</div><input value={form.admin_name} onChange={set('admin_name')} className={inp} required /></div>
               <div><div className="text-xs text-[#5f5a54] mb-1.5">И-мэйл *</div><input type="email" value={form.admin_email} onChange={set('admin_email')} className={inp} required /></div>
               <div><div className="text-xs text-[#5f5a54] mb-1.5">Нууц үг * (8+ тэмдэгт)</div><input type="text" value={form.admin_password} onChange={set('admin_password')} className={inp} minLength={8} required /></div>
-              {formErr && <div className="bg-brand-soft border border-brand/20 rounded-md px-3 py-2 text-sm text-brand">{formErr}</div>}
+              {formErr && <div className="bg-danger-soft border border-danger-line rounded-md px-3 py-2 text-sm text-danger">{formErr}</div>}
               <div className="flex gap-2 pt-1">
                 <button type="button" onClick={() => setOpen(false)} className="flex-1 py-2.5 text-sm text-[#5f5a54] border border-[#e6e0d8] rounded-md hover:border-[#d4ccc2]">Болих</button>
                 <button type="submit" disabled={busy} className="flex-1 py-2.5 text-sm font-medium bg-brand hover:bg-brand-dark disabled:opacity-40 text-white rounded-md">{busy ? 'Үүсгэж байна...' : 'Үүсгэх'}</button>

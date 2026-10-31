@@ -186,7 +186,7 @@ export default function NewVehiclePage() {
           </div>
         )}
 
-        {error && <div className="bg-brand-soft border border-brand/20 rounded-lg px-3 py-2 text-xs text-brand mb-4">{error}</div>}
+        {error && <div className="bg-danger-soft border border-danger-line rounded-lg px-3 py-2 text-xs text-danger mb-4">{error}</div>}
 
         <div className="flex gap-2">
           <button type="button" onClick={() => router.push('/vehicles')}
@@ -340,7 +340,7 @@ export default function NewVehiclePage() {
         </Section>
 
         {error && (
-          <div className="bg-brand-soft border border-brand/20 rounded-md px-3 py-2 text-xs text-brand">{error}</div>
+          <div className="bg-danger-soft border border-danger-line rounded-md px-3 py-2 text-xs text-danger">{error}</div>
         )}
 
         <div className="flex gap-2 pt-1">

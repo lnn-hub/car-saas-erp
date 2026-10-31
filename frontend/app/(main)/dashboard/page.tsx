@@ -8,10 +8,10 @@ interface Summary { total_sold: string; total_revenue: string; total_profit: str
 interface Vehicle { id: string; brand: string; model: string; year: number; status: string; total_cost: string; created_at: string; }
 
 const STATUS: Record<string, { label: string; bg: string; text: string; dot: string }> = {
-  ARRIVED:   { label: 'Ирсэн',       bg: 'bg-zinc-50',   text: 'text-zinc-600',   dot: 'bg-zinc-400' },
-  PUBLISHED: { label: 'Зарагдах',    bg: 'bg-brand-soft',    text: 'text-brand',    dot: 'bg-brand' },
-  RESERVED:  { label: 'Захиалга',    bg: 'bg-zinc-50',  text: 'text-zinc-800',  dot: 'bg-zinc-700' },
-  SOLD:      { label: 'Зарагдсан',   bg: 'bg-zinc-50', text: 'text-[#111]', dot: 'bg-zinc-300' },
+  ARRIVED:   { label: 'Ирсэн',       bg: 'bg-sky-50',     text: 'text-sky-700',     dot: 'bg-sky-500' },
+  PUBLISHED: { label: 'Зарагдах',    bg: 'bg-emerald-50', text: 'text-emerald-700', dot: 'bg-emerald-500' },
+  RESERVED:  { label: 'Захиалга',    bg: 'bg-amber-50',   text: 'text-amber-700',   dot: 'bg-amber-500' },
+  SOLD:      { label: 'Зарагдсан',   bg: 'bg-zinc-100',   text: 'text-zinc-600',    dot: 'bg-zinc-400' },
 };
 
 const STATUS_ICONS: Record<string, React.ReactNode> = {
@@ -134,9 +134,9 @@ export default function DashboardPage() {
         {/* Progress bar */}
         <div className="flex h-1.5">
           {[
-            { key: 'ARRIVED',   color: 'bg-zinc-400' },
-            { key: 'PUBLISHED', color: 'bg-brand' },
-            { key: 'RESERVED',  color: 'bg-zinc-700' },
+            { key: 'ARRIVED',   color: 'bg-sky-500' },
+            { key: 'PUBLISHED', color: 'bg-emerald-500' },
+            { key: 'RESERVED',  color: 'bg-amber-400' },
             { key: 'SOLD',      color: 'bg-zinc-300' },
           ].map(({ key, color }) => {
             const pct = vehicles.length ? (counts[key as keyof typeof counts] / vehicles.length) * 100 : 0;

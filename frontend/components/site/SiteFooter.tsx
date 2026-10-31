@@ -129,7 +129,7 @@ export function MobileCallBar({ company }: { company: Company | null }) {
   if (!company?.phone) return null;
   return (
     <div className="lg:hidden fixed inset-x-3 bottom-[calc(0.75rem+env(safe-area-inset-bottom))] z-40 glass rounded-full p-1.5 flex gap-1.5">
-      <a href={`tel:${company.phone}`} className="flex-1 flex items-center justify-center gap-2 bg-ink active:bg-brand text-white text-sm font-medium h-12 rounded-full">
+      <a href={`tel:${company.phone}`} className="flex-1 flex items-center justify-center gap-2 bg-brand active:bg-brand-dark text-white text-sm font-medium h-12 rounded-full">
         <IcPhone cls="w-4 h-4" /> Залгах
       </a>
       <a href={waLink(company.phone)} target="_blank" rel="noreferrer" className="flex-1 flex items-center justify-center gap-2 bg-white text-ink text-sm font-medium h-12 rounded-full border border-zinc-200">

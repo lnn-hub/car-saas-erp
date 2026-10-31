@@ -55,10 +55,10 @@ const FUEL_LABELS: Record<string, string> = {
   ELECTRIC: "Цахилгаан",
 };
 const STATUS: Record<string, { label: string; dot: string }> = {
-  ARRIVED: { label: "Ирсэн", dot: "bg-zinc-400" },
-  PUBLISHED: { label: "Нийтлэгдсэн", dot: "bg-brand" },
-  RESERVED: { label: "Захиалгатай", dot: "bg-zinc-700" },
-  SOLD: { label: "Зарагдсан", dot: "bg-zinc-300" },
+  ARRIVED: { label: "Ирсэн", dot: "bg-sky-500" },
+  PUBLISHED: { label: "Нийтлэгдсэн", dot: "bg-emerald-500" },
+  RESERVED: { label: "Захиалгатай", dot: "bg-amber-500" },
+  SOLD: { label: "Зарагдсан", dot: "bg-zinc-400" },
 };
 const STATUS_NEXT = ["ARRIVED", "PUBLISHED", "RESERVED"];
 const PAYMENT_TYPES = [
@@ -469,12 +469,13 @@ function VehicleDetailContent() {
                 key={s}
                 onClick={() => changeStatus(s)}
                 disabled={vehicle.status === s}
-                className={`px-3.5 py-2.5 rounded-md text-sm transition-colors border ${
+                className={`inline-flex items-center gap-2 h-10 px-4 rounded-full text-sm font-medium transition-colors border ${
                   vehicle.status === s
-                    ? "border-[#e6e0d8] bg-[#f3efe9] text-[#6f6a64] cursor-default"
-                    : "border-[#e6e0d8] text-[#5f5a54] hover:border-[#d4ccc2] hover:text-[#1c1917]"
+                    ? "border-ink bg-ink text-white cursor-default"
+                    : "border-[#e6e0d8] bg-white text-[#5f5a54] hover:border-[#d4ccc2] hover:text-[#1c1917]"
                 }`}
               >
+                <span className={`w-2 h-2 rounded-full ${STATUS[s]?.dot}`} />
                 {STATUS[s]?.label}
               </button>
             ))}
@@ -806,17 +807,17 @@ function VehicleDetailContent() {
                     {/* Ашгийн preview */}
                     {salePriceNum > 0 && (
                       <div
-                        className={`mt-2 px-3 py-2 rounded-md text-xs flex items-center justify-between ${profit >= 0 ? "bg-zinc-50 border border-zinc-200" : "bg-brand-soft border border-brand/20"}`}
+                        className={`mt-2 px-3 py-2 rounded-md text-xs flex items-center justify-between ${profit >= 0 ? "bg-emerald-50 border border-emerald-200" : "bg-danger-soft border border-danger-line"}`}
                       >
                         <span
                           className={
-                            profit >= 0 ? "text-[#111]" : "text-brand"
+                            profit >= 0 ? "text-emerald-800" : "text-danger"
                           }
                         >
                           {profit >= 0 ? "Ашиг" : "Алдагдал"}
                         </span>
                         <span
-                          className={`font-semibold tabular-nums ${profit >= 0 ? "text-[#111]" : "text-brand"}`}
+                          className={`font-semibold tabular-nums ${profit >= 0 ? "text-emerald-800" : "text-danger"}`}
                         >
                           {profit >= 0 ? "+" : ""}
                           {fmt(profit)} ({margin}%)

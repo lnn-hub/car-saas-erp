@@ -109,7 +109,7 @@ function AdminModal({ onClose, company }: { onClose: () => void; company: Compan
           <input type="email" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="И-мэйл" required autoFocus className={field} />
           <input type="password" value={password} onChange={(e) => setPassword(e.target.value)} placeholder="Нууц үг" required className={field} />
           {error && (
-            <div className="bg-brand-soft border border-brand/15 rounded-2xl px-4 py-2.5 text-xs text-brand">{error}</div>
+            <div className="bg-danger-soft border border-danger-line rounded-2xl px-4 py-2.5 text-xs text-danger">{error}</div>
           )}
           <button
             type="submit"
@@ -202,7 +202,7 @@ export function SiteHeader({ company }: { company: Company | null }) {
             {company?.phone && (
               <a
                 href={`tel:${company.phone}`}
-                className="hidden lg:inline-flex items-center gap-2 bg-ink hover:bg-brand text-white text-sm font-medium pl-4 pr-5 h-12 rounded-full transition-colors"
+                className="hidden lg:inline-flex items-center gap-2 bg-brand hover:bg-brand-dark text-white text-sm font-medium pl-4 pr-5 h-12 rounded-full transition-colors"
               >
                 <span className="w-7 h-7 -ml-1 rounded-full bg-white/15 flex items-center justify-center">
                   <IcPhone cls="w-3.5 h-3.5" />
@@ -258,7 +258,7 @@ export function SiteHeader({ company }: { company: Company | null }) {
             ))}
             <div className="grid grid-cols-2 gap-2 p-2 pt-3">
               {company?.phone && (
-                <a href={`tel:${company.phone}`} className="flex items-center justify-center gap-2 bg-ink text-white rounded-full py-3.5 text-sm font-medium">
+                <a href={`tel:${company.phone}`} className="flex items-center justify-center gap-2 bg-brand text-white rounded-full py-3.5 text-sm font-medium">
                   <IcPhone cls="w-4 h-4" /> Залгах
                 </a>
               )}

@@ -19,7 +19,7 @@ function fmtDate(d: string) {
 const PAYMENT: Record<string, string> = { CASH: 'Бэлэн', LOAN: 'Зээл', LEASING: 'Лизинг' };
 const PAYMENT_COLOR: Record<string, string> = {
   CASH:    'bg-zinc-100 text-zinc-500',
-  LOAN:    'bg-brand-soft text-brand',
+  LOAN:    'bg-sky-50 text-sky-700',
   LEASING: 'bg-zinc-900 text-white',
 };
 

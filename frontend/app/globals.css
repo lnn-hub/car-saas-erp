@@ -7,9 +7,14 @@
 
   --color-brand: #8b1e2d;
   --color-brand-dark: #6d1523;
-  --color-brand-light: #e07a88;
+  --color-brand-light: #efb7bd;
   --color-brand-soft: #f9eef0;
   --color-ink: #121010;
+
+  /* Алдааны өнгө — брэндийн бордогоос тусдаа */
+  --color-danger: #b42318;
+  --color-danger-soft: #fef3f2;
+  --color-danger-line: #fecdca;
   --color-canvas: #f5f3f0;
 
   /* Дулаан саарал: burgundy-тай зохицно, бичвэр нь WCAG AA (4.5:1+) */

@@ -243,7 +243,7 @@ export default function SettingsPage() {
           </div>
         </div>
 
-        {error && <div className="bg-brand-soft border border-brand/20 rounded-lg px-3 py-2 text-xs text-brand">{error}</div>}
+        {error && <div className="bg-danger-soft border border-danger-line rounded-lg px-3 py-2 text-xs text-danger">{error}</div>}
         {saved && <div className="bg-zinc-50 border border-zinc-200 rounded-lg px-3 py-2 text-xs text-zinc-700">Хадгалагдлаа</div>}
 
         <button type="submit" disabled={saving}
@@ -305,7 +305,7 @@ export default function SettingsPage() {
             </div>
           )}
           {(seed?.error || seedErr) && (
-            <div className="bg-brand-soft border border-brand/20 rounded-lg px-3 py-2 text-xs text-brand">{seed?.error || seedErr}</div>
+            <div className="bg-danger-soft border border-danger-line rounded-lg px-3 py-2 text-xs text-danger">{seed?.error || seedErr}</div>
           )}
         </div>
       </Section>
@@ -344,7 +344,7 @@ export default function SettingsPage() {
                 <label className="text-xs text-[#5f5a54] block mb-1.5">Танилцуулга</label>
                 <textarea value={mForm.bio} onChange={e => setMForm(p => ({ ...p, bio: e.target.value }))} rows={3} className={inp + ' resize-none'} />
               </div>
-              {mError && <div className="bg-brand-soft border border-brand/20 rounded-md px-3 py-2 text-xs text-brand">{mError}</div>}
+              {mError && <div className="bg-danger-soft border border-danger-line rounded-md px-3 py-2 text-xs text-danger">{mError}</div>}
               <div className="flex gap-2">
                 <button type="button" onClick={() => setEditing(null)}
                   className="flex-1 py-2.5 text-sm text-[#5f5a54] border border-[#e6e0d8] rounded-md hover:border-[#d4ccc2]">Болих</button>

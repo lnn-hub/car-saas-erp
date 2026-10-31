@@ -318,7 +318,7 @@ function VehicleContent({ id, initial }: { id: string; initial: VehicleDetail | 
               {v.company?.phone && (
                 <div className="space-y-2 mt-5">
                   <a href={`tel:${v.company.phone}`}
-                    className="flex items-center justify-center gap-2 w-full h-14 rounded-full bg-ink hover:bg-brand text-white font-medium transition-colors">
+                    className="flex items-center justify-center gap-2 w-full h-14 rounded-full bg-brand hover:bg-brand-dark text-white font-medium transition-colors">
                     <IcPhone cls="w-4 h-4" /> Залгах · {v.company.phone}
                   </a>
                   <a href={waHref} target="_blank" rel="noreferrer"
@@ -385,7 +385,7 @@ function VehicleContent({ id, initial }: { id: string; initial: VehicleDetail | 
             </button>
           )}
           <a href={`tel:${v.company.phone}`}
-            className="flex-1 flex items-center justify-center gap-2 bg-ink active:bg-brand text-white text-sm font-medium h-12 rounded-full">
+            className="flex-1 flex items-center justify-center gap-2 bg-brand active:bg-brand-dark text-white text-sm font-medium h-12 rounded-full">
             <IcPhone cls="w-4 h-4" /> Залгах
           </a>
           <a href={waHref} target="_blank" rel="noreferrer"
