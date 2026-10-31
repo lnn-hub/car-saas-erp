@@ -46,7 +46,7 @@ export function HeroSlides({ vehicles }: { vehicles: Vehicle[] }) {
 
       {/* Одоо харагдаж буй машин */}
       <div
-        className="hidden md:block absolute right-6 lg:right-10 bottom-28 z-10 w-[300px]"
+        className="hidden md:block absolute right-6 lg:right-10 bottom-[104px] z-10 w-[300px]"
         onMouseEnter={() => setPaused(true)}
         onMouseLeave={() => setPaused(false)}
       >
@@ -71,7 +71,7 @@ export function HeroSlides({ vehicles }: { vehicles: Vehicle[] }) {
       </div>
 
       {slides.length > 1 && (
-        <div className="hidden sm:flex absolute right-6 lg:right-10 bottom-20 z-10 gap-1.5 md:w-[300px]">
+        <div className="hidden sm:flex absolute right-6 lg:right-10 bottom-[68px] z-10 gap-1.5 md:w-[300px]">
           {slides.map((v, k) => (
             <button
               key={v.id}

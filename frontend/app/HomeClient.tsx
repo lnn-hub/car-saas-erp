@@ -140,7 +140,7 @@ function HomeContent({ initial }: { initial: SiteInitial | null }) {
           <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,#5a1420_0%,#121010_60%)]" />
           <HeroSlides vehicles={vehicles} />
 
-          <div className="relative px-6 sm:px-12 lg:px-16 pt-24 pb-24 sm:pb-28 max-w-4xl">
+          <div className="relative px-6 sm:px-12 lg:px-16 pt-24 pb-16 sm:pb-20 max-w-4xl">
             <div className="inline-flex items-center gap-2.5 glass-dark rounded-full pl-2.5 pr-4 py-1.5 text-[13px] text-white/85 mb-6 sm:mb-8">
               <span className={`w-2 h-2 rounded-full ${loading || retrying ? "bg-amber-300 animate-pulse" : "bg-green-400 animate-[pulseDot_2s_ease-in-out_infinite]"}`} />
               {retrying ? "Сервер асаж байна, түр хүлээнэ үү..." : loading ? "Ачааллаж байна" : `${vehicles.length} машин худалдаанд байна`}
@@ -184,7 +184,7 @@ function HomeContent({ initial }: { initial: SiteInitial | null }) {
         </div>
 
         {/* Хайлтын самбар */}
-        <div className="relative z-10 -mt-10 sm:-mt-12 px-2 sm:px-8">
+        <div className="relative z-10 -mt-6 sm:-mt-5 px-2 sm:px-8">
           <form
             onSubmit={(e) => {
               e.preventDefault();
