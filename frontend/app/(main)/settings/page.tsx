@@ -68,8 +68,13 @@ export default function SettingsPage() {
 
   const [seed, setSeed] = useState<{ running: boolean; done: number; total: number; message: string; error: string | null; failed?: string[]; finishedAt?: string | null } | null>(null);
   const [seedErr, setSeedErr] = useState('');
+  // Жишээ өгөгдөл оруулахыг зөвхөн системийн эзэмшигч (SUPERADMIN_EMAILS) хийнэ
+  const [canSeed, setCanSeed] = useState(false);
 
   useEffect(() => {
+    const u = JSON.parse(localStorage.getItem('user') || '{}');
+    if (!u.superadmin) return;
+    setCanSeed(true);
     api.demoSeedStatus().then(setSeed).catch(() => {});
   }, []);
 
@@ -277,6 +282,7 @@ export default function SettingsPage() {
         </div>
       </Section>
 
+      {canSeed && (
       <Section title="Жишээ өгөгдөл" hint="Demo харуулахад">
         <div className="p-5 space-y-3">
           <p className="text-sm text-[#5f5a54] leading-relaxed">
@@ -309,6 +315,7 @@ export default function SettingsPage() {
           )}
         </div>
       </Section>
+      )}
 
       {editing && (
         <div className="fixed inset-0 z-50 bg-black/50 flex items-end sm:items-center justify-center sm:px-4"

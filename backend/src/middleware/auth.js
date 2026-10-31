@@ -40,9 +40,6 @@ async function authMiddleware(req, res, next) {
   }
 }
 
-const requireSuper = (req, res, next) =>
-  req.user?.superadmin ? next() : res.status(403).json({ error: 'Зөвхөн суперадмин' });
-
 const requireFeature = (key) => async (req, res, next) => {
   try {
     const st = await companyState(req.user.company_id);
@@ -56,6 +53,5 @@ const requireAdmin = (req, res, next) =>
 
 module.exports = authMiddleware;
 module.exports.requireAdmin = requireAdmin;
-module.exports.requireSuper = requireSuper;
 module.exports.requireFeature = requireFeature;
 module.exports.invalidateCompany = invalidateCompany;
