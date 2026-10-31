@@ -121,6 +121,8 @@ export function SiteFooter({ company }: { company: Company | null }) {
           {cname}
         </div>
       )}
+      {/* Утсан дээр хөвөгч "Залгах" мөрийн доор footer үргэлжилнэ */}
+      <div className="lg:hidden h-[calc(5.5rem+env(safe-area-inset-bottom))]" />
     </footer>
   );
 }

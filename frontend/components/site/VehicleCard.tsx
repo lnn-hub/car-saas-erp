@@ -66,11 +66,11 @@ export function VehicleCard({
         <div className="absolute inset-x-0 bottom-0 h-1/3 bg-gradient-to-t from-black/25 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
 
         <div className="absolute top-2 left-2 sm:top-3 sm:left-3 flex flex-wrap gap-1.5">
-          <span className="glass !shadow-none rounded-full px-2.5 py-1 text-[11px] sm:text-xs font-semibold text-ink tabular-nums">
+          <span className="bg-white/90 rounded-full px-2.5 py-1 text-[11px] sm:text-xs font-semibold text-ink tabular-nums">
             {v.year}
           </span>
           {v.has_plates && (
-            <span className="hidden sm:inline-flex items-center rounded-full bg-brand/90 backdrop-blur px-2.5 py-1 text-xs font-medium text-white">
+            <span className="hidden sm:inline-flex items-center rounded-full bg-brand/90 px-2.5 py-1 text-xs font-medium text-white">
               Дугаартай
             </span>
           )}
@@ -90,7 +90,7 @@ export function VehicleCard({
             className={`absolute top-1.5 right-1.5 sm:top-2 sm:right-2 w-10 h-10 sm:w-11 sm:h-11 rounded-full flex items-center justify-center transition-all duration-300 ${
               compared
                 ? "bg-brand text-white shadow-lg scale-100"
-                : "glass !shadow-none text-ink sm:opacity-0 sm:scale-90 group-hover:opacity-100 group-hover:scale-100"
+                : "bg-white/90 text-ink sm:opacity-0 sm:scale-90 group-hover:opacity-100 group-hover:scale-100"
             }`}
           >
             {compared ? (
@@ -114,11 +114,11 @@ export function VehicleCard({
 
         <div className="mt-auto pt-3 sm:pt-4 flex items-end justify-between gap-2">
           {price ? (
-            <div className="font-display text-base sm:text-[22px] font-semibold text-ink tabular-nums leading-none tracking-tight">{price}</div>
+            <div className="font-display text-[15px] sm:text-[22px] font-semibold text-ink tabular-nums leading-none tracking-tight whitespace-nowrap">{price}</div>
           ) : (
             <div className="text-sm text-zinc-500">Үнэ тохиролцоно</div>
           )}
-          <span className="shrink-0 w-9 h-9 sm:w-11 sm:h-11 rounded-full bg-zinc-100 text-ink group-hover:bg-brand group-hover:text-white flex items-center justify-center transition-all duration-300 group-hover:-rotate-45">
+          <span className="shrink-0 w-8 h-8 sm:w-11 sm:h-11 rounded-full bg-zinc-100 text-ink group-hover:bg-brand group-hover:text-white flex items-center justify-center transition-all duration-300 group-hover:-rotate-45">
             <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2}><path d="M5 12h14M13 6l6 6-6 6" /></svg>
           </span>
         </div>

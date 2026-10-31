@@ -41,7 +41,7 @@ function AboutContent({ initial }: { initial: SiteInitial | null }) {
   ];
 
   return (
-    <div className="min-h-screen pb-24 lg:pb-0">
+    <div className="min-h-screen">
       <SiteHeader company={company} />
 
       {/* ━━━ HERO ━━━ */}

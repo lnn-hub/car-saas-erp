@@ -160,7 +160,7 @@ function VehicleContent({ id, initial }: { id: string; initial: VehicleDetail | 
   const card = 'bg-white rounded-[28px] ring-1 ring-ink/[0.06] shadow-card';
 
   return (
-    <div className="min-h-screen pb-28 lg:pb-0">
+    <div className="min-h-screen">
       <SiteHeader company={company} />
 
       <main className="max-w-7xl mx-auto px-4 pt-2 sm:pt-4">

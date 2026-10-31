@@ -35,7 +35,7 @@ export function HeroSlides({ vehicles }: { vehicles: Vehicle[] }) {
               alt=""
               loading={k === 0 ? "eager" : "lazy"}
               fetchPriority={k === 0 ? "high" : "auto"}
-              className="w-full h-full object-cover animate-[kenburns_14s_ease-in-out_infinite_alternate]"
+              className="w-full h-full object-cover sm:animate-[kenburns_14s_ease-in-out_infinite_alternate]"
             />
           </div>
         ))}

@@ -131,7 +131,7 @@ function HomeContent({ initial }: { initial: SiteInitial | null }) {
   ].filter(Boolean) as { key: string; href: string; label: string; value: string; icon: React.ReactNode; ext: boolean }[];
 
   return (
-    <div className="min-h-screen pb-24 lg:pb-0">
+    <div className="min-h-screen">
       <SiteHeader company={company} />
 
       {/* ━━━ HERO ━━━ */}
