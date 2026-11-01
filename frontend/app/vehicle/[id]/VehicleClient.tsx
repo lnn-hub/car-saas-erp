@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { BACKEND, companyQuery, optimizeImg, Vehicle, VehicleDetail } from '@/lib/site';
 import { FUEL, TRANS, fmtEngine, fmtPrice } from '@/lib/format';
 import { useCompany } from '@/lib/useSiteData';
+import { useCompare, COMPARE_MAX } from '@/lib/compare';
 import { SiteHeader } from '@/components/site/SiteHeader';
 import { SiteFooter } from '@/components/site/SiteFooter';
 import { LeasingCalculator } from '@/components/site/LeasingCalculator';
@@ -51,6 +52,7 @@ function VehicleContent({ id, initial }: { id: string; initial: VehicleDetail | 
   const [slide, setSlide] = useState(0);
   const [loading, setLoad] = useState(!initial);
   const stripRef = useRef<HTMLDivElement>(null);
+  const { ids: compareIds, toggle: toggleCompare } = useCompare();
 
   useEffect(() => {
     let cancelled = false;
@@ -327,6 +329,24 @@ function VehicleContent({ id, initial }: { id: string; initial: VehicleDetail | 
                   </a>
                 </div>
               )}
+
+              {v.company?.features?.compare !== false && (() => {
+                const inCompare = compareIds.includes(v.id);
+                const full = !inCompare && compareIds.length >= COMPARE_MAX;
+                return (
+                  <div className="flex items-center gap-2 mt-2">
+                    <button type="button" onClick={() => toggleCompare(v.id)} disabled={full}
+                      className={`flex-1 flex items-center justify-center gap-2 h-12 rounded-full text-sm font-medium transition-colors disabled:opacity-40 ${inCompare ? 'bg-brand-soft text-brand' : 'bg-zinc-50 text-ink hover:bg-zinc-100'}`}>
+                      {inCompare ? <>{Ic.check} Харьцуулалтад нэмэгдсэн</> : full ? `Дээд тал нь ${COMPARE_MAX} машин` : '+ Харьцуулахад нэмэх'}
+                    </button>
+                    {compareIds.length >= 2 && (
+                      <Link href="/#cars" className="shrink-0 h-12 px-4 rounded-full bg-ink text-white text-sm font-medium flex items-center gap-1.5">
+                        Харьцуулах <span className="opacity-60 tabular-nums">{compareIds.length}</span>
+                      </Link>
+                    )}
+                  </div>
+                );
+              })()}
 
               <div className="flex items-center gap-3 mt-6 pt-5 border-t border-zinc-100">
                 <BrandMark logoUrl={v.company?.logo_url} name={v.company?.name || ''} size={40} showName={false} />

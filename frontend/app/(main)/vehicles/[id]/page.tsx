@@ -56,7 +56,7 @@ const FUEL_LABELS: Record<string, string> = {
 };
 const STATUS: Record<string, { label: string; dot: string }> = {
   ARRIVED: { label: "Ирсэн", dot: "bg-sky-500" },
-  PUBLISHED: { label: "Нийтлэгдсэн", dot: "bg-emerald-500" },
+  PUBLISHED: { label: "Нийтлэгдсэн", dot: "bg-violet-500" },
   RESERVED: { label: "Захиалгатай", dot: "bg-amber-500" },
   SOLD: { label: "Зарагдсан", dot: "bg-zinc-400" },
 };
@@ -440,7 +440,7 @@ function VehicleDetailContent() {
             <input type="number" min="0" inputMode="numeric" placeholder="Зарах үнэ (₮)" value={edit.price} onChange={(e) => setEdit((p) => ({ ...p, price: e.target.value }))} className={inp} />
             <input type="date" value={edit.manufactured_date} onChange={(e) => setEdit((p) => ({ ...p, manufactured_date: e.target.value }))} className={inp} />
             <label className="flex items-center gap-2 text-sm text-[#46413c]">
-              <input type="checkbox" checked={edit.has_plates} onChange={(e) => setEdit((p) => ({ ...p, has_plates: e.target.checked }))} className="accent-[#8b1e2d]" />
+              <input type="checkbox" checked={edit.has_plates} onChange={(e) => setEdit((p) => ({ ...p, has_plates: e.target.checked }))} className="accent-brand" />
               Улсын дугаартай
             </label>
             <textarea value={edit.description} onChange={(e) => setEdit((p) => ({ ...p, description: e.target.value }))} rows={6}

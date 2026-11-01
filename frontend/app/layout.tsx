@@ -16,7 +16,7 @@ export async function generateMetadata(): Promise<Metadata> {
   // Лого байхгүй бол брэндийн өнгөтэй, нэрийн эхний үсэгтэй дүрс
   const letter = (name?.[0] || "A").replace(/[<>&"']/g, "");
   const letterIcon = `data:image/svg+xml,${encodeURIComponent(
-    `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64"><rect width="64" height="64" rx="12" fill="#8b1e2d"/><text x="32" y="45" font-family="Arial,sans-serif" font-size="38" font-weight="700" fill="#fff" text-anchor="middle">${letter}</text></svg>`
+    `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64"><rect width="64" height="64" rx="12" fill="#1f5c4a"/><text x="32" y="45" font-family="Arial,sans-serif" font-size="38" font-weight="700" fill="#fff" text-anchor="middle">${letter}</text></svg>`
   )}`;
   const icon = logoIcon || letterIcon;
   if (name) {

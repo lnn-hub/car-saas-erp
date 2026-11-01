@@ -47,7 +47,7 @@ function AboutContent({ initial }: { initial: SiteInitial | null }) {
       {/* ━━━ HERO ━━━ */}
       <section className="px-3 sm:px-4">
         <div className="relative max-w-[1400px] mx-auto rounded-[28px] sm:rounded-[40px] overflow-hidden bg-ink text-white">
-          <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_left,#5a1420_0%,#121010_55%)]" />
+          <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_left,var(--color-brand-deep)_0%,#121010_55%)]" />
           <div
             className="absolute inset-0 opacity-[0.07]"
             style={{ backgroundImage: "radial-gradient(rgb(255 255 255 / 0.7) 1px, transparent 1px)", backgroundSize: "22px 22px" }}
@@ -144,7 +144,7 @@ function AboutContent({ initial }: { initial: SiteInitial | null }) {
                       {src ? (
                         <img src={src} alt={m.name} loading="lazy" className="w-full h-full object-cover object-top group-hover:scale-[1.04] transition-transform duration-[1.2s] ease-out-expo" />
                       ) : (
-                        <div className="w-full h-full flex items-center justify-center bg-[radial-gradient(ellipse_at_top,#5a1420,#121010)]">
+                        <div className="w-full h-full flex items-center justify-center bg-[radial-gradient(ellipse_at_top,var(--color-brand-deep),#121010)]">
                           <span className="font-display text-5xl sm:text-6xl font-semibold text-white/85 tracking-tight">
                             {m.name.split(" ").map((n) => n[0]).join("").slice(0, 2).toUpperCase()}
                           </span>

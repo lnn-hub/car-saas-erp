@@ -1,8 +1,9 @@
 "use client";
-import { useState, Suspense } from "react";
+import { useEffect, useState, Suspense } from "react";
 import { optimizeImg, SiteInitial } from "@/lib/site";
 import { useSiteData } from "@/lib/useSiteData";
 import { FUEL } from "@/lib/format";
+import { useCompare, COMPARE_MAX } from "@/lib/compare";
 import { SiteHeader } from "@/components/site/SiteHeader";
 import { MobileCallBar, SiteCta, SiteFooter } from "@/components/site/SiteFooter";
 import { HeroSlides } from "@/components/site/HeroSlides";
@@ -22,6 +23,13 @@ function IcArrow({ cls = "w-4 h-4" }: { cls?: string }) {
   return (
     <svg className={cls} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2}>
       <path d="M5 12h14M13 6l6 6-6 6" />
+    </svg>
+  );
+}
+function IcFilter({ cls = "w-4 h-4" }: { cls?: string }) {
+  return (
+    <svg className={cls} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round">
+      <path d="M4 6h16M7 12h10M10 18h4" />
     </svg>
   );
 }
@@ -55,10 +63,9 @@ function HomeContent({ initial }: { initial: SiteInitial | null }) {
   const [filterBrand, setBrand] = useState("");
   const [filterPrice, setPrice] = useState("");
   const [sortBy, setSort] = useState("");
-  const [compare, setCompare] = useState<string[]>([]);
+  const { ids: compare, toggle: toggleCompare, clear: clearCompare } = useCompare();
   const [compareOpen, setCompareOpen] = useState(false);
-  const toggleCompare = (id: string) =>
-    setCompare((c) => (c.includes(id) ? c.filter((x) => x !== id) : c.length >= 3 ? c : [...c, id]));
+  const [sheetOpen, setSheetOpen] = useState(false);
   const compareOn = company?.features?.compare !== false;
   const compared = vehicles.filter((v) => compare.includes(v.id));
 
@@ -104,6 +111,20 @@ function HomeContent({ initial }: { initial: SiteInitial | null }) {
     setBrand("");
     setPrice("");
   };
+  const activeCount = [filterBrand, filterPrice, filterFuel, filterTrans].filter(Boolean).length;
+
+  useEffect(() => {
+    if (!sheetOpen) return;
+    const prev = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    const onKey = (e: KeyboardEvent) => e.key === "Escape" && setSheetOpen(false);
+    window.addEventListener("keydown", onKey);
+    return () => {
+      document.body.style.overflow = prev;
+      window.removeEventListener("keydown", onKey);
+    };
+  }, [sheetOpen]);
+
   const goCars = () => document.getElementById("cars")?.scrollIntoView({ behavior: "smooth" });
 
   const stats = [
@@ -137,7 +158,7 @@ function HomeContent({ initial }: { initial: SiteInitial | null }) {
       {/* ━━━ HERO ━━━ */}
       <section className="px-3 sm:px-4">
         <div className="relative max-w-[1400px] mx-auto rounded-[28px] sm:rounded-[40px] overflow-hidden bg-ink text-white min-h-[560px] sm:min-h-[640px] lg:min-h-[700px] flex flex-col justify-end">
-          <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,#5a1420_0%,#121010_60%)]" />
+          <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,var(--color-brand-deep)_0%,#121010_60%)]" />
           <HeroSlides vehicles={vehicles} />
 
           <div className="relative px-6 sm:px-12 lg:px-16 pt-24 pb-16 sm:pb-20 max-w-4xl">
@@ -185,12 +206,45 @@ function HomeContent({ initial }: { initial: SiteInitial | null }) {
 
         {/* Хайлтын самбар */}
         <div className="relative z-10 -mt-6 sm:-mt-5 px-2 sm:px-8">
+          {/* Утас: хайх мөр + шүүлтүүрийн товч */}
+          <form
+            onSubmit={(e) => {
+              e.preventDefault();
+              (document.activeElement as HTMLElement | null)?.blur();
+              goCars();
+            }}
+            className="md:hidden flex items-center gap-1.5 bg-white rounded-full shadow-lift ring-1 ring-ink/5 p-1.5"
+          >
+            <label className="flex-1 min-w-0 flex items-center gap-2.5 pl-3.5 h-12">
+              <IcSearch cls="w-5 h-5 text-zinc-500 shrink-0" />
+              <input
+                value={search}
+                onChange={(e) => setSearch(e.target.value)}
+                enterKeyHint="search"
+                placeholder="Марк, загвар хайх"
+                className="flex-1 min-w-0 bg-transparent text-base text-ink placeholder:text-zinc-400 focus:outline-none"
+              />
+            </label>
+            <button
+              type="button"
+              onClick={() => setSheetOpen(true)}
+              className="relative shrink-0 h-12 pl-4 pr-5 rounded-full bg-brand text-white text-sm font-medium flex items-center gap-2 active:bg-brand-dark"
+            >
+              <IcFilter /> Шүүлтүүр
+              {activeCount > 0 && (
+                <span className="absolute -top-1 -right-1 min-w-5 h-5 px-1 rounded-full bg-ink text-white text-[11px] font-semibold flex items-center justify-center ring-2 ring-white">
+                  {activeCount}
+                </span>
+              )}
+            </button>
+          </form>
+
           <form
             onSubmit={(e) => {
               e.preventDefault();
               goCars();
             }}
-            className="max-w-5xl mx-auto bg-white rounded-[26px] md:rounded-full shadow-lift ring-1 ring-ink/5 p-2 grid grid-cols-2 md:grid-cols-[1.6fr_1fr_1fr_auto] gap-1 md:gap-0"
+            className="hidden md:grid max-w-5xl mx-auto bg-white rounded-full shadow-lift ring-1 ring-ink/5 p-2 md:grid-cols-[1.6fr_1fr_1fr_auto] gap-0"
           >
             <label className="col-span-2 md:col-span-1 flex items-center gap-3 px-4 md:px-6 h-14 md:h-16 rounded-full hover:bg-zinc-50 focus-within:bg-zinc-50 transition-colors cursor-text">
               <IcSearch cls="w-5 h-5 text-zinc-500 shrink-0" />
@@ -249,7 +303,14 @@ function HomeContent({ initial }: { initial: SiteInitial | null }) {
                   Цэвэрлэх
                 </button>
               )}
-              <label className="relative">
+              <button
+                onClick={() => setSheetOpen(true)}
+                className="sm:hidden inline-flex items-center gap-2 h-11 px-4 rounded-full bg-white border border-zinc-200 text-sm font-medium text-ink"
+              >
+                <IcFilter /> Шүүлтүүр, эрэмбэ
+                {activeCount > 0 && <span className="min-w-5 h-5 px-1 rounded-full bg-brand text-white text-[11px] font-semibold flex items-center justify-center">{activeCount}</span>}
+              </button>
+              <label className="relative hidden sm:block">
                 <span className="sr-only">Эрэмбэлэх</span>
                 <select
                   value={sortBy}
@@ -275,16 +336,16 @@ function HomeContent({ initial }: { initial: SiteInitial | null }) {
                 {b} <span className="ml-1 opacity-60 tabular-nums">{brandCounts[b]}</span>
               </button>
             ))}
-            {(fuelsInUse.length > 1 || transInUse.length > 1) && <span className="w-px h-6 bg-zinc-200 shrink-0 mx-1" />}
+            {(fuelsInUse.length > 1 || transInUse.length > 1) && <span className="hidden sm:block w-px h-6 bg-zinc-200 shrink-0 mx-1" />}
             {fuelsInUse.length > 1 &&
               fuelsInUse.map((k) => (
-                <button key={k} onClick={() => setFilterFuel(filterFuel === k ? "" : k)} className={chip(filterFuel === k)}>
+                <button key={k} onClick={() => setFilterFuel(filterFuel === k ? "" : k)} className={`hidden sm:inline-block ${chip(filterFuel === k)}`}>
                   {FUEL[k]}
                 </button>
               ))}
             {transInUse.length > 1 &&
               transInUse.map((k) => (
-                <button key={k} onClick={() => setFilterTrans(filterTrans === k ? "" : k)} className={chip(filterTrans === k)}>
+                <button key={k} onClick={() => setFilterTrans(filterTrans === k ? "" : k)} className={`hidden sm:inline-block ${chip(filterTrans === k)}`}>
                   {k === "AUTO" ? "Автомат" : "Механик"}
                 </button>
               ))}
@@ -390,7 +451,7 @@ function HomeContent({ initial }: { initial: SiteInitial | null }) {
       <SiteCta company={company} />
       <SiteFooter company={company} />
 
-      {compareOn && compare.length > 0 && (
+      {compareOn && compared.length > 0 && (
         <div className="fixed left-1/2 -translate-x-1/2 bottom-[calc(5.5rem+env(safe-area-inset-bottom))] lg:bottom-6 z-40 bg-ink/90 backdrop-blur-xl text-white rounded-full shadow-lift flex items-center gap-2 sm:gap-3 pl-2 pr-2 py-2 max-w-[calc(100vw-24px)] animate-[fadeUp_0.3s_var(--ease-out-expo)]">
           <div className="flex -space-x-2 pl-1">
             {compared.map((v) => (
@@ -399,8 +460,8 @@ function HomeContent({ initial }: { initial: SiteInitial | null }) {
               </span>
             ))}
           </div>
-          <span className="text-sm whitespace-nowrap px-1">{compare.length}/3</span>
-          <button onClick={() => setCompare([])} className="text-sm text-white/60 hover:text-white whitespace-nowrap px-2 h-10">Цэвэрлэх</button>
+          <span className="text-sm whitespace-nowrap px-1">{compare.length}/{COMPARE_MAX}</span>
+          <button onClick={clearCompare} className="text-sm text-white/60 hover:text-white whitespace-nowrap px-2 h-10">Цэвэрлэх</button>
           <button
             onClick={() => setCompareOpen(true)}
             disabled={compare.length < 2}
@@ -416,9 +477,87 @@ function HomeContent({ initial }: { initial: SiteInitial | null }) {
           onClose={() => setCompareOpen(false)}
           onRemove={(id) => {
             toggleCompare(id);
-            if (compare.length <= 2) setCompareOpen(false);
+            if (compared.length <= 2) setCompareOpen(false);
           }}
         />
+      )}
+      {/* Утас: шүүлтүүрийн доороос гарах цонх */}
+      {sheetOpen && (
+        <div className="md:hidden fixed inset-0 z-[90]" role="dialog" aria-label="Шүүлтүүр">
+          <div className="absolute inset-0 bg-ink/40 backdrop-blur-sm animate-[pageIn_0.2s_ease-out]" onClick={() => setSheetOpen(false)} />
+          <div className="absolute inset-x-0 bottom-0 bg-white rounded-t-[28px] shadow-lift max-h-[88dvh] flex flex-col animate-[sheetUp_0.4s_var(--ease-out-expo)]">
+            <div className="pt-2.5 pb-1 flex justify-center">
+              <span className="w-10 h-1 rounded-full bg-zinc-200" />
+            </div>
+            <div className="flex items-center justify-between px-5 pb-3">
+              <h3 className="font-display text-xl font-semibold text-ink">Шүүлтүүр</h3>
+              <button onClick={() => setSheetOpen(false)} aria-label="Хаах" className="w-10 h-10 rounded-full bg-zinc-100 flex items-center justify-center text-ink">
+                <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2}><path d="M18 6L6 18M6 6l12 12" /></svg>
+              </button>
+            </div>
+            <div className="flex-1 overflow-y-auto overscroll-contain px-5 pb-4 space-y-6">
+              {[
+                {
+                  title: "Эрэмбэлэх",
+                  items: SORTS.filter((o) => hasPrices || !o.key.startsWith("price")).map((o) => ({ key: o.key || "new", label: o.label, on: sortBy === o.key, click: () => setSort(o.key) })),
+                },
+                {
+                  title: "Марк",
+                  items: [
+                    { key: "all", label: `Бүгд · ${vehicles.length}`, on: !filterBrand, click: () => setBrand("") },
+                    ...uniqueBrands.map((b) => ({ key: b, label: `${b} · ${brandCounts[b]}`, on: filterBrand === b, click: () => setBrand(filterBrand === b ? "" : b) })),
+                  ],
+                },
+                ...(hasPrices
+                  ? [{ title: "Үнэ", items: PRICE_RANGES.map((r) => ({ key: r.key, label: r.label, on: filterPrice === r.key, click: () => setPrice(filterPrice === r.key ? "" : r.key) })) }]
+                  : []),
+                ...(fuelsInUse.length > 1
+                  ? [{ title: "Түлш", items: fuelsInUse.map((k) => ({ key: k, label: FUEL[k], on: filterFuel === k, click: () => setFilterFuel(filterFuel === k ? "" : k) })) }]
+                  : []),
+                ...(transInUse.length > 1
+                  ? [{ title: "Хурдны хайрцаг", items: transInUse.map((k) => ({ key: k, label: k === "AUTO" ? "Автомат" : "Механик", on: filterTrans === k, click: () => setFilterTrans(filterTrans === k ? "" : k) })) }]
+                  : []),
+              ].map((g) => (
+                <div key={g.title}>
+                  <div className="text-sm font-medium text-zinc-500 mb-2.5">{g.title}</div>
+                  <div className="flex flex-wrap gap-2">
+                    {g.items.map((it) => (
+                      <button
+                        key={it.key}
+                        onClick={it.click}
+                        className={`h-11 px-4 rounded-full text-sm font-medium border transition-colors ${
+                          it.on ? "bg-ink border-ink text-white" : "bg-white border-zinc-200 text-zinc-700 active:bg-zinc-50"
+                        }`}
+                      >
+                        {it.label}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              ))}
+            </div>
+            <div className="flex items-center gap-2 px-4 pt-3 pb-[calc(0.75rem+env(safe-area-inset-bottom))] border-t border-zinc-100">
+              <button
+                onClick={() => {
+                  clearAll();
+                  setSort("");
+                }}
+                className="h-12 px-5 rounded-full text-sm font-medium text-zinc-600 active:bg-zinc-100"
+              >
+                Цэвэрлэх
+              </button>
+              <button
+                onClick={() => {
+                  setSheetOpen(false);
+                  goCars();
+                }}
+                className="flex-1 h-12 rounded-full bg-brand active:bg-brand-dark text-white text-sm font-medium"
+              >
+                {filtered.length} машин харах
+              </button>
+            </div>
+          </div>
+        </div>
       )}
       <MobileCallBar company={company} />
     </div>

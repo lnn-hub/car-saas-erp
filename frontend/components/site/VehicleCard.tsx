@@ -87,7 +87,7 @@ export function VehicleCard({
               e.stopPropagation();
               onCompare(v.id);
             }}
-            className={`absolute top-1.5 right-1.5 sm:top-2 sm:right-2 w-10 h-10 sm:w-11 sm:h-11 rounded-full flex items-center justify-center transition-all duration-300 ${
+            className={`absolute top-1.5 right-1.5 sm:top-2 sm:right-2 w-10 h-10 sm:w-11 sm:h-11 rounded-full ${compared ? "flex" : "hidden sm:flex"} items-center justify-center transition-all duration-300 ${
               compared
                 ? "bg-brand text-white shadow-lg scale-100"
                 : "bg-white/90 text-ink sm:opacity-0 sm:scale-90 group-hover:opacity-100 group-hover:scale-100"

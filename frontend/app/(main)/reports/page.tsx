@@ -272,7 +272,7 @@ export default function ReportsPage() {
                 {data.rows.map((r, i) => (
                   <tr key={r.id} className="border-t border-[#f3efe9] hover:bg-[#faf8f5]">
                     <td className="px-4 py-2.5 text-[#6f6a64] tabular-nums">{i + 1}</td>
-                    <td className="px-4 py-2.5 whitespace-nowrap"><span className={`px-2 py-0.5 rounded-full text-xs ${r.status === 'SOLD' ? 'bg-zinc-100 text-zinc-600' : r.status === 'PUBLISHED' ? 'bg-emerald-50 text-emerald-700' : r.status === 'RESERVED' ? 'bg-amber-50 text-amber-700' : 'bg-sky-50 text-sky-700'}`}>{STATUS[r.status]}</span></td>
+                    <td className="px-4 py-2.5 whitespace-nowrap"><span className={`px-2 py-0.5 rounded-full text-xs ${r.status === 'SOLD' ? 'bg-zinc-100 text-zinc-600' : r.status === 'PUBLISHED' ? 'bg-violet-50 text-violet-700' : r.status === 'RESERVED' ? 'bg-amber-50 text-amber-700' : 'bg-sky-50 text-sky-700'}`}>{STATUS[r.status]}</span></td>
                     <td className="px-4 py-2.5 whitespace-nowrap tabular-nums text-[#46413c]">{r.arrived_at || '-'}</td>
                     <td className="px-4 py-2.5 whitespace-nowrap tabular-nums text-[#46413c]">{r.sold_at || '-'}</td>
                     <td className="px-4 py-2.5 tabular-nums text-[#46413c]">{r.days_in_stock ?? '-'}</td>

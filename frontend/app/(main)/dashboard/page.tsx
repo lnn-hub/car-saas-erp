@@ -9,7 +9,7 @@ interface Vehicle { id: string; brand: string; model: string; year: number; stat
 
 const STATUS: Record<string, { label: string; bg: string; text: string; dot: string }> = {
   ARRIVED:   { label: 'Ирсэн',       bg: 'bg-sky-50',     text: 'text-sky-700',     dot: 'bg-sky-500' },
-  PUBLISHED: { label: 'Зарагдах',    bg: 'bg-emerald-50', text: 'text-emerald-700', dot: 'bg-emerald-500' },
+  PUBLISHED: { label: 'Зарагдах',    bg: 'bg-violet-50',  text: 'text-violet-700',  dot: 'bg-violet-500' },
   RESERVED:  { label: 'Захиалга',    bg: 'bg-amber-50',   text: 'text-amber-700',   dot: 'bg-amber-500' },
   SOLD:      { label: 'Зарагдсан',   bg: 'bg-zinc-100',   text: 'text-zinc-600',    dot: 'bg-zinc-400' },
 };
@@ -135,7 +135,7 @@ export default function DashboardPage() {
         <div className="flex h-1.5">
           {[
             { key: 'ARRIVED',   color: 'bg-sky-500' },
-            { key: 'PUBLISHED', color: 'bg-emerald-500' },
+            { key: 'PUBLISHED', color: 'bg-violet-500' },
             { key: 'RESERVED',  color: 'bg-amber-400' },
             { key: 'SOLD',      color: 'bg-zinc-300' },
           ].map(({ key, color }) => {
