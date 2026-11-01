@@ -169,3 +169,68 @@ button, a, select { touch-action: manipulation; }
   tr, .print-avoid { break-inside: avoid; }
   @page { margin: 12mm; }
 }
+
+/* ─── Админы харанхуй горим ──────────────────────────────────────────────────
+   Админ хэсгийн гадна талын div дээр .admin-dark класс тавихад идэвхжинэ.
+   Өнгөний хувьсагчуудыг дахин тодорхойлж, хатуу бичигдсэн өнгөнүүдийг сольж өгнө. */
+.admin-dark {
+  color-scheme: dark;
+  --color-canvas: #0f0e0d;
+  --color-ink: #f1ede6;
+  --color-brand-soft: #16302a;
+  --color-danger: #fca5a5;
+  --color-danger-soft: rgb(220 38 38 / 0.15);
+  --color-danger-line: rgb(220 38 38 / 0.35);
+  --color-zinc-50: #1f1d1b;  --color-gray-50: #1f1d1b;
+  --color-zinc-100: #262422; --color-gray-100: #262422;
+  --color-zinc-200: #33302d; --color-gray-200: #33302d;
+  --color-zinc-300: #45413d; --color-gray-300: #45413d;
+  --color-zinc-400: #6b655f; --color-gray-400: #6b655f;
+  --color-zinc-500: #9c958d; --color-gray-500: #9c958d;
+  --color-zinc-600: #b5aea6; --color-gray-600: #b5aea6;
+  --color-zinc-700: #cdc7bf; --color-gray-700: #cdc7bf;
+  --color-zinc-800: #e3ded7; --color-gray-800: #e3ded7;
+  --color-zinc-900: #efebe5; --color-gray-900: #efebe5;
+  background-color: var(--color-canvas);
+  color: var(--color-ink);
+}
+html:has(.admin-dark), html:has(.admin-dark) body { background-color: #0f0e0d; }
+
+/* Гадаргуу */
+.admin-dark .bg-white { background-color: #1b1917; }
+.admin-dark [class*="bg-white/"] { background-color: rgb(27 25 23 / 0.85); }
+.admin-dark .bg-ink { background-color: #34302c; }
+.admin-dark .border-ink { border-color: #34302c; }
+.admin-dark [class*="bg-ink/"] { background-color: rgb(0 0 0 / 0.55); }
+.admin-dark .glass { background: rgb(27 25 23 / 0.88); border-color: rgb(255 255 255 / 0.08); }
+.admin-dark .text-brand { color: #7cc4a6; }
+
+/* Хатуу бичигдсэн өнгөнүүд */
+.admin-dark .text-\[\#1c1917\], .admin-dark .text-\[\#111\] { color: #f1ede6; }
+.admin-dark .text-\[\#46413c\] { color: #cdc7bf; }
+.admin-dark .text-\[\#5f5a54\] { color: #b5aea6; }
+.admin-dark .text-\[\#6f6a64\] { color: #9c958d; }
+.admin-dark .text-\[\#d4ccc2\] { color: #6b655f; }
+.admin-dark .placeholder-\[\#6f6a64\]::placeholder { color: #6b655f; }
+.admin-dark .border-\[\#e6e0d8\], .admin-dark .border-\[\#d4ccc2\], .admin-dark .border-\[\#f3efe9\] { border-color: #33302d; }
+.admin-dark .divide-\[\#f3efe9\] > :not(:last-child) { border-color: #33302d; }
+.admin-dark .bg-\[\#f3efe9\], .admin-dark .bg-\[\#faf8f5\] { background-color: #262422; }
+.admin-dark .hover\:bg-\[\#faf8f5\]:hover, .admin-dark .hover\:bg-\[\#f3efe9\]:hover { background-color: #2a2725; }
+.admin-dark .bg-\[\#e6e0d8\], .admin-dark .bg-\[\#d4ccc2\] { background-color: #33302d; }
+.admin-dark .bg-\[\#1c1917\], .admin-dark .bg-\[\#111\] { background-color: #34302c; }
+.admin-dark .hover\:text-\[\#1c1917\]:hover { color: #ffffff; }
+.admin-dark .hover\:border-\[\#d4ccc2\]:hover { border-color: #45413d; }
+
+/* Статусын зөөлөн өнгөнүүд */
+.admin-dark .bg-emerald-50 { background-color: rgb(16 185 129 / 0.14); }
+.admin-dark .bg-amber-50 { background-color: rgb(245 158 11 / 0.14); }
+.admin-dark .bg-sky-50 { background-color: rgb(14 165 233 / 0.14); }
+.admin-dark .bg-violet-50 { background-color: rgb(139 92 246 / 0.16); }
+.admin-dark .border-emerald-200 { border-color: rgb(16 185 129 / 0.35); }
+.admin-dark .border-amber-200 { border-color: rgb(245 158 11 / 0.35); }
+.admin-dark .text-emerald-700, .admin-dark .text-emerald-800 { color: #6ee7b7; }
+.admin-dark .text-amber-700, .admin-dark .text-amber-800, .admin-dark .text-amber-900 { color: #fcd34d; }
+.admin-dark .text-sky-700 { color: #7dd3fc; }
+.admin-dark .text-violet-700 { color: #c4b5fd; }
+/* Идэвхтэй шүүлтүүрийн чип (bg-ink + border-ink) харанхуйд тод харагдана */
+.admin-dark .bg-ink.border-ink { background-color: #f1ede6; border-color: #f1ede6; color: #121010; }

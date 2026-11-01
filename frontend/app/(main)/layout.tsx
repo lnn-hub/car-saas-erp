@@ -21,6 +21,8 @@ function IcMenu()    { return <svg className="w-5 h-5" viewBox="0 0 24 24" fill=
 function IcX()       { return <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2}><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>; }
 function IcInbox()   { return <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.8}><path d="M22 12h-6l-2 3h-4l-2-3H2"/><path d="M5.45 5.11L2 12v6a2 2 0 002 2h16a2 2 0 002-2v-6l-3.45-6.89A2 2 0 0016.76 4H7.24a2 2 0 00-1.79 1.11z"/></svg>; }
 function IcUsers()   { return <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.8}><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87M16 3.13a4 4 0 010 7.75"/></svg>; }
+function IcMoon()    { return <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.8}><path d="M21 12.8A9 9 0 1111.2 3a7 7 0 009.8 9.8z"/></svg>; }
+function IcSun()     { return <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.8}><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/></svg>; }
 function IcOut()     { return <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.5}><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4M16 17l5-5-5-5M21 12H9"/></svg>; }
 
 // Mobile-д харагдах tab bar-ийн nav
@@ -62,6 +64,18 @@ function MainLayoutInner({ children }: { children: React.ReactNode }) {
   const [features, setFeatures]  = useState<{ reports?: boolean }>({});
   const [drawerOpen, setDrawer]   = useState(false);
   const [newLeads, setNewLeads]   = useState(0);
+  const [dark, setDark]           = useState(false);
+
+  // Харанхуй горим: хадгалсан сонголт, эсвэл төхөөрөмжийн тохиргоо
+  useEffect(() => {
+    let saved: string | null = null;
+    try { saved = localStorage.getItem('admin-theme'); } catch {}
+    setDark(saved ? saved === 'dark' : window.matchMedia('(prefers-color-scheme: dark)').matches);
+  }, []);
+  const toggleDark = () => setDark((d) => {
+    try { localStorage.setItem('admin-theme', d ? 'light' : 'dark'); } catch {}
+    return !d;
+  });
 
   useEffect(() => {
     warmUp(); // Render cold start-аас сэргийлэх
@@ -96,7 +110,7 @@ function MainLayoutInner({ children }: { children: React.ReactNode }) {
     (n.href !== '/reports' || (features.reports !== false && canSeeMoney)) &&
     (n.href !== '/settings' || userRole === 'ADMIN'));
 
-  const logout = () => { localStorage.clear(); router.push('/login'); };
+  const logout = () => { localStorage.removeItem('token'); localStorage.removeItem('user'); router.push('/login'); };
 
   const SidebarContent = () => (
     <>
@@ -129,6 +143,18 @@ function MainLayoutInner({ children }: { children: React.ReactNode }) {
       </nav>
 
       {/* Вэбсайт */}
+      <div className="px-3 pb-2">
+        <button type="button" onClick={toggleDark}
+          className="w-full flex items-center justify-between gap-2 px-4 h-11 rounded-xl text-sm text-zinc-700 hover:bg-white/60 transition-colors font-medium">
+          <span className="flex items-center gap-2.5">
+            <span className="text-zinc-400">{dark ? <IcSun /> : <IcMoon />}</span>
+            {dark ? 'Цайвар горим' : 'Харанхуй горим'}
+          </span>
+          <span className={`relative w-9 h-5 rounded-full transition-colors ${dark ? 'bg-brand' : 'bg-zinc-300'}`}>
+            <span className={`absolute top-0.5 w-4 h-4 rounded-full bg-white shadow transition-all ${dark ? 'left-[18px]' : 'left-0.5'}`} />
+          </span>
+        </button>
+      </div>
       <div className="px-3 pb-3">
         <a href="/" target="_blank" rel="noreferrer"
           className="flex items-center justify-between gap-2 px-4 h-11 rounded-xl text-sm text-zinc-700 bg-white/60 hover:bg-white ring-1 ring-ink/[0.06] transition-colors font-medium">
@@ -157,7 +183,7 @@ function MainLayoutInner({ children }: { children: React.ReactNode }) {
   );
 
   return (
-    <div className="min-h-screen bg-canvas flex">
+    <div className={`min-h-screen bg-canvas flex ${dark ? 'admin-dark' : ''}`}>
 
       {/* ── Desktop sidebar ── */}
       <aside className="print:hidden hidden lg:flex w-64 shrink-0 flex-col fixed h-full z-30 bg-canvas border-r border-ink/[0.06]">
