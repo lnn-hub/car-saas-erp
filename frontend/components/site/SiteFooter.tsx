@@ -9,7 +9,7 @@ export function SiteCta({ company }: { company: Company | null }) {
   if (!company?.phone) return null;
   return (
     <section className="px-3 sm:px-4 py-6 sm:py-10">
-      <div className="reveal relative max-w-7xl mx-auto overflow-hidden rounded-[28px] sm:rounded-[40px] bg-ink text-white px-6 py-12 sm:px-14 sm:py-16">
+      <div className="reveal relative max-w-7xl mx-auto overflow-hidden rounded-[24px] sm:rounded-[40px] bg-ink text-white px-5 py-9 sm:px-14 sm:py-16">
         <div className="pointer-events-none absolute -top-40 -right-24 w-[520px] h-[520px] rounded-full bg-brand/60 blur-[120px]" />
         <div className="pointer-events-none absolute -bottom-48 left-10 w-[420px] h-[420px] rounded-full bg-brand-light/20 blur-[120px]" />
         <div
@@ -21,17 +21,17 @@ export function SiteCta({ company }: { company: Company | null }) {
             <div className="inline-flex items-center gap-2 glass-dark rounded-full px-3 py-1.5 text-xs text-white/80 mb-5">
               <span className="w-1.5 h-1.5 rounded-full bg-brand-light" /> Захиалгаар оруулна
             </div>
-            <h3 className="font-display text-3xl sm:text-5xl font-semibold leading-[1.05] tracking-tight">
+            <h3 className="font-display text-[26px] sm:text-5xl font-semibold leading-[1.05] tracking-tight">
               Хүссэн машинаа олоогүй юу?
             </h3>
-            <p className="text-white/60 mt-4 sm:text-lg max-w-xl">
+            <p className="text-white/60 text-sm mt-3 sm:mt-4 sm:text-lg max-w-xl">
               Бидэнтэй холбогдоорой. Таны төсөв, хэрэгцээнд тохирох машиныг хайж олоод оруулж өгнө.
             </p>
           </div>
           <div className="flex flex-col sm:flex-row gap-3 shrink-0">
             <a
               href={`tel:${company.phone}`}
-              className="inline-flex items-center justify-center gap-2.5 bg-white text-ink hover:bg-brand-light hover:text-white h-14 px-7 rounded-full font-medium transition-colors"
+              className="inline-flex items-center justify-center gap-2.5 bg-white text-ink hover:bg-brand-light hover:text-white h-12 sm:h-14 px-7 rounded-full text-sm sm:text-base font-medium transition-colors"
             >
               <IcPhone cls="w-4 h-4" /> {company.phone}
             </a>
@@ -39,7 +39,7 @@ export function SiteCta({ company }: { company: Company | null }) {
               href={waLink(company.phone)}
               target="_blank"
               rel="noreferrer"
-              className="inline-flex items-center justify-center gap-2.5 glass-dark hover:bg-white/15 h-14 px-7 rounded-full font-medium transition-colors"
+              className="inline-flex items-center justify-center gap-2.5 glass-dark hover:bg-white/15 h-12 sm:h-14 px-7 rounded-full text-sm sm:text-base font-medium transition-colors"
             >
               <IcWa cls="w-4 h-4" /> WhatsApp
             </a>

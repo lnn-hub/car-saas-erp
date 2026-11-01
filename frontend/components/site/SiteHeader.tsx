@@ -176,12 +176,12 @@ export function SiteHeader({ company }: { company: Company | null }) {
 
       <header className="sticky top-0 z-50 px-3 sm:px-4 pt-2 pb-2 pointer-events-none">
         <div
-          className={`pointer-events-auto max-w-7xl mx-auto rounded-full h-16 pl-4 pr-2 sm:pl-6 flex items-center justify-between gap-3 transition-all duration-500 ${
+          className={`pointer-events-auto max-w-7xl mx-auto rounded-full h-14 sm:h-16 pl-3.5 pr-1.5 sm:pl-6 sm:pr-2 flex items-center justify-between gap-3 transition-all duration-500 ${
             scrolled || menuOpen ? "glass" : "bg-white/60 border border-white/80 shadow-card backdrop-blur-md"
           }`}
         >
           <a href="/" className="flex items-center min-w-0" aria-label={cname || "Нүүр"}>
-            <BrandMark logoUrl={company?.logo_url} name={cname} size={34} nameClassName="font-display font-semibold text-ink text-[17px] tracking-tight" />
+            <BrandMark logoUrl={company?.logo_url} name={cname} size={30} nameClassName="font-display font-semibold text-ink text-[15px] sm:text-[17px] tracking-tight" />
           </a>
 
           <nav className="hidden md:flex items-center gap-0.5 rounded-full bg-zinc-100/70 p-1">
@@ -222,7 +222,7 @@ export function SiteHeader({ company }: { company: Company | null }) {
               onClick={() => setMenu(!menuOpen)}
               aria-label="Цэс"
               aria-expanded={menuOpen}
-              className="md:hidden w-12 h-12 flex items-center justify-center rounded-full bg-ink text-white"
+              className="md:hidden w-11 h-11 flex items-center justify-center rounded-full bg-ink text-white"
             >
               <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round">
                 {menuOpen ? (

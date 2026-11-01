@@ -157,21 +157,21 @@ function HomeContent({ initial }: { initial: SiteInitial | null }) {
 
       {/* ━━━ HERO ━━━ */}
       <section className="px-3 sm:px-4">
-        <div className="relative max-w-[1400px] mx-auto rounded-[28px] sm:rounded-[40px] overflow-hidden bg-ink text-white min-h-[560px] sm:min-h-[640px] lg:min-h-[700px] flex flex-col justify-end">
+        <div className="relative max-w-[1400px] mx-auto rounded-[28px] sm:rounded-[40px] overflow-hidden bg-ink text-white min-h-[440px] sm:min-h-[640px] lg:min-h-[700px] flex flex-col justify-end">
           <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,var(--color-brand-deep)_0%,#121010_60%)]" />
           <HeroSlides vehicles={vehicles} />
 
-          <div className="relative px-6 sm:px-12 lg:px-16 pt-24 pb-16 sm:pb-20 max-w-4xl">
-            <div className="inline-flex items-center gap-2.5 glass-dark rounded-full pl-2.5 pr-4 py-1.5 text-[13px] text-white/85 mb-6 sm:mb-8">
+          <div className="relative px-5 sm:px-12 lg:px-16 pt-16 sm:pt-24 pb-12 sm:pb-20 max-w-4xl">
+            <div className="inline-flex items-center gap-2.5 glass-dark rounded-full pl-2.5 pr-3.5 py-1 sm:pr-4 sm:py-1.5 text-xs sm:text-[13px] text-white/85 mb-4 sm:mb-8">
               <span className={`w-2 h-2 rounded-full ${loading || retrying ? "bg-amber-300 animate-pulse" : "bg-green-400 animate-[pulseDot_2s_ease-in-out_infinite]"}`} />
               {retrying ? "Сервер асаж байна, түр хүлээнэ үү..." : loading ? "Ачааллаж байна" : `${vehicles.length} машин худалдаанд байна`}
             </div>
-            <h1 className="font-display text-[42px] leading-[1.02] sm:text-7xl lg:text-[88px] font-semibold tracking-[-0.04em]">
+            <h1 className="font-display text-[32px] leading-[1.05] sm:text-7xl lg:text-[88px] font-semibold tracking-[-0.04em]">
               Чанартай машин,
               <br />
               <span className="text-brand-light">шууд таны гарт.</span>
             </h1>
-            <p className="text-white/70 text-base sm:text-lg leading-relaxed mt-5 sm:mt-7 max-w-xl">
+            <p className="text-white/70 text-sm sm:text-lg leading-relaxed mt-3 sm:mt-7 max-w-xl">
               {company?.address
                 ? `${company.address}. Бүх машин техникийн бүрэн үзлэгт тэнцсэн.`
                 : "Бүх машин техникийн бүрэн үзлэгт тэнцсэн, нягт шалгагдсан."}
@@ -179,7 +179,7 @@ function HomeContent({ initial }: { initial: SiteInitial | null }) {
             <div className="flex flex-wrap gap-3 mt-8 sm:mt-10">
               <button
                 onClick={goCars}
-                className="group inline-flex items-center gap-3 bg-white text-ink pl-6 pr-2 h-14 rounded-full font-medium hover:bg-brand-soft transition-colors"
+                className="group inline-flex items-center gap-3 bg-white text-ink pl-5 sm:pl-6 pr-1.5 sm:pr-2 h-11 sm:h-14 rounded-full text-sm sm:text-base font-medium hover:bg-brand-soft transition-colors"
               >
                 Машинууд үзэх
                 <span className="w-10 h-10 rounded-full bg-ink text-white flex items-center justify-center group-hover:bg-brand transition-colors">
@@ -187,7 +187,7 @@ function HomeContent({ initial }: { initial: SiteInitial | null }) {
                 </span>
               </button>
               {company?.phone && (
-                <a href={`tel:${company.phone}`} className="inline-flex items-center gap-2.5 glass-dark hover:bg-white/15 px-6 h-14 rounded-full font-medium transition-colors">
+                <a href={`tel:${company.phone}`} className="inline-flex items-center gap-2.5 glass-dark hover:bg-white/15 px-5 sm:px-6 h-11 sm:h-14 text-sm sm:text-base rounded-full font-medium transition-colors">
                   <IcPhone cls="w-4 h-4" /> {company.phone}
                 </a>
               )}
@@ -287,14 +287,14 @@ function HomeContent({ initial }: { initial: SiteInitial | null }) {
       </section>
 
       {/* ━━━ МАШИНУУД ━━━ */}
-      <section id="cars" className="px-4 pt-16 sm:pt-24 pb-12 sm:pb-20">
+      <section id="cars" className="px-4 pt-10 sm:pt-24 pb-10 sm:pb-20">
         <div className="max-w-7xl mx-auto">
-          <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-5 mb-6 sm:mb-8">
+          <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-3 sm:gap-5 mb-4 sm:mb-8">
             <div>
               <div className="text-xs font-semibold uppercase tracking-[0.14em] text-brand mb-3">Худалдаанд байгаа</div>
-              <h2 className="font-display text-4xl sm:text-5xl font-semibold tracking-[-0.03em] text-ink flex items-baseline gap-3">
+              <h2 className="font-display text-[28px] sm:text-5xl font-semibold tracking-[-0.03em] text-ink flex items-baseline gap-2.5 sm:gap-3">
                 Машинууд
-                <span className="text-zinc-400 text-2xl sm:text-3xl tabular-nums">{loading ? "" : filtered.length}</span>
+                <span className="text-zinc-400 text-xl sm:text-3xl tabular-nums">{loading ? "" : filtered.length}</span>
               </h2>
             </div>
             <div className="flex items-center gap-2">
@@ -327,7 +327,7 @@ function HomeContent({ initial }: { initial: SiteInitial | null }) {
           </div>
 
           {/* Шүүлтүүр чипүүд */}
-          <div className="-mx-4 px-4 flex items-center gap-2 overflow-x-auto no-scrollbar pb-1 mb-6 sm:mb-8">
+          <div className="-mx-4 px-4 flex items-center gap-2 overflow-x-auto no-scrollbar pb-1 mb-4 sm:mb-8">
             <button onClick={() => setBrand("")} className={chip(!filterBrand)}>
               Бүгд <span className="ml-1 opacity-60 tabular-nums">{vehicles.length}</span>
             </button>
@@ -387,12 +387,12 @@ function HomeContent({ initial }: { initial: SiteInitial | null }) {
       </section>
 
       {/* ━━━ ХОЛБОО БАРИХ ━━━ */}
-      <section id="contact" className="px-4 py-12 sm:py-20">
+      <section id="contact" className="px-4 py-8 sm:py-20">
         <div className="max-w-7xl mx-auto">
-          <div className="max-w-2xl mb-8 sm:mb-12">
+          <div className="max-w-2xl mb-6 sm:mb-12">
             <div className="text-xs font-semibold uppercase tracking-[0.14em] text-brand mb-3">Холбоо барих</div>
-            <h2 className="font-display text-4xl sm:text-5xl font-semibold tracking-[-0.03em] text-ink leading-[1.05]">Бидэнтэй холбогдоорой</h2>
-            <p className="text-zinc-600 sm:text-lg mt-4 leading-relaxed">
+            <h2 className="font-display text-[28px] sm:text-5xl font-semibold tracking-[-0.03em] text-ink leading-[1.05]">Бидэнтэй холбогдоорой</h2>
+            <p className="text-zinc-600 text-sm sm:text-lg mt-3 sm:mt-4 leading-relaxed">
               Машин сонирхсон, үнэ болон үзэх цагийн талаар асуух зүйл байвал шууд холбогдоорой.
             </p>
           </div>
@@ -402,16 +402,16 @@ function HomeContent({ initial }: { initial: SiteInitial | null }) {
               {company?.phone && (
                 <a
                   href={`tel:${company.phone}`}
-                  className="reveal group relative overflow-hidden sm:col-span-2 lg:row-span-2 bg-brand text-white rounded-[28px] p-7 sm:p-10 flex flex-col justify-between min-h-[260px] sm:min-h-[340px]"
+                  className="reveal group relative overflow-hidden sm:col-span-2 lg:row-span-2 bg-brand text-white rounded-[24px] sm:rounded-[28px] p-6 sm:p-10 flex flex-col justify-between min-h-[200px] sm:min-h-[340px]"
                 >
                   <div className="pointer-events-none absolute -right-20 -top-20 w-80 h-80 rounded-full bg-white/10 blur-3xl" />
-                  <div className="relative w-14 h-14 rounded-full bg-white/15 flex items-center justify-center">
+                  <div className="relative w-11 h-11 sm:w-14 sm:h-14 rounded-full bg-white/15 flex items-center justify-center">
                     <IcPhone cls="w-6 h-6" />
                   </div>
                   <div className="relative">
                     <div className="text-white/70 text-sm mb-2">Утсаар шууд</div>
-                    <div className="font-display text-4xl sm:text-6xl font-semibold tracking-tight tabular-nums">{company.phone}</div>
-                    <div className="mt-6 inline-flex items-center gap-3 bg-white text-ink pl-5 pr-1.5 h-12 rounded-full text-sm font-medium">
+                    <div className="font-display text-[32px] sm:text-6xl font-semibold tracking-tight tabular-nums">{company.phone}</div>
+                    <div className="mt-4 sm:mt-6 inline-flex items-center gap-3 bg-white text-ink pl-5 pr-1.5 h-11 sm:h-12 rounded-full text-sm font-medium">
                       Залгах
                       <span className="w-9 h-9 rounded-full bg-ink text-white flex items-center justify-center group-hover:-rotate-45 transition-transform duration-300">
                         <IcArrow />
@@ -423,16 +423,16 @@ function HomeContent({ initial }: { initial: SiteInitial | null }) {
               {contacts.map((c) => {
                 const inner = (
                   <>
-                    <div className="w-12 h-12 rounded-full bg-zinc-100 text-ink flex items-center justify-center group-hover:bg-brand group-hover:text-white transition-colors">
+                    <div className="w-11 h-11 sm:w-12 sm:h-12 shrink-0 rounded-full bg-zinc-100 text-ink flex items-center justify-center group-hover:bg-brand group-hover:text-white transition-colors">
                       {c.icon}
                     </div>
-                    <div className="mt-6 min-w-0">
+                    <div className="sm:mt-6 min-w-0">
                       <div className="text-sm text-zinc-500">{c.label}</div>
-                      <div className="font-display text-lg font-semibold text-ink mt-0.5 break-words">{c.value}</div>
+                      <div className="font-display text-base sm:text-lg font-semibold text-ink mt-0.5 break-words">{c.value}</div>
                     </div>
                   </>
                 );
-                const cls = "reveal group bg-white rounded-[28px] p-6 sm:p-7 ring-1 ring-ink/[0.06] shadow-card flex flex-col justify-between min-h-[160px] transition-all duration-500 ease-out-expo";
+                const cls = "reveal group bg-white rounded-[24px] sm:rounded-[28px] p-5 sm:p-7 ring-1 ring-ink/[0.06] shadow-card flex flex-row sm:flex-col items-center sm:items-stretch gap-4 sm:gap-0 justify-start sm:justify-between min-h-0 sm:min-h-[160px] transition-all duration-500 ease-out-expo";
                 return c.href ? (
                   <a key={c.key} href={c.href} {...(c.ext ? { target: "_blank", rel: "noreferrer" } : {})} className={`${cls} hover:shadow-lift hover:-translate-y-1`}>
                     {inner}
