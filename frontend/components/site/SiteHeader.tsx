@@ -4,6 +4,7 @@ import { usePathname, useRouter } from "next/navigation";
 import { BACKEND, Company } from "@/lib/site";
 import { IcPhone, IcPin } from "./icons";
 import { BrandMark } from "./BrandMark";
+import { useTheme } from "@/lib/theme";
 
 const NAV: [string, string][] = [
   ["/", "Нүүр"],
@@ -18,6 +19,14 @@ function IcLock({ cls = "w-4 h-4" }: { cls?: string }) {
       <rect x="3" y="11" width="18" height="11" rx="2" />
       <path d="M7 11V7a5 5 0 0110 0v4" />
     </svg>
+  );
+}
+
+function IcTheme({ dark }: { dark: boolean }) {
+  return dark ? (
+    <svg className="w-[18px] h-[18px]" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round"><circle cx="12" cy="12" r="4" /><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4" /></svg>
+  ) : (
+    <svg className="w-[18px] h-[18px]" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round"><path d="M21 12.8A9 9 0 1111.2 3a7 7 0 009.8 9.8z" /></svg>
   );
 }
 
@@ -142,6 +151,7 @@ export function SiteHeader({ company }: { company: Company | null }) {
   const [adminModal, setAdminModal] = useState(false);
   const [scrolled, setScrolled] = useState(false);
   const clock = useClock();
+  const { dark, toggle } = useTheme();
   const cname = company?.name ?? "";
 
   useEffect(() => {
@@ -210,6 +220,14 @@ export function SiteHeader({ company }: { company: Company | null }) {
                 Залгах
               </a>
             )}
+            <button
+              onClick={toggle}
+              aria-label={dark ? "Цайвар горим" : "Харанхуй горим"}
+              title={dark ? "Цайвар горим" : "Харанхуй горим"}
+              className="w-11 h-11 sm:w-12 sm:h-12 flex items-center justify-center rounded-full text-zinc-600 hover:text-ink hover:bg-zinc-100 transition-colors"
+            >
+              <IcTheme dark={dark} />
+            </button>
             <button
               onClick={() => setAdminModal(true)}
               aria-label="Админ нэвтрэх"

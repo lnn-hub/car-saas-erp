@@ -35,7 +35,7 @@ export function SiteCta({ company }: { company: Company | null }) {
           <div className="flex flex-col sm:flex-row gap-3 shrink-0">
             <a
               href={`tel:${company.phone}`}
-              className="inline-flex items-center justify-center gap-2.5 bg-white text-ink hover:bg-brand-light hover:text-white h-12 sm:h-14 px-7 rounded-full text-sm sm:text-base font-medium transition-colors"
+              className="keep-white inline-flex items-center justify-center gap-2.5 bg-white text-ink hover:bg-brand-light hover:text-white h-12 sm:h-14 px-7 rounded-full text-sm sm:text-base font-medium transition-colors"
             >
               <IcPhone cls="w-4 h-4" /> {company.phone}
             </a>
@@ -61,7 +61,7 @@ export function SiteFooter({ company }: { company: Company | null }) {
   const [year, setYear] = useState<number | null>(null);
   useEffect(() => setYear(new Date().getFullYear()), []);
   return (
-    <footer className="relative mt-6 bg-ink text-zinc-400 rounded-t-[28px] sm:rounded-t-[40px] overflow-hidden">
+    <footer className="keep-palette relative mt-6 bg-ink text-zinc-400 rounded-t-[28px] sm:rounded-t-[40px] overflow-hidden">
       <div className="relative max-w-7xl mx-auto px-6 sm:px-8 pt-14 sm:pt-20 pb-8">
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-[1.4fr_1fr_1fr] gap-10 lg:gap-16">
           <div className="max-w-sm">

@@ -11,6 +11,7 @@ import { CompareModal } from "@/components/site/CompareModal";
 import { VehicleCard, VehicleCardSkeleton } from "@/components/site/VehicleCard";
 import { IcPhone, IcPin } from "@/components/site/icons";
 import { ChatIcon } from "@/components/site/ChatIcon";
+import { LeadForm } from "@/components/site/LeadForm";
 import { chatChannels } from "@/lib/contact";
 
 function IcSearch({ cls = "w-4 h-4" }: { cls?: string }) {
@@ -68,6 +69,7 @@ function HomeContent({ initial }: { initial: SiteInitial | null }) {
   const { ids: compare, toggle: toggleCompare, clear: clearCompare } = useCompare();
   const [compareOpen, setCompareOpen] = useState(false);
   const [sheetOpen, setSheetOpen] = useState(false);
+  const [leadOpen, setLeadOpen] = useState(false);
   const compareOn = company?.features?.compare !== false;
   const compared = vehicles.filter((v) => compare.includes(v.id));
 
@@ -140,8 +142,8 @@ function HomeContent({ initial }: { initial: SiteInitial | null }) {
       active ? "bg-ink border-ink text-white shadow-card" : "bg-white border-zinc-200 text-zinc-700 hover:border-zinc-400"
     }`;
 
-  const contacts = [
-    ...chatChannels(company).map((ch) => ({ key: ch.key, href: ch.href, label: ch.label, value: "Мессеж бичих", icon: <ChatIcon ch={ch.key} cls="w-5 h-5" />, ext: true })),
+  const chats = chatChannels(company);
+  const info = [
     company?.email && {
       key: "mail", href: `mailto:${company.email}`, label: "И-мэйл", value: company.email, ext: false,
       icon: <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.8}><rect x="2" y="4" width="20" height="16" rx="3" /><path d="M22 7l-10 6L2 7" /></svg>,
@@ -181,7 +183,7 @@ function HomeContent({ initial }: { initial: SiteInitial | null }) {
             <div className="flex flex-wrap gap-3 mt-8 sm:mt-10">
               <button
                 onClick={goCars}
-                className="group inline-flex items-center gap-3 bg-white text-ink pl-5 sm:pl-6 pr-1.5 sm:pr-2 h-11 sm:h-14 rounded-full text-sm sm:text-base font-medium hover:bg-brand-soft transition-colors"
+                className="keep-white group inline-flex items-center gap-3 bg-white text-ink pl-5 sm:pl-6 pr-1.5 sm:pr-2 h-11 sm:h-14 rounded-full text-sm sm:text-base font-medium hover:bg-brand-soft transition-colors"
               >
                 Машинууд үзэх
                 <span className="w-10 h-10 rounded-full bg-ink text-white flex items-center justify-center group-hover:bg-brand transition-colors">
@@ -391,7 +393,7 @@ function HomeContent({ initial }: { initial: SiteInitial | null }) {
       {/* ━━━ ХОЛБОО БАРИХ ━━━ */}
       <section id="contact" className="px-4 py-8 sm:py-20">
         <div className="max-w-7xl mx-auto">
-          <div className="max-w-2xl mb-6 sm:mb-12">
+          <div className="max-w-2xl mb-6 sm:mb-10">
             <div className="text-xs font-semibold uppercase tracking-[0.14em] text-brand mb-3">Холбоо барих</div>
             <h2 className="font-display text-[28px] sm:text-5xl font-semibold tracking-[-0.03em] text-ink leading-[1.05]">Бидэнтэй холбогдоорой</h2>
             <p className="text-zinc-600 text-sm sm:text-lg mt-3 sm:mt-4 leading-relaxed">
@@ -399,56 +401,88 @@ function HomeContent({ initial }: { initial: SiteInitial | null }) {
             </p>
           </div>
 
-          {company?.phone || contacts.length ? (
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
+          {company?.phone || info.length ? (
+            <div className={`grid grid-cols-1 gap-3 sm:gap-4 ${company?.phone && info.length ? "lg:grid-cols-[1.05fr_1fr]" : ""}`}>
               {company?.phone && (
-                <a
-                  href={`tel:${company.phone}`}
-                  className="reveal group relative overflow-hidden sm:col-span-2 lg:row-span-2 bg-brand text-white rounded-[24px] sm:rounded-[28px] p-6 sm:p-10 flex flex-col justify-between min-h-[200px] sm:min-h-[340px]"
-                >
-                  <div className="pointer-events-none absolute -right-20 -top-20 w-80 h-80 rounded-full bg-white/10 blur-3xl" />
-                  <div className="relative w-11 h-11 sm:w-14 sm:h-14 rounded-full bg-white/15 flex items-center justify-center">
-                    <IcPhone cls="w-6 h-6" />
+                <div className="reveal relative overflow-hidden bg-brand text-white rounded-[24px] sm:rounded-[28px] p-6 sm:p-10 flex flex-col justify-between gap-10 min-h-[280px] sm:min-h-[360px]">
+                  <div className="pointer-events-none absolute -right-24 -top-24 w-96 h-96 rounded-full bg-white/10 blur-3xl" />
+                  <div className="pointer-events-none absolute -left-16 -bottom-24 w-72 h-72 rounded-full bg-black/10 blur-3xl" />
+                  <div className="relative flex items-center gap-3">
+                    <span className="w-11 h-11 rounded-full bg-white/15 flex items-center justify-center"><IcPhone cls="w-5 h-5" /></span>
+                    <span className="text-sm text-white/75">Утсаар шууд холбогдох</span>
                   </div>
                   <div className="relative">
-                    <div className="text-white/70 text-sm mb-2">Утсаар шууд</div>
-                    <div className="font-display text-[32px] sm:text-6xl font-semibold tracking-tight tabular-nums">{company.phone}</div>
-                    <div className="mt-4 sm:mt-6 inline-flex items-center gap-3 bg-white text-ink pl-5 pr-1.5 h-11 sm:h-12 rounded-full text-sm font-medium">
-                      Залгах
-                      <span className="w-9 h-9 rounded-full bg-ink text-white flex items-center justify-center group-hover:-rotate-45 transition-transform duration-300">
-                        <IcArrow />
-                      </span>
+                    <a href={`tel:${company.phone}`} className="block font-display text-[40px] sm:text-6xl lg:text-7xl font-semibold tracking-tight tabular-nums leading-none hover:opacity-90 transition-opacity">
+                      {company.phone}
+                    </a>
+                    <div className="flex flex-wrap items-center gap-2 mt-7">
+                      <a href={`tel:${company.phone}`} className="keep-white inline-flex items-center gap-2 bg-white text-ink h-12 px-5 rounded-full text-sm font-medium hover:bg-brand-soft transition-colors">
+                        <IcPhone cls="w-4 h-4" /> Залгах
+                      </a>
+                      <button type="button" onClick={() => setLeadOpen(true)} className="inline-flex items-center gap-2 bg-white/15 hover:bg-white/25 text-white h-12 px-5 rounded-full text-sm font-medium transition-colors">
+                        <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2}><rect x="3" y="4" width="18" height="18" rx="3" /><path d="M16 2v4M8 2v4M3 10h18" /></svg>
+                        Үзэх цаг товлох
+                      </button>
+                      {chats.map((ch) => (
+                        <a key={ch.key} href={ch.href} target="_blank" rel="noreferrer" aria-label={ch.label} title={ch.label}
+                          className="w-12 h-12 rounded-full bg-white/15 hover:bg-white/25 flex items-center justify-center transition-colors">
+                          <ChatIcon ch={ch.key} cls="w-5 h-5" />
+                        </a>
+                      ))}
                     </div>
                   </div>
-                </a>
+                </div>
               )}
-              {contacts.map((c) => {
-                const inner = (
-                  <>
-                    <div className="w-11 h-11 sm:w-12 sm:h-12 shrink-0 rounded-full bg-zinc-100 text-ink flex items-center justify-center group-hover:bg-brand group-hover:text-white transition-colors">
-                      {c.icon}
+
+              {info.length > 0 && (
+                <div className="reveal bg-white rounded-[24px] sm:rounded-[28px] ring-1 ring-ink/[0.06] shadow-card overflow-hidden flex flex-col">
+                  <ul className="divide-y divide-zinc-100">
+                    {info.map((c) => {
+                      const inner = (
+                        <>
+                          <span className="w-11 h-11 rounded-full bg-zinc-100 text-ink flex items-center justify-center shrink-0 group-hover:bg-brand group-hover:text-white transition-colors">{c.icon}</span>
+                          <span className="flex-1 min-w-0">
+                            <span className="block text-xs text-zinc-500">{c.label}</span>
+                            <span className="block text-[15px] font-medium text-ink break-words mt-0.5">{c.value}</span>
+                          </span>
+                          {c.href && (
+                            <svg className="w-4 h-4 text-zinc-400 group-hover:text-brand group-hover:translate-x-0.5 transition-all shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2}><path d="M9 18l6-6-6-6" /></svg>
+                          )}
+                        </>
+                      );
+                      const cls = "group flex items-center gap-4 px-5 sm:px-6 py-4";
+                      return (
+                        <li key={c.key}>
+                          {c.href ? (
+                            <a href={c.href} {...(c.ext ? { target: "_blank", rel: "noreferrer" } : {})} className={`${cls} hover:bg-zinc-50 transition-colors`}>{inner}</a>
+                          ) : (
+                            <div className={cls}>{inner}</div>
+                          )}
+                        </li>
+                      );
+                    })}
+                  </ul>
+                  {company?.address && (
+                    <div className="relative flex-1 min-h-[200px] sm:min-h-[220px] border-t border-zinc-100 bg-zinc-100">
+                      <iframe
+                        title="Байршил газрын зураг дээр"
+                        src={`https://maps.google.com/maps?q=${encodeURIComponent(company.address)}&z=14&output=embed`}
+                        loading="lazy"
+                        referrerPolicy="no-referrer-when-downgrade"
+                        className="contact-map absolute inset-0 w-full h-full border-0"
+                      />
                     </div>
-                    <div className="sm:mt-6 min-w-0">
-                      <div className="text-sm text-zinc-500">{c.label}</div>
-                      <div className="font-display text-base sm:text-lg font-semibold text-ink mt-0.5 break-words">{c.value}</div>
-                    </div>
-                  </>
-                );
-                const cls = "reveal group bg-white rounded-[24px] sm:rounded-[28px] p-5 sm:p-7 ring-1 ring-ink/[0.06] shadow-card flex flex-row sm:flex-col items-center sm:items-stretch gap-4 sm:gap-0 justify-start sm:justify-between min-h-0 sm:min-h-[160px] transition-all duration-500 ease-out-expo";
-                return c.href ? (
-                  <a key={c.key} href={c.href} {...(c.ext ? { target: "_blank", rel: "noreferrer" } : {})} className={`${cls} hover:shadow-lift hover:-translate-y-1`}>
-                    {inner}
-                  </a>
-                ) : (
-                  <div key={c.key} className={cls}>{inner}</div>
-                );
-              })}
+                  )}
+                </div>
+              )}
             </div>
           ) : (
             <div className="bg-white rounded-[28px] ring-1 ring-ink/5 p-8 text-sm text-zinc-500">Холбоо барих мэдээлэл удахгүй нэмэгдэнэ.</div>
           )}
         </div>
       </section>
+
+      <LeadForm open={leadOpen} onClose={() => setLeadOpen(false)} kind="VIEWING" />
 
       <SiteCta company={company} />
       <SiteFooter company={company} />

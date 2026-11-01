@@ -3,11 +3,15 @@ import { Onest, Geologica } from "next/font/google";
 import "./globals.css";
 import { getSiteData } from "@/lib/server-data";
 import { optimizeImg, SITE_URL } from "@/lib/site";
+import { THEME_SCRIPT } from "@/lib/theme";
 
 const onest = Onest({ subsets: ["latin", "cyrillic", "cyrillic-ext"], variable: "--font-onest", display: "swap" });
 const geologica = Geologica({ subsets: ["latin", "cyrillic", "cyrillic-ext"], variable: "--font-geologica", display: "swap" });
 
-export const viewport: Viewport = { width: "device-width", initialScale: 1, viewportFit: "cover", themeColor: "#f5f3f0" };
+export const viewport: Viewport = { width: "device-width", initialScale: 1, viewportFit: "cover", themeColor: [
+  { media: "(prefers-color-scheme: light)", color: "#f5f3f0" },
+  { media: "(prefers-color-scheme: dark)", color: "#0f0e0d" },
+] };
 
 export async function generateMetadata(): Promise<Metadata> {
   const data = await getSiteData();
@@ -40,7 +44,11 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="mn" className={`h-full antialiased ${onest.variable} ${geologica.variable}`}>
+    <html lang="mn" className={`h-full antialiased ${onest.variable} ${geologica.variable}`} suppressHydrationWarning>
+      <head>
+        {/* Харанхуй горимыг хуудас зурагдахаас өмнө тавина (цагаан анивчихгүй) */}
+        <script dangerouslySetInnerHTML={{ __html: THEME_SCRIPT }} />
+      </head>
       <body className="min-h-full flex flex-col">{children}</body>
     </html>
   );

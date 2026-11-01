@@ -7,6 +7,7 @@ import { warmUp } from '@/lib/api';
 import { BrandMark } from '@/components/site/BrandMark';
 import { api } from '@/lib/api';
 import { ROLE_LABEL } from '@/lib/role';
+import { useTheme } from '@/lib/theme';
 
 const BACKEND = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000';
 
@@ -64,18 +65,7 @@ function MainLayoutInner({ children }: { children: React.ReactNode }) {
   const [features, setFeatures]  = useState<{ reports?: boolean }>({});
   const [drawerOpen, setDrawer]   = useState(false);
   const [newLeads, setNewLeads]   = useState(0);
-  const [dark, setDark]           = useState(false);
-
-  // Харанхуй горим: хадгалсан сонголт, эсвэл төхөөрөмжийн тохиргоо
-  useEffect(() => {
-    let saved: string | null = null;
-    try { saved = localStorage.getItem('admin-theme'); } catch {}
-    setDark(saved ? saved === 'dark' : window.matchMedia('(prefers-color-scheme: dark)').matches);
-  }, []);
-  const toggleDark = () => setDark((d) => {
-    try { localStorage.setItem('admin-theme', d ? 'light' : 'dark'); } catch {}
-    return !d;
-  });
+  const { dark, toggle: toggleDark } = useTheme();
 
   useEffect(() => {
     warmUp(); // Render cold start-аас сэргийлэх
@@ -183,7 +173,7 @@ function MainLayoutInner({ children }: { children: React.ReactNode }) {
   );
 
   return (
-    <div className={`min-h-screen bg-canvas flex ${dark ? 'admin-dark' : ''}`}>
+    <div className="min-h-screen bg-canvas flex">
 
       {/* ── Desktop sidebar ── */}
       <aside className="print:hidden hidden lg:flex w-64 shrink-0 flex-col fixed h-full z-30 bg-canvas border-r border-ink/[0.06]">

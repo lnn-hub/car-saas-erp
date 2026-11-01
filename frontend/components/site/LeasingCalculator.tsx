@@ -13,7 +13,7 @@ function Range({ value, min, max, step, onChange }: {
     <input
       type="range" className="calc-range w-full" min={min} max={max} step={step} value={clamp(value, min, max)}
       onChange={(e) => onChange(Number(e.target.value))}
-      style={{ backgroundImage: `linear-gradient(to right, var(--color-brand) ${pct}%, #e7e2db ${pct}%)` }}
+      style={{ backgroundImage: `linear-gradient(to right, var(--color-brand) ${pct}%, var(--color-zinc-200) ${pct}%)` }}
     />
   );
 }

@@ -69,7 +69,7 @@ function AboutContent({ initial }: { initial: SiteInitial | null }) {
               </p>
               <a
                 href="/#contact"
-                className="group inline-flex items-center gap-3 bg-white text-ink pl-6 pr-2 h-14 rounded-full font-medium hover:bg-brand-soft transition-colors mt-8"
+                className="keep-white group inline-flex items-center gap-3 bg-white text-ink pl-6 pr-2 h-14 rounded-full font-medium hover:bg-brand-soft transition-colors mt-8"
               >
                 Холбогдох
                 <span className="w-10 h-10 rounded-full bg-ink text-white flex items-center justify-center group-hover:bg-brand transition-colors">
