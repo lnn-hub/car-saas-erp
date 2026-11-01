@@ -63,8 +63,13 @@ app.get('/health', async (req, res) => {
 });
 
 const PORT = process.env.PORT || 4000;
-require('./db/ensureSchema')()
-  .catch((err) => console.error('Schema шинэчлэхэд алдаа:', err.message))
-  .finally(() => {
+// Эхлээд өгөгдлийн сангийн migration-ыг ажиллуулна. Амжилтгүй бол сервер асахгүй (хуучин бүтэцтэй
+// сан дээр шинэ код ажиллаж өгөгдөл эвдэхээс сэргийлнэ). Render дахин оролдоно.
+require('./db/migrate')()
+  .then(() => {
     app.listen(PORT, () => console.log(`Server ажиллаж байна: http://localhost:${PORT}`));
+  })
+  .catch((err) => {
+    console.error(err.message);
+    process.exit(1);
   });

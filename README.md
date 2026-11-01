@@ -10,7 +10,6 @@
 ```
 frontend/   Next.js 16 (App Router, Tailwind v4) — нийтийн сайт + админ. Vercel дээр.
 backend/    Express + PostgreSQL (pg) — REST API. Render дээр.
-database/   schema.sql — шинэ сан үүсгэх бүтэц
 docs/       нэмэлт заавар (нөөцлөлт)
 .github/    CI (формат, lint, build) ба долоо хоног тутмын шифрлэгдсэн нөөцлөлт
 ```
@@ -43,7 +42,7 @@ cp frontend/.env.example frontend/.env.local
 
 # 3. Өгөгдлийн сан (анх удаа)
 createdb car_saas_db
-psql car_saas_db -f database/schema.sql
+cd backend && npm run migrate && cd ..       # бүх хүснэгтийг үүсгэнэ
 cd backend && npm run create-admin -- admin@example.mn 'нууц-үг-8+' 'Админ' && cd ..
 
 # 4. Асаах (тус тусдаа терминалд)
@@ -70,9 +69,14 @@ cd backend && npm run check
 
 GitHub дээр push болон pull request бүрт CI (`.github/workflows/ci.yml`) эдгээрийг автоматаар ажиллуулна.
 
-## Өгөгдлийн сангийн өөрчлөлт
+## Өгөгдлийн сангийн өөрчлөлт (migration)
 
-Backend асахдаа `backend/src/db/ensureSchema.js` дутуу багана, хүснэгт, индексийг нэмдэг. Шинэ сан үүсгэхэд `database/schema.sql`-ийг ашиглана.
+Бүтэц нь `backend/src/db/migrations/` доторх дугаарласан SQL файлуудаар тодорхойлогдоно (`001_baseline.sql`, `002_...`).
+Ажилласан migration-ууд сан дахь `schema_migrations` хүснэгтэд тэмдэглэгддэг тул нэг файл дахин ажиллахгүй.
+
+- Шинэ өөрчлөлт хийхдээ **дараагийн дугаартай шинэ файл** нэмнэ, жишээ нь `003_add_vehicle_vin_photo.sql`. Ажилласан хуучин файлыг хэзээ ч засахгүй.
+- `npm run migrate` хүлээгдэж буй migration-уудыг ажиллуулна. Backend асахдаа мөн автоматаар ажиллуулдаг. Migration амжилтгүй бол сервер асахгүй.
+- Файл бүр нэг транзакцаар ажиллана: алдаа гарвал тэр файлын өөрчлөлт бүхэлдээ буцна.
 
 ## Байршуулалт (deploy)
 

@@ -44,8 +44,18 @@ jobs:
           NEXT_PUBLIC_API_URL: http://localhost:4001
 
   backend:
-    name: Backend (syntax, modules)
+    name: Backend (modules, migrations)
     runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: car_saas_ci
+        ports: ['5432:5432']
+        options: --health-cmd pg_isready --health-interval 5s --health-timeout 5s --health-retries 10
+    env:
+      DATABASE_URL: postgresql://postgres:postgres@localhost:5432/car_saas_ci
     defaults:
       run:
         working-directory: backend
@@ -58,3 +68,7 @@ jobs:
           cache-dependency-path: backend/package-lock.json
       - run: npm ci
       - run: npm run check
+      # Хоосон сан дээр бүх migration ажиллах ёстой, хоёр дахь удаа юу ч хийхгүй байх ёстой
+      - run: npm run migrate
+      - run: npm run migrate
+      - run: npm run create-admin -- ci@example.mn ci-password-123
