@@ -245,3 +245,19 @@ html.theme-dark, html.theme-dark body { background-color: #0f0e0d; }
   --color-zinc-300: #d6cfc6; --color-zinc-400: #a39a8f; --color-zinc-500: #8a837a;
   background-color: #191715;
 }
+
+/* ─── Цайвар горимд хүрээг тодруулна (карт, товч, талбар тод ялгарна) ─── */
+html:not(.theme-dark) .ring-ink\/\[0\.06\],
+html:not(.theme-dark) .ring-ink\/\[0\.05\],
+html:not(.theme-dark) .ring-ink\/5,
+html:not(.theme-dark) .ring-ink\/\[0\.08\] { --tw-ring-color: rgb(18 16 16 / 0.15); }
+html:not(.theme-dark) .ring-ink\/10 { --tw-ring-color: rgb(18 16 16 / 0.22); }
+html:not(.theme-dark) .border-ink\/\[0\.06\] { border-color: rgb(18 16 16 / 0.15); }
+html:not(.theme-dark) .border-zinc-200,
+html:not(.theme-dark) .border-\[\#e6e0d8\],
+html:not(.theme-dark) .border-\[\#d4ccc2\] { border-color: #cfc7bc; }
+html:not(.theme-dark) .border-zinc-100,
+html:not(.theme-dark) .border-\[\#f3efe9\],
+html:not(.theme-dark) .divide-zinc-100 > :not(:last-child),
+html:not(.theme-dark) .divide-\[\#f3efe9\] > :not(:last-child) { border-color: #e4ddd3; }
+html:not(.theme-dark) .glass { border-color: rgb(18 16 16 / 0.1); }
