@@ -27,5 +27,5 @@ export function fmtKm(n: number | null | undefined) {
 
 export function fmtEngine(cc: string | number | null | undefined) {
   if (!cc || !Number(cc)) return null;
-  return `${(Number(cc) / 1000).toFixed(1)}L`;
+  return `${(Number(cc) / 1000).toFixed(1)} л`;
 }

@@ -122,20 +122,21 @@ function VehicleContent({ id, initial }: { id: string; initial: VehicleDetail | 
     { icon: Ic.odo,    label: 'Гүйлт',          value: km || '—' },
     { icon: Ic.fuel,   label: 'Түлш',           value: FUEL[v.fuel_type] || '—' },
     { icon: Ic.gear,   label: 'Хурдны хайрцаг', value: TRANS[v.transmission] || '—' },
-    { icon: Ic.engine, label: 'Хөдөлгүүр',      value: engine || '—' },
+    { icon: Ic.engine, label: 'Хөдөлгүүр',      value: engine ? `${engine}` : '—' },
   ];
+  const mfg = v.manufactured_date ? `${v.manufactured_date.slice(0, 4)} оны ${Number(v.manufactured_date.slice(5, 7))}-р сар` : null;
 
   const allSpecs = [
-    { label: 'Марк',            value: v.brand },
-    { label: 'Загвар',          value: v.model },
-    { label: 'Он',              value: String(v.year) },
-    { label: 'Үйлдвэрлэсэн',    value: v.manufactured_date ? v.manufactured_date.slice(0, 7).replace('-', '.') : null },
-    { label: 'Өнгө',            value: v.color || null },
-    { label: 'Гүйлт',           value: km },
-    { label: 'Түлшний төрөл',   value: FUEL[v.fuel_type] },
-    { label: 'Хурдны хайрцаг',  value: TRANS[v.transmission] },
-    { label: 'Хөдөлгүүр',       value: engine },
-    { label: 'Улсын дугаар',    value: v.has_plates ? 'Дугаартай' : 'Дугааргүй' },
+    { label: 'Үйлдвэр',               value: v.brand },
+    { label: 'Загвар',                value: v.model },
+    { label: 'Үйлдвэрлэсэн он',       value: String(v.year) },
+    { label: 'Үйлдвэрлэсэн сар',      value: mfg },
+    { label: 'Өнгө',                  value: v.color || null },
+    { label: 'Гүйлт',                 value: km },
+    { label: 'Түлшний төрөл',         value: FUEL[v.fuel_type] },
+    { label: 'Хурдны хайрцаг',        value: TRANS[v.transmission] },
+    { label: 'Хөдөлгүүрийн багтаамж', value: engine },
+    { label: 'Улсын дугаар',          value: v.has_plates ? 'Авсан' : 'Аваагүй' },
   ].filter(s => s.value);
 
   const descLines = (v.description || '').split('\n').map(l => l.trim());
@@ -183,10 +184,12 @@ function VehicleContent({ id, initial }: { id: string; initial: VehicleDetail | 
         {/* Title */}
         <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 mb-6 sm:mb-8">
           <div>
-            <div className="text-xs font-semibold uppercase tracking-[0.14em] text-brand mb-2">{v.brand}</div>
-            <h1 className="font-display text-4xl sm:text-6xl font-semibold tracking-[-0.035em] text-ink leading-[1.02]">
-              {v.model} <span className="text-zinc-400">{v.year}</span>
+            <h1 className="font-display text-[32px] sm:text-5xl font-semibold tracking-[-0.02em] text-ink leading-tight">
+              {v.brand} {v.model}
             </h1>
+            <p className="text-base sm:text-lg text-zinc-600 mt-2">
+              {[`${v.year} он`, FUEL[v.fuel_type], TRANS[v.transmission]].filter(Boolean).join(' · ')}
+            </p>
             <div className="flex flex-wrap gap-2 mt-4">
               {v.has_plates && (
                 <span className="inline-flex items-center gap-1.5 h-8 px-3 rounded-full bg-brand-soft text-brand text-sm font-medium">
@@ -259,25 +262,22 @@ function VehicleContent({ id, initial }: { id: string; initial: VehicleDetail | 
               ))}
             </div>
 
-            {leasingOn && (
-              <LeasingCalculator price={price ? Number(v.price) : null} phone={v.company?.phone}
-                chatHref={chats[0]?.href} chatLabel={chats[0]?.label} />
-            )}
-
             {intro && (
               <section className={`${card} p-6 sm:p-8`}>
-                <h2 className="font-display text-xl sm:text-2xl font-semibold text-ink mb-4">Машины тухай</h2>
-                <p className="text-[15px] sm:text-base text-zinc-600 leading-relaxed whitespace-pre-line">{intro}</p>
+                <h2 className="font-display text-xl sm:text-2xl font-semibold text-ink mb-4">Тайлбар</h2>
+                <div className="space-y-3 text-[15px] sm:text-base text-zinc-700 leading-7 max-w-prose">
+                  {intro.split(/\n{2,}/).map((para, i) => <p key={i}>{para}</p>)}
+                </div>
               </section>
             )}
 
             {features.length > 0 && (
               <section className={`${card} p-6 sm:p-8`}>
                 <h2 className="font-display text-xl sm:text-2xl font-semibold text-ink mb-5">Онцлох тоноглол</h2>
-                <ul className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <ul className="grid grid-cols-1 sm:grid-cols-2 gap-x-8 gap-y-3">
                   {features.map((f) => (
-                    <li key={f} className="flex items-start gap-3 rounded-2xl bg-zinc-50 px-4 py-3.5 text-sm text-zinc-700">
-                      <span className="mt-0.5 w-5 h-5 shrink-0 rounded-full bg-brand text-white flex items-center justify-center">{Ic.check}</span>
+                    <li key={f} className="flex items-start gap-3 text-[15px] text-zinc-700 leading-6">
+                      <span className="mt-0.5 w-5 h-5 shrink-0 rounded-full bg-brand-soft text-brand flex items-center justify-center">{Ic.check}</span>
                       <span>{f}</span>
                     </li>
                   ))}
@@ -286,16 +286,21 @@ function VehicleContent({ id, initial }: { id: string; initial: VehicleDetail | 
             )}
 
             <section className={`${card} p-6 sm:p-8`}>
-              <h2 className="font-display text-xl sm:text-2xl font-semibold text-ink mb-3">Техникийн үзүүлэлт</h2>
+              <h2 className="font-display text-xl sm:text-2xl font-semibold text-ink mb-2">Техникийн үзүүлэлт</h2>
               <dl className="grid grid-cols-1 sm:grid-cols-2 sm:gap-x-10">
                 {allSpecs.map(({ label, value }) => (
-                  <div key={label} className="flex items-center justify-between gap-4 py-3.5 border-b border-zinc-100">
-                    <dt className="text-sm text-zinc-500">{label}</dt>
-                    <dd className="text-sm font-medium text-ink text-right">{value}</dd>
+                  <div key={label} className="flex items-baseline justify-between gap-4 py-3.5 border-b border-zinc-100">
+                    <dt className="text-[15px] text-zinc-500">{label}</dt>
+                    <dd className="text-[15px] font-medium text-ink text-right">{value}</dd>
                   </div>
                 ))}
               </dl>
             </section>
+
+            {leasingOn && (
+              <LeasingCalculator price={price ? Number(v.price) : null} phone={v.company?.phone}
+                chatHref={chats[0]?.href} chatLabel={chats[0]?.label} />
+            )}
 
             {credit && <p className="text-xs text-zinc-500 px-2">{credit}</p>}
           </div>
@@ -399,7 +404,7 @@ function VehicleContent({ id, initial }: { id: string; initial: VehicleDetail | 
             <div className="flex items-end justify-between gap-4 mb-6 sm:mb-8">
               <div>
                 <div className="text-xs font-semibold uppercase tracking-[0.14em] text-brand mb-2">Бусад машинууд</div>
-                <h2 className="font-display text-3xl sm:text-4xl font-semibold tracking-[-0.03em] text-ink">Танд таалагдаж магадгүй</h2>
+                <h2 className="font-display text-2xl sm:text-4xl font-semibold tracking-[-0.02em] text-ink">Төстэй машинууд</h2>
               </div>
               <Link href="/#cars" className="hidden sm:inline-flex items-center gap-2 h-11 px-5 rounded-full bg-white ring-1 ring-ink/[0.08] text-sm font-medium text-ink hover:ring-ink/30 transition-all whitespace-nowrap">
                 Бүгдийг үзэх {Ic.arrow}
