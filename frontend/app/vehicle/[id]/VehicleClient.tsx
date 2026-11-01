@@ -12,7 +12,10 @@ import { LeasingCalculator } from '@/components/site/LeasingCalculator';
 import { BrandMark } from '@/components/site/BrandMark';
 import { Lightbox } from '@/components/site/Lightbox';
 import { CarPlaceholder, VehicleCard, VehicleCardSkeleton } from '@/components/site/VehicleCard';
-import { IcPhone, IcWa } from '@/components/site/icons';
+import { IcPhone } from '@/components/site/icons';
+import { ChatIcon } from '@/components/site/ChatIcon';
+import { LeadForm } from '@/components/site/LeadForm';
+import { chatChannels } from '@/lib/contact';
 
 function imgSrc(u: string, w = 1400) { return optimizeImg(u, w) || u; }
 
@@ -48,6 +51,7 @@ function VehicleContent({ id, initial }: { id: string; initial: VehicleDetail | 
   const [others, setOthers] = useState<Vehicle[] | null>(null);
   const [copied, setCopied] = useState(false);
   const [calcOpen, setCalcOpen] = useState(false);
+  const [leadOpen, setLeadOpen] = useState(false);
   const [lightbox, setLightbox] = useState<number | null>(null);
   const [slide, setSlide] = useState(0);
   const [loading, setLoad] = useState(!initial);
@@ -139,9 +143,7 @@ function VehicleContent({ id, initial }: { id: string; initial: VehicleDetail | 
   const features  = descLines.filter(l => l.startsWith('•')).map(l => l.replace(/^•\s*/, ''));
   const credit    = descLines.find(l => l.startsWith('Зургийн эх сурвалж'));
   const intro     = descLines.filter(l => l && !l.startsWith('•') && !l.startsWith('Зургийн эх сурвалж')).join('\n\n');
-  const waHref    = v.company?.phone
-    ? `https://wa.me/976${v.company.phone.replace(/\D/g, '')}?text=${encodeURIComponent(`Сайн байна уу, ${v.year} оны ${v.brand} ${v.model} машины талаар лавлах гэсэн юм.`)}`
-    : '';
+  const chats     = chatChannels(v.company, `Сайн байна уу, ${v.year} оны ${v.brand} ${v.model} машины талаар лавлах гэсэн юм.`);
 
   async function copyLink() {
     try {
@@ -323,10 +325,21 @@ function VehicleContent({ id, initial }: { id: string; initial: VehicleDetail | 
                     className="flex items-center justify-center gap-2 w-full h-14 rounded-full bg-brand hover:bg-brand-dark text-white font-medium transition-colors">
                     <IcPhone cls="w-4 h-4" /> Залгах · {v.company.phone}
                   </a>
-                  <a href={waHref} target="_blank" rel="noreferrer"
-                    className="flex items-center justify-center gap-2 w-full h-14 rounded-full bg-white ring-1 ring-ink/10 hover:ring-ink/30 text-ink font-medium transition-all">
-                    <IcWa cls="w-4 h-4" /> WhatsApp-аар бичих
-                  </a>
+                  <button type="button" onClick={() => setLeadOpen(true)}
+                    className="flex items-center justify-center gap-2 w-full h-14 rounded-full bg-ink hover:bg-ink/90 text-white font-medium transition-colors">
+                    <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2}><rect x="3" y="4" width="18" height="18" rx="3" /><path d="M16 2v4M8 2v4M3 10h18" /></svg>
+                    Үзэх цаг товлох
+                  </button>
+                  {chats.length > 0 && (
+                    <div className={`grid gap-2 ${chats.length > 1 ? 'grid-cols-2' : 'grid-cols-1'}`}>
+                      {chats.map((ch) => (
+                        <a key={ch.key} href={ch.href} target="_blank" rel="noreferrer"
+                          className="flex items-center justify-center gap-2 h-12 rounded-full bg-white ring-1 ring-ink/10 hover:ring-ink/30 text-ink text-sm font-medium transition-all">
+                          <ChatIcon ch={ch.key} /> {ch.label}
+                        </a>
+                      ))}
+                    </div>
+                  )}
                 </div>
               )}
 
@@ -393,7 +406,7 @@ function VehicleContent({ id, initial }: { id: string; initial: VehicleDetail | 
 
       {leasingOn && <LeasingCalculator open={calcOpen} onClose={() => setCalcOpen(false)}
         price={price ? Number(v.price) : null}
-        carName={`${v.year} ${v.brand} ${v.model}`} phone={v.company?.phone} />}
+        carName={`${v.year} ${v.brand} ${v.model}`} phone={v.company?.phone} chatHref={chats[0]?.href} chatLabel={chats[0]?.label} />}
 
       {/* Mobile: хөвөгч доод мөр */}
       {v.company?.phone && (
@@ -408,12 +421,15 @@ function VehicleContent({ id, initial }: { id: string; initial: VehicleDetail | 
             className="flex-1 flex items-center justify-center gap-2 bg-brand active:bg-brand-dark text-white text-sm font-medium h-12 rounded-full">
             <IcPhone cls="w-4 h-4" /> Залгах
           </a>
-          <a href={waHref} target="_blank" rel="noreferrer"
+          <button type="button" onClick={() => setLeadOpen(true)}
             className="flex-1 flex items-center justify-center gap-2 bg-white border border-zinc-200 text-ink text-sm font-medium h-12 rounded-full">
-            <IcWa cls="w-4 h-4" /> WhatsApp
-          </a>
+            Цаг товлох
+          </button>
         </div>
       )}
+
+      <LeadForm open={leadOpen} onClose={() => setLeadOpen(false)} kind="VIEWING"
+        vehicle={{ id: v.id, title: `${v.year} ${v.brand} ${v.model}` }} />
     </div>
   );
 }

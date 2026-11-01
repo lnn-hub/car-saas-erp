@@ -1,5 +1,10 @@
 export const BACKEND = process.env.NEXT_PUBLIC_API_URL || "http://localhost:4000";
 
+// Сайтын үндсэн хаяг (Facebook/Google-д зориулсан холбоос). Vercel production хаягийг автоматаар авна.
+export const SITE_URL =
+  process.env.NEXT_PUBLIC_SITE_URL ||
+  (process.env.VERCEL_PROJECT_PRODUCTION_URL ? `https://${process.env.VERCEL_PROJECT_PRODUCTION_URL}` : "http://localhost:3000");
+
 // Олон компанит серверт: энэ нийтийн сайт аль компанийн өгөгдлийг харуулахыг тодорхойлно.
 // Тохируулаагүй бол анхны компани (нэг компанит байршуулалт).
 export const SITE_COMPANY = process.env.NEXT_PUBLIC_SITE_COMPANY || "";
@@ -22,6 +27,9 @@ export interface Company {
   working_hours?: string | null;
   logo_url: string | null;
   features?: Features;
+  messenger_url?: string | null;
+  viber_phone?: string | null;
+  whatsapp_phone?: string | null;
 }
 export interface Vehicle {
   id: string;

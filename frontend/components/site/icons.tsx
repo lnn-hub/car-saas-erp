@@ -32,3 +32,18 @@ export function IcPin({ cls = "w-4 h-4" }: { cls?: string }) {
     </svg>
   );
 }
+export function IcMessenger({ cls = "w-4 h-4" }: { cls?: string }) {
+  return (
+    <svg className={cls} viewBox="0 0 24 24" fill="currentColor">
+      <path d="M12 2C6.36 2 2 6.13 2 11.7c0 2.91 1.19 5.44 3.14 7.17.16.14.26.35.27.57l.05 1.78c.02.57.6.94 1.12.71l1.98-.87c.17-.08.36-.09.54-.05.91.25 1.87.38 2.9.38 5.64 0 10-4.13 10-9.7S17.64 2 12 2zm6 7.46l-2.94 4.66c-.47.74-1.47.93-2.17.4l-2.34-1.75a.6.6 0 00-.72 0l-3.16 2.4c-.42.32-.97-.18-.69-.63l2.94-4.66c.47-.74 1.47-.93 2.17-.4l2.34 1.75a.6.6 0 00.72 0l3.16-2.4c.42-.32.97.18.69.63z" />
+    </svg>
+  );
+}
+export function IcViber({ cls = "w-4 h-4" }: { cls?: string }) {
+  return (
+    <svg className={cls} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.8} strokeLinecap="round" strokeLinejoin="round">
+      <path d="M12 2.5c-4.9 0-8.5 1.6-8.5 7.6 0 3.3 1 5.4 2.9 6.6v3.6c0 .5.6.8 1 .4l2.6-2.5c.6.1 1.3.1 2 .1 4.9 0 8.5-1.6 8.5-7.7S16.9 2.5 12 2.5z" />
+      <path d="M9.2 7.4c.4-.2.8 0 1 .4l.6 1.3c.1.3 0 .6-.2.8l-.4.4c.4.9 1.1 1.7 2 2.1l.4-.4c.2-.2.5-.3.8-.2l1.3.6c.4.2.6.6.4 1-.4.9-1.3 1.4-2.2 1.1-2.2-.7-3.8-2.3-4.5-4.5-.3-.9.2-1.8 1.1-2.2z" />
+    </svg>
+  );
+}

@@ -33,8 +33,8 @@ function Field({ label, children, hint }: { label: string; children: React.React
 const boxCls =
   "w-full text-right bg-zinc-50 border border-zinc-200 focus:bg-white focus:border-ink/40 focus:ring-4 focus:ring-ink/5 focus:outline-none rounded-2xl px-4 py-2.5 font-display font-semibold text-ink text-lg tabular-nums transition";
 
-export function LeasingCalculator({ open, onClose, price, carName, phone }: {
-  open: boolean; onClose: () => void; price: number | null; carName?: string; phone?: string;
+export function LeasingCalculator({ open, onClose, price, carName, phone, chatHref, chatLabel }: {
+  open: boolean; onClose: () => void; price: number | null; carName?: string; phone?: string; chatHref?: string; chatLabel?: string;
 }) {
   const startPrice = price && price > 0 ? Math.round(price) : 100_000_000;
   const [carPrice, setCarPrice] = useState(startPrice);
@@ -63,7 +63,6 @@ export function LeasingCalculator({ open, onClose, price, carName, phone }: {
   }, [carPrice, months, downPct, rate]);
 
   const maxPrice = Math.max(500_000_000, startPrice * 2);
-  const waText = `Сайн байна уу, ${carName || "машин"}-ийн лизингийн талаар лавлах гэсэн юм. Тооцоолол: үнэ ${fmt(carPrice)}₮, урьдчилгаа ${downPct}%, ${months} сар, сарын хүү ${rate}% -> сарын төлбөр ${fmt(calc.monthly)}₮.`;
 
   return (
     <div className={`fixed inset-0 z-[90] overflow-hidden ${open ? "" : "pointer-events-none"}`} aria-hidden={!open}>
@@ -152,10 +151,10 @@ export function LeasingCalculator({ open, onClose, price, carName, phone }: {
             <span className="text-sm text-zinc-500">Сарын төлбөр</span>
             <span className="font-display text-2xl font-semibold text-brand tabular-nums tracking-tight">{fmt(calc.monthly)}₮</span>
           </div>
-          {phone && (
-            <a href={`https://wa.me/976${phone.replace(/\D/g, "")}?text=${encodeURIComponent(waText)}`} target="_blank" rel="noreferrer"
+          {(chatHref || phone) && (
+            <a href={chatHref || `tel:${phone}`} {...(chatHref ? { target: "_blank", rel: "noreferrer" } : {})}
               className="flex items-center justify-center h-12 ring-1 ring-ink/10 hover:ring-ink/30 text-ink text-sm rounded-full transition-all font-medium">
-              Лизингийн талаар лавлах
+              Лизингийн талаар лавлах{chatHref && chatLabel ? ` (${chatLabel})` : ""}
             </a>
           )}
           <button onClick={onClose}

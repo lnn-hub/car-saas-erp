@@ -9,7 +9,9 @@ import { MobileCallBar, SiteCta, SiteFooter } from "@/components/site/SiteFooter
 import { HeroSlides } from "@/components/site/HeroSlides";
 import { CompareModal } from "@/components/site/CompareModal";
 import { VehicleCard, VehicleCardSkeleton } from "@/components/site/VehicleCard";
-import { IcPhone, IcWa, IcPin } from "@/components/site/icons";
+import { IcPhone, IcPin } from "@/components/site/icons";
+import { ChatIcon } from "@/components/site/ChatIcon";
+import { chatChannels } from "@/lib/contact";
 
 function IcSearch({ cls = "w-4 h-4" }: { cls?: string }) {
   return (
@@ -139,7 +141,7 @@ function HomeContent({ initial }: { initial: SiteInitial | null }) {
     }`;
 
   const contacts = [
-    company?.phone && { key: "wa", href: `https://wa.me/976${company.phone.replace(/\D/g, "")}`, label: "WhatsApp", value: "Мессеж бичих", icon: <IcWa cls="w-5 h-5" />, ext: true },
+    ...chatChannels(company).map((ch) => ({ key: ch.key, href: ch.href, label: ch.label, value: "Мессеж бичих", icon: <ChatIcon ch={ch.key} cls="w-5 h-5" />, ext: true })),
     company?.email && {
       key: "mail", href: `mailto:${company.email}`, label: "И-мэйл", value: company.email, ext: false,
       icon: <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.8}><rect x="2" y="4" width="20" height="16" rx="3" /><path d="M22 7l-10 6L2 7" /></svg>,

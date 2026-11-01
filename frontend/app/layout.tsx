@@ -2,7 +2,7 @@ import type { Metadata, Viewport } from "next";
 import { Onest, Geologica } from "next/font/google";
 import "./globals.css";
 import { getSiteData } from "@/lib/server-data";
-import { optimizeImg } from "@/lib/site";
+import { optimizeImg, SITE_URL } from "@/lib/site";
 
 const onest = Onest({ subsets: ["latin", "cyrillic", "cyrillic-ext"], variable: "--font-onest", display: "swap" });
 const geologica = Geologica({ subsets: ["latin", "cyrillic", "cyrillic-ext"], variable: "--font-geologica", display: "swap" });
@@ -20,13 +20,18 @@ export async function generateMetadata(): Promise<Metadata> {
   )}`;
   const icon = logoIcon || letterIcon;
   if (name) {
+    const description = `${name} - чанартай машин шууд таны гарт. ${data?.vehicles.length || 0} машин худалдаанд байна.`;
+    const ogImage = optimizeImg(data?.vehicles.find((v) => v.main_image)?.main_image ?? null, 1200) || optimizeImg(data?.company?.logo_url ?? null, 600);
     return {
+      metadataBase: new URL(SITE_URL),
       ...(icon ? { icons: { icon, apple: icon } } : {}),
       title: { default: name, template: `%s | ${name}` },
-      description: `${name} - чанартай машин шууд таны гарт`,
+      description,
+      openGraph: { type: "website", siteName: name, title: name, description, locale: "mn_MN", ...(ogImage ? { images: [{ url: ogImage, width: 1200 }] } : {}) },
+      twitter: { card: "summary_large_image", title: name, description, ...(ogImage ? { images: [ogImage] } : {}) },
     };
   }
-  return { title: "Автомашины худалдаа", description: "Чанартай машин шууд таны гарт" };
+  return { metadataBase: new URL(SITE_URL), title: "Автомашины худалдаа", description: "Чанартай машин шууд таны гарт" };
 }
 
 export default function RootLayout({

@@ -3,6 +3,7 @@ const pool = require('./pool');
 // Олон компани, олон зурагтай үед удаашрахаас сэргийлэх индексүүд (дахин ажиллуулахад аюулгүй)
 const INDEXES = [
   'CREATE INDEX IF NOT EXISTS idx_vehicle_images_vehicle ON vehicle_images(vehicle_id, sort_order)',
+  'CREATE INDEX IF NOT EXISTS idx_leads_company_created ON leads(company_id, created_at DESC)',
   'CREATE INDEX IF NOT EXISTS idx_vehicles_company_status ON vehicles(company_id, status)',
   'CREATE INDEX IF NOT EXISTS idx_sales_company_sold_at ON sales(company_id, sold_at)',
   'CREATE INDEX IF NOT EXISTS idx_customers_company ON customers(company_id)',
@@ -28,7 +29,10 @@ async function ensureSchema() {
       ADD COLUMN IF NOT EXISTS is_active      BOOLEAN NOT NULL DEFAULT TRUE,
       ADD COLUMN IF NOT EXISTS plan           VARCHAR(30) NOT NULL DEFAULT 'basic',
       ADD COLUMN IF NOT EXISTS max_vehicles   INT,
-      ADD COLUMN IF NOT EXISTS features       JSONB NOT NULL DEFAULT '{}'::jsonb
+      ADD COLUMN IF NOT EXISTS features       JSONB NOT NULL DEFAULT '{}'::jsonb,
+      ADD COLUMN IF NOT EXISTS messenger_url  VARCHAR(255),
+      ADD COLUMN IF NOT EXISTS viber_phone    VARCHAR(30),
+      ADD COLUMN IF NOT EXISTS whatsapp_phone VARCHAR(30)
   `);
   await pool.query(`
     CREATE TABLE IF NOT EXISTS team_members (
@@ -40,6 +44,21 @@ async function ensureSchema() {
       photo_url  TEXT,
       sort_order INT DEFAULT 0,
       created_at TIMESTAMPTZ DEFAULT NOW()
+    )
+  `);
+  // Сайтаас ирсэн хүсэлт (үзэх цаг товлох, машин захиалах)
+  await pool.query(`
+    CREATE TABLE IF NOT EXISTS leads (
+      id             UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+      company_id     UUID NOT NULL REFERENCES companies(id) ON DELETE CASCADE,
+      vehicle_id     UUID REFERENCES vehicles(id) ON DELETE SET NULL,
+      kind           VARCHAR(20) NOT NULL DEFAULT 'VIEWING',
+      name           VARCHAR(120) NOT NULL,
+      phone          VARCHAR(30) NOT NULL,
+      preferred_time VARCHAR(120),
+      message        TEXT,
+      status         VARCHAR(20) NOT NULL DEFAULT 'NEW',
+      created_at     TIMESTAMPTZ NOT NULL DEFAULT NOW()
     )
   `);
 

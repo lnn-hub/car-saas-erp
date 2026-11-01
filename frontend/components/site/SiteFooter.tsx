@@ -2,12 +2,14 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { Company } from "@/lib/site";
-import { IcPhone, IcWa, IcPin } from "./icons";
+import { IcPhone, IcPin } from "./icons";
 import { BrandMark } from "./BrandMark";
-
-const waLink = (phone: string) => `https://wa.me/976${phone.replace(/\D/g, "")}`;
+import { ChatIcon } from "./ChatIcon";
+import { LeadForm } from "./LeadForm";
+import { chatChannels } from "@/lib/contact";
 
 export function SiteCta({ company }: { company: Company | null }) {
+  const [formOpen, setFormOpen] = useState(false);
   if (!company?.phone) return null;
   return (
     <section className="px-3 sm:px-4 py-6 sm:py-10">
@@ -37,17 +39,18 @@ export function SiteCta({ company }: { company: Company | null }) {
             >
               <IcPhone cls="w-4 h-4" /> {company.phone}
             </a>
-            <a
-              href={waLink(company.phone)}
-              target="_blank"
-              rel="noreferrer"
+            <button
+              type="button"
+              onClick={() => setFormOpen(true)}
               className="inline-flex items-center justify-center gap-2.5 glass-dark hover:bg-white/15 h-12 sm:h-14 px-7 rounded-full text-sm sm:text-base font-medium transition-colors"
             >
-              <IcWa cls="w-4 h-4" /> WhatsApp
-            </a>
+              <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2}><path d="M12 20h9M16.5 3.5a2.1 2.1 0 013 3L7 19l-4 1 1-4 12.5-12.5z" /></svg>
+              Хүсэлт үлдээх
+            </button>
           </div>
         </div>
       </div>
+      <LeadForm open={formOpen} onClose={() => setFormOpen(false)} kind="REQUEST" />
     </section>
   );
 }
@@ -71,9 +74,11 @@ export function SiteFooter({ company }: { company: Company | null }) {
                 <a href={`tel:${company.phone}`} aria-label="Залгах" className="w-11 h-11 rounded-full bg-white/[0.07] hover:bg-brand text-white flex items-center justify-center transition-colors">
                   <IcPhone cls="w-4 h-4" />
                 </a>
-                <a href={waLink(company.phone)} target="_blank" rel="noreferrer" aria-label="WhatsApp" className="w-11 h-11 rounded-full bg-white/[0.07] hover:bg-brand text-white flex items-center justify-center transition-colors">
-                  <IcWa cls="w-4 h-4" />
-                </a>
+                {chatChannels(company).map((ch) => (
+                  <a key={ch.key} href={ch.href} target="_blank" rel="noreferrer" aria-label={ch.label} className="w-11 h-11 rounded-full bg-white/[0.07] hover:bg-brand text-white flex items-center justify-center transition-colors">
+                    <ChatIcon ch={ch.key} />
+                  </a>
+                ))}
               </div>
             )}
           </div>
@@ -133,14 +138,17 @@ export function SiteFooter({ company }: { company: Company | null }) {
 
 export function MobileCallBar({ company }: { company: Company | null }) {
   if (!company?.phone) return null;
+  const ch = chatChannels(company)[0];
   return (
     <div className="lg:hidden fixed inset-x-3 bottom-[calc(0.75rem+env(safe-area-inset-bottom))] z-40 glass rounded-full p-1.5 flex gap-1.5">
       <a href={`tel:${company.phone}`} className="flex-1 flex items-center justify-center gap-2 bg-brand active:bg-brand-dark text-white text-sm font-medium h-12 rounded-full">
         <IcPhone cls="w-4 h-4" /> Залгах
       </a>
-      <a href={waLink(company.phone)} target="_blank" rel="noreferrer" className="flex-1 flex items-center justify-center gap-2 bg-white text-ink text-sm font-medium h-12 rounded-full border border-zinc-200">
-        <IcWa cls="w-4 h-4" /> WhatsApp
-      </a>
+      {ch && (
+        <a href={ch.href} target="_blank" rel="noreferrer" className="flex-1 flex items-center justify-center gap-2 bg-white text-ink text-sm font-medium h-12 rounded-full border border-zinc-200">
+          <ChatIcon ch={ch.key} /> {ch.label}
+        </a>
+      )}
     </div>
   );
 }
