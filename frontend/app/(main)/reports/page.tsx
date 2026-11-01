@@ -2,6 +2,7 @@
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { api } from '@/lib/api';
+import { useRole } from '@/lib/role';
 
 interface Summary {
   month: string; sold: number; revenue: number; cost: number; profit: number; margin: number;
@@ -104,7 +105,17 @@ function Bars({ items, empty }: { items: { label: string; value: number; sub: st
   );
 }
 
+function NoAccess() {
+  return (
+    <div className="px-4 py-24 text-center">
+      <div className="font-display text-xl font-semibold text-ink">Энэ хэсэгт хандах эрх алга</div>
+      <p className="text-sm text-zinc-500 mt-2">Админд хандаж эрх авна уу.</p>
+    </div>
+  );
+}
+
 export default function ReportsPage() {
+  const { ready, canSeeMoney } = useRole();
   const [month, setMonth] = useState(thisMonth);
   const [data, setData] = useState<MonthReport | null>(null);
   const [year, setYear] = useState<YearReport | null>(null);
@@ -184,6 +195,8 @@ export default function ReportsPage() {
   ] : [];
 
   const maxYearRevenue = Math.max(1, ...(year?.months.map((m) => m.revenue) || [0]));
+
+  if (ready && !canSeeMoney) return <NoAccess />;
 
   return (
     <div className="px-4 sm:px-6 py-4 sm:py-6 max-w-[1500px] mx-auto w-full space-y-4 sm:space-y-5 print:max-w-none print:p-0">

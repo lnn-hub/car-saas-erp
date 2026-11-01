@@ -81,8 +81,6 @@ export const api = {
     return request('/auth/login', { method: 'POST', body: JSON.stringify({ email, password }) });
   },
 
-  register: (data: { company_name: string; name: string; email: string; password: string }) =>
-    request('/auth/register', { method: 'POST', body: JSON.stringify(data) }),
 
   getVehicles: () => request('/vehicles', {}, true),
   getVehicle:  (id: string) => request(`/vehicles/${id}`, {}, true),
@@ -143,7 +141,6 @@ export const api = {
     return request(`/upload/image/${imageId}`, { method: 'DELETE' });
   },
 
-  getVehicleReport: (qs: string) => request(`/reports/vehicles?${qs}`),
   getMonthReport: (month: string) => request(`/reports/month?month=${month}`),
   getYearReport: (year: number) => request(`/reports/year?year=${year}`),
 
@@ -189,6 +186,16 @@ export const api = {
     if (!res.ok) throw new Error(data.error || 'Upload алдаа');
     return data;
   },
+
+  getLeads: () => request('/leads'),
+  leadsCount: () => request('/leads/count'),
+  updateLead: (id: string, status: string) => request(`/leads/${id}`, { method: 'PATCH', body: JSON.stringify({ status }) }),
+  deleteLead: (id: string) => request(`/leads/${id}`, { method: 'DELETE' }),
+
+  getUsers: () => request('/users'),
+  createUser: (data: { name: string; email: string; password: string; role: string }) =>
+    request('/users', { method: 'POST', body: JSON.stringify(data) }),
+  updateUser: (id: string, data: object) => request(`/users/${id}`, { method: 'PATCH', body: JSON.stringify(data) }),
 
   searchCustomers: (q: string) =>
     request(`/customers?q=${encodeURIComponent(q)}`),

@@ -1,11 +1,12 @@
 'use client';
 import { useEffect, useState } from 'react';
 import { api } from '@/lib/api';
+import { useRole } from '@/lib/role';
 
 interface Sale {
   id: string; brand: string; model: string; year: number; vin: string;
   customer_name: string; customer_phone: string; sold_by_name: string;
-  sale_price: string; total_cost: string; net_profit: string;
+  sale_price: string; total_cost?: string; net_profit?: string;
   payment_type: string; sold_at: string;
 }
 interface Summary { total_sold: string; total_revenue: string; total_profit: string; avg_profit: string; }
@@ -27,6 +28,7 @@ export default function SalesPage() {
   const [sales, setSales]     = useState<Sale[]>([]);
   const [summary, setSummary] = useState<Summary | null>(null);
   const [loading, setLoading] = useState(true);
+  const { canSeeMoney } = useRole();
 
   useEffect(() => {
     Promise.all([api.getSales(), api.getSummary()])
@@ -49,8 +51,10 @@ export default function SalesPage() {
         {[
           { label: 'Нийт зарагдсан',  value: `${summary?.total_sold ?? '0'}`, unit: 'машин', },
           { label: 'Нийт орлого',     value: summary ? fmt(summary.total_revenue) : '—', unit: '', },
-          { label: 'Цэвэр ашиг',      value: summary ? fmt(summary.total_profit) : '—',  unit: '', },
-          { label: 'Дундаж ашиг',     value: summary ? fmt(summary.avg_profit ?? 0) : '—', unit: '', },
+          ...(canSeeMoney ? [
+            { label: 'Цэвэр ашиг',      value: summary ? fmt(summary.total_profit) : '—',  unit: '', },
+            { label: 'Дундаж ашиг',     value: summary ? fmt(summary.avg_profit ?? 0) : '—', unit: '', },
+          ] : []),
         ].map(c => (
           <div key={c.label} className="rounded-[22px] bg-white ring-1 ring-ink/[0.06] px-3 sm:px-5 py-3 sm:py-4 shadow-card">
             <div className="text-xs text-[#5f5a54] mb-2">{c.label}</div>
@@ -73,7 +77,7 @@ export default function SalesPage() {
           <table className="w-full text-sm">
             <thead>
               <tr className="border-b border-[#e6e0d8] bg-[#faf8f5]">
-                {['Машин', 'Үйлчлүүлэгч', 'Төлбөр', 'Зарагдсан үнэ', 'Цэвэр ашиг', 'Огноо'].map((h, i) => (
+                {['Машин', 'Үйлчлүүлэгч', 'Төлбөр', 'Зарагдсан үнэ', ...(canSeeMoney ? ['Цэвэр ашиг'] : []), 'Огноо'].map((h, i) => (
                   <th key={i} className={`py-2.5 px-5 text-xs font-medium text-[#6f6a64] ${['Зарагдсан үнэ','Цэвэр ашиг'].includes(h) ? 'text-right' : 'text-left'}`}>{h}</th>
                 ))}
               </tr>
@@ -94,11 +98,13 @@ export default function SalesPage() {
                     </span>
                   </td>
                   <td className="px-5 py-3 text-right tabular-nums text-[#1c1917]">{fmt(s.sale_price)}</td>
+                  {canSeeMoney && (
                   <td className="px-5 py-3 text-right tabular-nums">
                     <span className={Number(s.net_profit) >= 0 ? 'text-[#111] font-medium' : 'text-brand font-medium'}>
-                      {Number(s.net_profit) >= 0 ? '+' : ''}{fmt(s.net_profit)}
+                      {Number(s.net_profit) >= 0 ? '+' : ''}{fmt(s.net_profit ?? 0)}
                     </span>
                   </td>
+                  )}
                   <td className="px-5 py-3 text-[#6f6a64] text-xs">{fmtDate(s.sold_at)}</td>
                 </tr>
               ))}
@@ -136,12 +142,12 @@ export default function SalesPage() {
                 <div className="text-xs text-[#6f6a64]">Зарагдсан үнэ</div>
                 <div className="text-sm font-semibold text-[#1c1917] tabular-nums">{fmt(s.sale_price)}</div>
               </div>
-              <div className="text-right">
+              {canSeeMoney && <div className="text-right">
                 <div className="text-xs text-[#6f6a64]">Цэвэр ашиг</div>
                 <div className={`text-sm font-semibold tabular-nums ${Number(s.net_profit) >= 0 ? 'text-[#111]' : 'text-brand'}`}>
-                  {Number(s.net_profit) >= 0 ? '+' : ''}{fmt(s.net_profit)}
+                  {Number(s.net_profit) >= 0 ? '+' : ''}{fmt(s.net_profit ?? 0)}
                 </div>
-              </div>
+              </div>}
             </div>
           </div>
         ))}

@@ -33,6 +33,8 @@ app.use('/api/reports',   require('./routes/reports'));
 app.use('/api/public',    require('./routes/public'));
 app.use('/api/settings',  require('./routes/settings'));
 app.use('/api/team',      require('./routes/team'));
+app.use('/api/leads',     require('./routes/leads'));
+app.use('/api/users',     require('./routes/users'));
 app.use('/api/admin',     require('./routes/admin'));
 app.use('/api/upload',    require('./routes/upload'));
 app.use('/uploads',       require('express').static(require('path').join(__dirname, '../uploads')));

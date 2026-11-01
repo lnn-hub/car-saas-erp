@@ -5,6 +5,8 @@ import { useEffect, useState } from 'react';
 import React from 'react';
 import { warmUp } from '@/lib/api';
 import { BrandMark } from '@/components/site/BrandMark';
+import { api } from '@/lib/api';
+import { ROLE_LABEL } from '@/lib/role';
 
 const BACKEND = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000';
 
@@ -17,6 +19,7 @@ function IcSettings(){ return <svg className="w-5 h-5" viewBox="0 0 24 24" fill=
 function IcGlobe()   { return <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.8}><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 014 10 15.3 15.3 0 01-4 10 15.3 15.3 0 01-4-10 15.3 15.3 0 014-10z"/></svg>; }
 function IcMenu()    { return <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2}><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>; }
 function IcX()       { return <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2}><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>; }
+function IcInbox()   { return <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.8}><path d="M22 12h-6l-2 3h-4l-2-3H2"/><path d="M5.45 5.11L2 12v6a2 2 0 002 2h16a2 2 0 002-2v-6l-3.45-6.89A2 2 0 0016.76 4H7.24a2 2 0 00-1.79 1.11z"/></svg>; }
 function IcOut()     { return <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.5}><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4M16 17l5-5-5-5M21 12H9"/></svg>; }
 
 // Mobile-д харагдах tab bar-ийн nav
@@ -24,8 +27,8 @@ const TAB_NAV = [
   { href: '/dashboard',    label: 'Нүүр',      Icon: IcHome },
   { href: '/vehicles',     label: 'Машин',      Icon: IcCar },
   { href: '/vehicles/new', label: 'Нэмэх',     Icon: IcPlus },
+  { href: '/leads',        label: 'Хүсэлт',     Icon: IcInbox },
   { href: '/sales',        label: 'Борлуулалт', Icon: IcMoney },
-  { href: '/settings',     label: 'Тохиргоо',  Icon: IcSettings },
 ];
 
 // Desktop sidebar nav
@@ -33,6 +36,7 @@ const SIDE_NAV = [
   { href: '/dashboard',    label: 'Нүүр хуудас',  Icon: IcHome },
   { href: '/vehicles',     label: 'Машинууд',      Icon: IcCar },
   { href: '/vehicles/new', label: 'Машин нэмэх',  Icon: IcPlus },
+  { href: '/leads',        label: 'Хүсэлтүүд',     Icon: IcInbox },
   { href: '/sales',        label: 'Борлуулалт',    Icon: IcMoney },
   { href: '/reports',      label: 'Тайлан',        Icon: IcChart },
   { href: '/settings',     label: 'Тохиргоо',      Icon: IcSettings },
@@ -55,6 +59,7 @@ function MainLayoutInner({ children }: { children: React.ReactNode }) {
   const [logoUrl, setLogoUrl]   = useState<string | null>(null);
   const [features, setFeatures]  = useState<{ reports?: boolean }>({});
   const [drawerOpen, setDrawer]   = useState(false);
+  const [newLeads, setNewLeads]   = useState(0);
 
   useEffect(() => {
     warmUp(); // Render cold start-аас сэргийлэх
@@ -70,14 +75,24 @@ function MainLayoutInner({ children }: { children: React.ReactNode }) {
   // Drawer хаах хуудас солигдоход
   useEffect(() => { setDrawer(false); }, [pathname]);
 
+  // Шинэ хүсэлтийн тоо (минут тутам шинэчилнэ)
+  useEffect(() => {
+    if (!localStorage.getItem('token')) return;
+    const load = () => api.leadsCount().then((d: { new: number }) => setNewLeads(d.new || 0)).catch(() => {});
+    load();
+    const t = setInterval(load, 60_000);
+    return () => clearInterval(t);
+  }, [pathname]);
+
   const isActive = (href: string) =>
     href === '/dashboard' ? pathname === href : pathname.startsWith(href);
 
   const initials = userName.split(' ').map(n => n[0]).join('').slice(0, 2).toUpperCase();
 
-  const navItems = [
-    ...SIDE_NAV.filter(n => n.href !== '/reports' || features.reports !== false),
-  ];
+  const canSeeMoney = userRole === 'ADMIN' || userRole === 'FINANCE';
+  const navItems = SIDE_NAV.filter(n =>
+    (n.href !== '/reports' || (features.reports !== false && canSeeMoney)) &&
+    (n.href !== '/settings' || userRole === 'ADMIN'));
 
   const logout = () => { localStorage.clear(); router.push('/login'); };
 
@@ -102,7 +117,10 @@ function MainLayoutInner({ children }: { children: React.ReactNode }) {
                   : 'text-zinc-600 hover:text-ink hover:bg-white/60'
               }`}>
               <span className={active ? 'text-brand' : 'text-zinc-400 group-hover:text-zinc-600'}><Icon /></span>
-              {label}
+              <span className="flex-1">{label}</span>
+              {href === '/leads' && newLeads > 0 && (
+                <span className="min-w-5 h-5 px-1.5 rounded-full bg-brand text-white text-[11px] font-semibold flex items-center justify-center">{newLeads}</span>
+              )}
             </Link>
           );
         })}
@@ -125,7 +143,7 @@ function MainLayoutInner({ children }: { children: React.ReactNode }) {
           </div>
           <div className="flex-1 min-w-0">
             <div className="text-sm font-medium text-ink truncate">{userName}</div>
-            <div className="text-xs text-zinc-500">{userRole === 'ADMIN' ? 'Админ' : userRole}</div>
+            <div className="text-xs text-zinc-500">{ROLE_LABEL[userRole] || userRole}</div>
           </div>
           <button onClick={logout} title="Гарах" aria-label="Гарах"
             className="w-9 h-9 rounded-full flex items-center justify-center text-zinc-400 hover:text-brand hover:bg-brand-soft transition-colors shrink-0">
@@ -185,7 +203,12 @@ function MainLayoutInner({ children }: { children: React.ReactNode }) {
                 className={`flex-1 h-full flex flex-col items-center justify-center gap-0.5 rounded-full transition-colors ${
                   active ? 'text-brand' : 'text-zinc-500'
                 }`}>
-                <Icon />
+                <span className="relative">
+                  <Icon />
+                  {href === '/leads' && newLeads > 0 && (
+                    <span className="absolute -top-1.5 -right-2.5 min-w-4 h-4 px-1 rounded-full bg-brand text-white text-[10px] font-semibold flex items-center justify-center ring-2 ring-white">{newLeads}</span>
+                  )}
+                </span>
                 <span className={`text-[11px] ${active ? 'font-semibold' : 'font-medium'}`}>{label}</span>
               </Link>
             );

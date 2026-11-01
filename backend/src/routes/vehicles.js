@@ -2,7 +2,7 @@ const router = require('express').Router();
 const { serverError } = require('../utils/http');
 const pool = require('../db/pool');
 const auth = require('../middleware/auth');
-const { requireAdmin } = auth;
+const { requireAdmin, requireMoney, canSeeMoney } = auth;
 
 // GET /api/vehicles — бүх машин
 router.get('/', auth, async (req, res) => {
@@ -18,7 +18,7 @@ router.get('/', auth, async (req, res) => {
        ORDER BY v.created_at DESC`,
       [req.user.company_id]
     );
-    res.json(rows);
+    res.json(canSeeMoney(req.user) ? rows : rows.map(({ total_cost, ...r }) => r));
   } catch (err) {
     serverError(res, err);
   }
@@ -33,7 +33,7 @@ router.get('/:id', auth, async (req, res) => {
       pool.query('SELECT * FROM vehicle_images WHERE vehicle_id = $1 ORDER BY sort_order', [req.params.id]),
     ]);
     if (!vehicle.rows[0]) return res.status(404).json({ error: 'Машин олдсонгүй' });
-    res.json({ ...vehicle.rows[0], costs: costs.rows, images: images.rows });
+    res.json({ ...vehicle.rows[0], costs: canSeeMoney(req.user) ? costs.rows : [], images: images.rows });
   } catch (err) {
     serverError(res, err);
   }
@@ -142,7 +142,7 @@ router.patch('/:id/status', auth, async (req, res) => {
 });
 
 // POST /api/vehicles/:id/costs — зардал нэмэх
-router.post('/:id/costs', auth, async (req, res) => {
+router.post('/:id/costs', auth, requireMoney, async (req, res) => {
   const { cost_type, amount, currency, note } = req.body;
   const amt = Number(amount);
   if (!cost_type || !Number.isFinite(amt) || amt === 0)

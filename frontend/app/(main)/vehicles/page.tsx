@@ -2,10 +2,11 @@
 import { useEffect, useState, useMemo } from 'react';
 import Link from 'next/link';
 import { api } from '@/lib/api';
+import { useRole } from '@/lib/role';
 
 interface Vehicle {
   id: string; brand: string; model: string; year: number;
-  mileage: number; color: string; status: string; total_cost: string; vin: string;
+  mileage: number; color: string; status: string; total_cost?: string; price?: string | null; vin: string;
 }
 
 const STATUS: Record<string, { label: string; dot: string; text: string }> = {
@@ -29,6 +30,7 @@ export default function VehiclesPage() {
   const [vehicles, setVehicles] = useState<Vehicle[]>([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState('');
+  const { canSeeMoney } = useRole();
   const [statusFilter, setStatusFilter] = useState<string[]>(['ARRIVED', 'PUBLISHED', 'RESERVED']);
   const [collapsed, setCollapsed] = useState<Record<string, boolean>>({});
   const [page, setPage] = useState(1);
@@ -82,7 +84,7 @@ export default function VehiclesPage() {
           <div>
             <h1 className="font-display text-2xl sm:text-[32px] font-semibold tracking-[-0.03em] text-ink leading-none">Машинууд</h1>
             <p className="text-sm text-zinc-500 mt-2 hidden sm:block">
-              {inStock} агуулахад &middot; {soldCount} зарагдсан &middot; {fmt(totalValue)}
+              {inStock} агуулахад &middot; {soldCount} зарагдсан{canSeeMoney && <> &middot; {fmt(totalValue)}</>}
             </p>
           </div>
           <Link href="/vehicles/new"
@@ -124,7 +126,7 @@ export default function VehiclesPage() {
           <span>Гүйлт</span>
           <span>Өнгө</span>
           <span>Статус</span>
-          <span className="text-right">Нийт өртөг</span>
+          <span className="text-right">{canSeeMoney ? 'Нийт өртөг' : 'Зарах үнэ'}</span>
           <span />
         </div>
       </div>
@@ -176,7 +178,7 @@ export default function VehiclesPage() {
                       </span>
                     ))}
                   </div>
-                  <span className="ml-auto text-xs text-[#6f6a64] tabular-nums">{fmt(brandTotal)}</span>
+                  <span className="ml-auto text-xs text-[#6f6a64] tabular-nums">{canSeeMoney ? fmt(brandTotal) : ''}</span>
                 </button>
 
                 {/* Vehicle rows */}
@@ -208,7 +210,7 @@ export default function VehiclesPage() {
                             <span className={`w-1.5 h-1.5 rounded-full shrink-0 ${STATUS[v.status]?.dot}`} />
                             <span className={`text-xs ${STATUS[v.status]?.text}`}>{STATUS[v.status]?.label}</span>
                           </span>
-                          <span className="text-sm text-[#5f5a54] tabular-nums text-right shrink-0">{fmt(v.total_cost)}</span>
+                          <span className="text-sm text-[#5f5a54] tabular-nums text-right shrink-0">{canSeeMoney ? fmt(v.total_cost || 0) : (v.price ? fmt(v.price) : '—')}</span>
                           <svg className="w-3.5 h-3.5 text-[#d4ccc2] group-hover:text-[#6f6a64] shrink-0 ml-auto" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.5}><path d="M9 18l6-6-6-6"/></svg>
                         </Link>
                       ))}

@@ -1,9 +1,12 @@
 'use client';
 import { useEffect, useRef, useState } from 'react';
 import { api } from '@/lib/api';
+import { useRole } from '@/lib/role';
+import { StaffManager } from '@/components/admin/StaffManager';
 
 interface Settings {
   name: string; phone: string; address: string; email: string; working_hours: string; show_prices: boolean;
+  messenger_url: string; viber_phone: string; whatsapp_phone: string;
 }
 interface Member { id: string; name: string; position: string | null; bio: string | null; photo_url: string | null; }
 
@@ -30,8 +33,18 @@ function Section({ title, hint, children }: { title: string; hint?: string; chil
   );
 }
 
+function NoAccess() {
+  return (
+    <div className="px-4 py-24 text-center">
+      <div className="font-display text-xl font-semibold text-ink">Энэ хэсэгт хандах эрх алга</div>
+      <p className="text-sm text-zinc-500 mt-2">Админд хандаж эрх авна уу.</p>
+    </div>
+  );
+}
+
 export default function SettingsPage() {
-  const [form, setForm]       = useState<Settings>({ name: '', phone: '', address: '', email: '', working_hours: '', show_prices: true });
+  const { ready, isAdmin } = useRole();
+  const [form, setForm]       = useState<Settings>({ name: '', phone: '', address: '', email: '', working_hours: '', show_prices: true, messenger_url: '', viber_phone: '', whatsapp_phone: '' });
   const [loading, setLoading] = useState(true);
   const [saving, setSaving]   = useState(false);
   const [saved, setSaved]     = useState(false);
@@ -100,6 +113,7 @@ export default function SettingsPage() {
       setForm({
         name: d.name || '', phone: d.phone || '', address: d.address || '',
         email: d.email || '', working_hours: d.working_hours || '', show_prices: d.show_prices !== false,
+        messenger_url: d.messenger_url || '', viber_phone: d.viber_phone || '', whatsapp_phone: d.whatsapp_phone || '',
       });
       setLogo(d.logo_url || null);
       setPlanInfo({ plan: d.plan || 'basic', max_vehicles: d.max_vehicles ?? null, vehicle_count: d.vehicle_count ?? 0 });
@@ -119,6 +133,7 @@ export default function SettingsPage() {
       await api.saveSettings({
         name: form.name, phone: form.phone, address: form.address, email: form.email,
         working_hours: form.working_hours, show_prices: form.show_prices,
+        messenger_url: form.messenger_url, viber_phone: form.viber_phone, whatsapp_phone: form.whatsapp_phone,
       });
       setSaved(true);
     } catch (err: unknown) {
@@ -156,6 +171,8 @@ export default function SettingsPage() {
   if (loading) return <div className="px-4 sm:px-6 py-5 sm:py-7 text-sm text-[#6f6a64]">Ачааллаж байна...</div>;
 
   const previewUrl = mFile ? URL.createObjectURL(mFile) : editing && editing !== 'new' ? photoSrc(editing.photo_url) : null;
+
+  if (ready && !isAdmin) return <NoAccess />;
 
   return (
     <div className="px-4 sm:px-6 py-4 sm:py-6 max-w-3xl mx-auto space-y-5">
@@ -235,6 +252,24 @@ export default function SettingsPage() {
           </div>
         </Section>
 
+        <Section title="Чатаар холбогдох" hint="Хоосон үлдээвэл сайтад харагдахгүй">
+          <div className="p-5 grid grid-cols-1 sm:grid-cols-3 gap-4">
+            <div>
+              <label className="text-xs text-[#5f5a54] block mb-1.5">Facebook Messenger</label>
+              <input value={form.messenger_url} onChange={e => set('messenger_url', e.target.value)} placeholder="Хуудасны нэр эсвэл m.me/... холбоос" className={inp} />
+            </div>
+            <div>
+              <label className="text-xs text-[#5f5a54] block mb-1.5">Viber дугаар</label>
+              <input value={form.viber_phone} onChange={e => set('viber_phone', e.target.value)} placeholder="99001122" inputMode="tel" className={inp} />
+            </div>
+            <div>
+              <label className="text-xs text-[#5f5a54] block mb-1.5">WhatsApp дугаар</label>
+              <input value={form.whatsapp_phone} onChange={e => set('whatsapp_phone', e.target.value)} placeholder="99001122" inputMode="tel" className={inp} />
+            </div>
+            <p className="sm:col-span-3 text-xs text-[#6f6a64]">Оруулсан сувгууд машины хуудас, холбоо барих хэсэг, утасны доод мөрөнд товч болж гарна.</p>
+          </div>
+        </Section>
+
         <div className="bg-white ring-1 ring-ink/[0.06] rounded-[22px] p-5 shadow-card">
           <div className="flex items-center justify-between gap-4">
             <div>
@@ -256,6 +291,8 @@ export default function SettingsPage() {
           {saving ? 'Хадгалж байна...' : 'Хадгалах'}
         </button>
       </form>
+
+      <StaffManager />
 
       <Section title="Манай баг" hint={`${team.length} гишүүн`}>
         <div className="divide-y divide-[#f3efe9]">

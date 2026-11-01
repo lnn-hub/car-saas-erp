@@ -1,5 +1,6 @@
 "use client";
 import { useEffect, useRef, useState, Suspense } from "react";
+import { useRole } from '@/lib/role';
 import { useParams, useRouter } from "next/navigation";
 import { api } from "@/lib/api";
 import { IconArrowLeft } from "@/components/icons";
@@ -78,6 +79,7 @@ function fmt(n: number) {
 function VehicleDetailContent() {
   const { id } = useParams<{ id: string }>();
   const router = useRouter();
+  const { canSeeMoney, isAdmin } = useRole();
   const [vehicle, setVehicle] = useState<Vehicle | null>(null);
   const [costForm, setCostForm] = useState({
     cost_type: "PURCHASE",
@@ -396,9 +398,9 @@ function VehicleDetailContent() {
               "Хурдны хайрцаг",
               vehicle.transmission === "AUTO" ? "Автомат" : "Механик",
             ],
-            ["Нийт өртөг", fmt(totalCost)],
+            ...(canSeeMoney ? [["Нийт өртөг", fmt(totalCost)]] : []),
             ["Зарах үнэ", vehicle.price ? fmt(Number(vehicle.price)) : "Оруулаагүй"],
-            ...(vehicle.price ? [["Зарах ашиг (төлөвлөсөн)", fmt(Number(vehicle.price) - totalCost)]] : []),
+            ...(canSeeMoney && vehicle.price ? [["Зарах ашиг (төлөвлөсөн)", fmt(Number(vehicle.price) - totalCost)]] : []),
           ].map(([k, v]) => (
             <div key={k}>
               <div className="text-xs text-[#6f6a64] mb-0.5">
@@ -483,7 +485,9 @@ function VehicleDetailContent() {
         </div>
       )}
 
-      {/* Costs */}
+      {/* Costs — зөвхөн өртөг харах эрхтэй хүнд */}
+      {canSeeMoney && (
+      <>
       <div className="bg-white ring-1 ring-ink/[0.06] rounded-2xl overflow-hidden">
         <div className="px-4 py-3 border-b border-[#e6e0d8] flex items-center justify-between">
           <span className="text-xs font-medium text-[#6f6a64]">
@@ -590,8 +594,12 @@ function VehicleDetailContent() {
           </form>
         )}
       </div>
+      </>
+      )}
 
-      {/* Danger zone */}
+      {/* Danger zone — зөвхөн админ */}
+      {isAdmin && (
+      <>
       <div className="bg-white border border-zinc-200 rounded-lg p-4 flex items-center justify-between gap-4">
         <div>
           <div className="text-sm font-bold text-[#1c1917]">Машин устгах</div>
@@ -600,6 +608,8 @@ function VehicleDetailContent() {
         <button type="button" onClick={removeVehicle}
           className="shrink-0 text-sm text-brand border border-brand/30 hover:bg-brand hover:text-white hover:border-brand px-4 py-2 rounded-full transition-colors font-medium">Устгах</button>
       </div>
+      </>
+      )}
 
       {/* ── SALE MODAL ── */}
       {showSale && (
@@ -631,8 +641,8 @@ function VehicleDetailContent() {
                 <p
                   className={`text-sm mb-6 ${profit >= 0 ? "text-[#111]" : "text-brand"}`}
                 >
-                  Ашиг: {profit >= 0 ? "+" : ""}
-                  {fmt(profit)} ({margin}%)
+                  {canSeeMoney && <>Ашиг: {profit >= 0 ? "+" : ""}
+                  {fmt(profit)} ({margin}%)</>}
                 </p>
                 <button
                   onClick={() => {
@@ -653,8 +663,8 @@ function VehicleDetailContent() {
                       Машин зарах
                     </h2>
                     <p className="text-xs text-[#6f6a64] mt-0.5">
-                      {vehicle.brand} {vehicle.model} {vehicle.year} · Өртөг:{" "}
-                      {fmt(totalCost)}
+                      {vehicle.brand} {vehicle.model} {vehicle.year}
+                      {canSeeMoney && <> · Өртөг: {fmt(totalCost)}</>}
                     </p>
                   </div>
                   <button
@@ -805,7 +815,7 @@ function VehicleDetailContent() {
                     />
 
                     {/* Ашгийн preview */}
-                    {salePriceNum > 0 && (
+                    {canSeeMoney && salePriceNum > 0 && (
                       <div
                         className={`mt-2 px-3 py-2 rounded-md text-xs flex items-center justify-between ${profit >= 0 ? "bg-emerald-50 border border-emerald-200" : "bg-danger-soft border border-danger-line"}`}
                       >

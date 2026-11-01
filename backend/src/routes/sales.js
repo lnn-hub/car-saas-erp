@@ -2,6 +2,7 @@ const router = require('express').Router();
 const { serverError } = require('../utils/http');
 const pool = require('../db/pool');
 const auth = require('../middleware/auth');
+const { canSeeMoney } = auth;
 
 // GET /api/sales — борлуулалтын жагсаалт
 router.get('/', auth, async (req, res) => {
@@ -24,7 +25,7 @@ router.get('/', auth, async (req, res) => {
        ORDER BY s.sold_at DESC`,
       [req.user.company_id]
     );
-    res.json(rows);
+    res.json(canSeeMoney(req.user) ? rows : rows.map(({ total_cost, net_profit, ...r }) => r));
   } catch (err) {
     serverError(res, err);
   }
@@ -92,7 +93,8 @@ router.get('/summary', auth, async (req, res) => {
        WHERE s.company_id = $1`,
       [req.user.company_id]
     );
-    res.json(rows[0]);
+    const r = rows[0];
+    res.json(canSeeMoney(req.user) ? r : { total_sold: r.total_sold, total_revenue: r.total_revenue });
   } catch (err) {
     serverError(res, err);
   }

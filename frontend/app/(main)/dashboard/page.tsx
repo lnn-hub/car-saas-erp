@@ -2,6 +2,7 @@
 import React, { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { api } from '@/lib/api';
+import { useRole } from '@/lib/role';
 import { SalesChart } from '@/components/admin/SalesChart';
 
 interface Summary { total_sold: string; total_revenue: string; total_profit: string; avg_profit: string; }
@@ -41,6 +42,7 @@ export default function DashboardPage() {
   const [sales, setSales]     = useState<{ sold_at: string; sale_price: string }[] | null>(null);
   const [userName, setUserName] = useState('');
   const [hour, setHour]         = useState(0);
+  const { canSeeMoney, isAdmin } = useRole();
 
   useEffect(() => {
     setHour(new Date().getHours());
@@ -89,10 +91,17 @@ export default function DashboardPage() {
       {/* KPI cards */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
         {[
+          ...(canSeeMoney ? [
           { label: 'Цэвэр ашиг',      value: fmt(summary?.total_profit ?? 0),  unit: summary ? `Дундаж ${fmt(summary.avg_profit ?? 0)} / машин` : '', featured: true, icon: <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.8}><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/></svg> },
           { label: 'Нийт орлого',     value: fmt(summary?.total_revenue ?? 0), unit: 'Борлуулалтаас', icon: <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.8}><rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg> },
           { label: 'Зарагдсан',       value: `${summary?.total_sold ?? 0}`, unit: 'машин',    icon: <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.8}><path d="M5 17H3a2 2 0 01-2-2v-4a2 2 0 012-2h16a2 2 0 012 2v4a2 2 0 01-2 2h-2"/><rect x="7" y="17" width="10" height="4" rx="2"/><path d="M5 11L7.5 5h9L19 11"/></svg> },
           { label: 'Агуулахын өртөг', value: fmt(totalCost),                   unit: `${inStock} машин агуулахад`, stock: true, icon: <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.8}><path d="M21 16V8a2 2 0 00-1-1.73l-7-4a2 2 0 00-2 0l-7 4A2 2 0 003 8v8a2 2 0 001 1.73l7 4a2 2 0 002 0l7-4A2 2 0 0021 16z"/></svg> },
+          ] : [
+          { label: 'Агуулахад', value: `${inStock}`, unit: 'машин', featured: true, stock: true, icon: <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.8}><path d="M21 16V8a2 2 0 00-1-1.73l-7-4a2 2 0 00-2 0l-7 4A2 2 0 003 8v8a2 2 0 001 1.73l7 4a2 2 0 002 0l7-4A2 2 0 0021 16z"/></svg> },
+          { label: 'Зарагдаж буй', value: `${counts.PUBLISHED}`, unit: 'вэбсайтад нийтлэгдсэн', stock: true, icon: <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.8}><path d="M20.59 13.41l-7.17 7.17a2 2 0 01-2.83 0L2 12V2h10l8.59 8.59a2 2 0 010 2.82z"/><line x1="7" y1="7" x2="7.01" y2="7"/></svg> },
+          { label: 'Зарагдсан',       value: `${summary?.total_sold ?? 0}`, unit: 'машин',    icon: <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.8}><path d="M5 17H3a2 2 0 01-2-2v-4a2 2 0 012-2h16a2 2 0 012 2v4a2 2 0 01-2 2h-2"/><rect x="7" y="17" width="10" height="4" rx="2"/><path d="M5 11L7.5 5h9L19 11"/></svg> },
+          { label: 'Нийт орлого',     value: fmt(summary?.total_revenue ?? 0), unit: 'Борлуулалтаас', icon: <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.8}><rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg> },
+          ]),
         ].map(c => (
           <div key={c.label} className={`relative overflow-hidden rounded-[22px] p-4 sm:p-5 ${c.featured ? 'bg-ink text-white' : 'bg-white ring-1 ring-ink/[0.06] shadow-card'}`}>
             {c.featured && <div className="pointer-events-none absolute -right-10 -top-16 w-48 h-48 rounded-full bg-brand/70 blur-3xl" />}
@@ -202,7 +211,7 @@ export default function DashboardPage() {
                 { href: '/vehicles/new', label: 'Машин нэмэх',  primary: true },
                 { href: '/vehicles',     label: 'Агуулах',       primary: false },
                 { href: '/sales',        label: 'Борлуулалт',    primary: false },
-                { href: '/settings',     label: 'Тохиргоо',      primary: false },
+                ...(isAdmin ? [{ href: '/settings',     label: 'Тохиргоо',      primary: false }] : [{ href: '/leads', label: 'Хүсэлтүүд', primary: false }]),
               ].map(({ href, label, primary }) => (
                 <Link key={href} href={href}
                   className={`flex items-center justify-between w-full px-3 py-2 rounded-lg text-sm transition-colors ${
@@ -218,7 +227,7 @@ export default function DashboardPage() {
           </div>
 
           {/* Mini stat */}
-          <div className="bg-white rounded-[22px] ring-1 ring-ink/[0.06] p-4 shadow-card">
+          {canSeeMoney && <div className="bg-white rounded-[22px] ring-1 ring-ink/[0.06] p-4 shadow-card">
             <div className="text-xs font-medium text-[#6f6a64] mb-3">Нэгж дундаж</div>
             <div className="space-y-2.5">
               {[
@@ -231,7 +240,7 @@ export default function DashboardPage() {
                 </div>
               ))}
             </div>
-          </div>
+          </div>}
         </div>
       </div>
     </div>

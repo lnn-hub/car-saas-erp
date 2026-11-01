@@ -10,6 +10,7 @@ router.get('/', auth, async (req, res) => {
   try {
     const { rows } = await pool.query(
       `SELECT name, slug, phone, address, email, working_hours, logo_url, show_prices, plan, max_vehicles, features,
+              messenger_url, viber_phone, whatsapp_phone,
               (SELECT COUNT(*)::int FROM vehicles WHERE company_id = $1) AS vehicle_count
        FROM companies WHERE id=$1`,
       [req.user.company_id]
@@ -41,6 +42,13 @@ router.patch('/', auth, requireAdmin, async (req, res) => {
       if (rows.length) return res.status(409).json({ error: 'Энэ slug аль хэдийн ашиглагдаж байна' });
     }
 
+    // Холбоо барих сувгууд: хоосон утга явуулбал устгана
+    for (const key of ['messenger_url', 'viber_phone', 'whatsapp_phone']) {
+      if (req.body[key] === undefined) continue;
+      const val = String(req.body[key] || '').trim().slice(0, key === 'messenger_url' ? 255 : 30) || null;
+      await pool.query(`UPDATE companies SET ${key} = $1 WHERE id = $2`, [val, req.user.company_id]);
+    }
+
     const { rows } = await pool.query(
       `UPDATE companies SET
         slug        = COALESCE($1, slug),
@@ -52,7 +60,7 @@ router.patch('/', auth, requireAdmin, async (req, res) => {
         working_hours = COALESCE($8, working_hours),
         name          = COALESCE($9, name)
        WHERE id=$6
-       RETURNING name, slug, phone, address, email, working_hours, logo_url, show_prices`,
+       RETURNING name, slug, phone, address, email, working_hours, logo_url, show_prices, messenger_url, viber_phone, whatsapp_phone`,
       [slug || null, phone || null, address || null, logo_url || null,
        show_prices !== undefined ? show_prices : null, req.user.company_id,
        email ?? null, working_hours ?? null, name ? String(name).trim() : null]
