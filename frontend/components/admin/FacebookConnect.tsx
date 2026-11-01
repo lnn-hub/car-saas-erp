@@ -47,9 +47,7 @@ export function FacebookConnect({ connected, pageName, onChange }: {
             </div>
             <button type="button" onClick={disconnect} className="h-9 px-4 rounded-full text-sm text-zinc-600 hover:text-danger hover:bg-danger-soft">Салгах</button>
           </div>
-        ) : (
-          <p className="text-sm text-zinc-600">Машиныг нэг товчоор пэйж рүүгээ зурагтай нь нийтэлнэ. Facebook-д ямар ч төлбөргүй.</p>
-        )}
+        ) : null}
 
         {pages.length > 1 && (
           <div>
