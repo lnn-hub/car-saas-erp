@@ -20,6 +20,7 @@ function IcGlobe()   { return <svg className="w-5 h-5" viewBox="0 0 24 24" fill=
 function IcMenu()    { return <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2}><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>; }
 function IcX()       { return <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2}><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>; }
 function IcInbox()   { return <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.8}><path d="M22 12h-6l-2 3h-4l-2-3H2"/><path d="M5.45 5.11L2 12v6a2 2 0 002 2h16a2 2 0 002-2v-6l-3.45-6.89A2 2 0 0016.76 4H7.24a2 2 0 00-1.79 1.11z"/></svg>; }
+function IcUsers()   { return <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.8}><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87M16 3.13a4 4 0 010 7.75"/></svg>; }
 function IcOut()     { return <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.5}><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4M16 17l5-5-5-5M21 12H9"/></svg>; }
 
 // Mobile-д харагдах tab bar-ийн nav
@@ -37,6 +38,7 @@ const SIDE_NAV = [
   { href: '/vehicles',     label: 'Машинууд',      Icon: IcCar },
   { href: '/vehicles/new', label: 'Машин нэмэх',  Icon: IcPlus },
   { href: '/leads',        label: 'Хүсэлтүүд',     Icon: IcInbox },
+  { href: '/customers',    label: 'Үйлчлүүлэгчид', Icon: IcUsers },
   { href: '/sales',        label: 'Борлуулалт',    Icon: IcMoney },
   { href: '/reports',      label: 'Тайлан',        Icon: IcChart },
   { href: '/settings',     label: 'Тохиргоо',      Icon: IcSettings },

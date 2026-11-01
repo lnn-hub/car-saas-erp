@@ -37,6 +37,7 @@ export default function LeadsPage() {
   const [leads, setLeads] = useState<Lead[] | null>(null);
   const [tab, setTab] = useState('NEW');
   const [error, setError] = useState('');
+  const [converted, setConverted] = useState<Record<string, { id: string; created: boolean }>>({});
 
   const load = () => api.getLeads().then(setLeads).catch((e: unknown) => setError(e instanceof Error ? e.message : 'Алдаа гарлаа'));
   useEffect(() => { load(); }, []);
@@ -44,6 +45,13 @@ export default function LeadsPage() {
   async function setStatus(l: Lead, status: Lead['status']) {
     setLeads((xs) => xs?.map((x) => (x.id === l.id ? { ...x, status } : x)) ?? null);
     try { await api.updateLead(l.id, status); } catch { load(); }
+  }
+  async function toCustomer(l: Lead) {
+    try {
+      const r = await api.leadToCustomer(l.id);
+      setConverted((m) => ({ ...m, [l.id]: { id: r.customer.id, created: r.created } }));
+      if (l.status === 'NEW') setLeads((xs) => xs?.map((x) => (x.id === l.id ? { ...x, status: 'CONTACTED' } : x)) ?? null);
+    } catch (e) { setError(e instanceof Error ? e.message : 'Алдаа'); }
   }
   async function remove(l: Lead) {
     if (!confirm(`${l.name}-ийн хүсэлтийг устгах уу?`)) return;
@@ -119,6 +127,13 @@ export default function LeadsPage() {
                 )}
                 {l.status !== 'NEW' && (
                   <button onClick={() => setStatus(l, 'NEW')} className="h-9 px-3 rounded-full text-sm text-zinc-500 hover:text-ink">Шинэ болгох</button>
+                )}
+                {converted[l.id] ? (
+                  <Link href="/customers" className="h-9 px-3 rounded-full text-sm font-medium text-emerald-700 bg-emerald-50 flex items-center">
+                    {converted[l.id].created ? 'Үйлчлүүлэгч болсон' : 'Үйлчлүүлэгч аль хэдийн байсан'} →
+                  </Link>
+                ) : (
+                  <button onClick={() => toCustomer(l)} className="h-9 px-3 rounded-full text-sm font-medium text-brand hover:bg-brand-soft transition-colors">+ Үйлчлүүлэгч болгох</button>
                 )}
                 <button onClick={() => remove(l)} className="ml-auto h-9 px-3 rounded-full text-sm text-zinc-400 hover:text-danger">Устгах</button>
               </div>

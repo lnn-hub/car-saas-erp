@@ -44,6 +44,35 @@ router.patch('/:id', async (req, res) => {
   }
 });
 
+// POST /api/leads/:id/customer — хүсэлтийг үйлчлүүлэгч болгох (утсаар давхцвал байгааг нь ашиглана)
+router.post('/:id/customer', async (req, res) => {
+  const client = await pool.connect();
+  try {
+    await client.query('BEGIN');
+    const { rows: [l] } = await client.query('SELECT * FROM leads WHERE id=$1 AND company_id=$2 FOR UPDATE', [req.params.id, req.user.company_id]);
+    if (!l) { await client.query('ROLLBACK'); return res.status(404).json({ error: 'Хүсэлт олдсонгүй' }); }
+    const digits = String(l.phone).replace(/\D/g, '');
+    const { rows: [existing] } = await client.query(
+      `SELECT * FROM customers WHERE company_id=$1 AND regexp_replace(COALESCE(phone, ''), '\\D', '', 'g') LIKE '%' || $2 LIMIT 1`,
+      [req.user.company_id, digits.slice(-8)]);
+    let customer = existing, created = false;
+    if (!customer) {
+      const note = [l.preferred_time && `Хүссэн цаг: ${l.preferred_time}`, l.message].filter(Boolean).join('\n') || null;
+      ({ rows: [customer] } = await client.query(
+        'INSERT INTO customers (company_id, name, phone, note) VALUES ($1,$2,$3,$4) RETURNING *',
+        [req.user.company_id, l.name, l.phone, note]));
+      created = true;
+    }
+    if (l.status === 'NEW') await client.query("UPDATE leads SET status='CONTACTED' WHERE id=$1", [l.id]);
+    await client.query('COMMIT');
+    res.status(created ? 201 : 200).json({ customer, created });
+  } catch (err) {
+    await client.query('ROLLBACK').catch(() => {});
+    if (err.code === '22P02') return res.status(404).json({ error: 'Хүсэлт олдсонгүй' });
+    serverError(res, err);
+  } finally { client.release(); }
+});
+
 // DELETE /api/leads/:id
 router.delete('/:id', async (req, res) => {
   try {

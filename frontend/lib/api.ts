@@ -197,8 +197,14 @@ export const api = {
     request('/users', { method: 'POST', body: JSON.stringify(data) }),
   updateUser: (id: string, data: object) => request(`/users/${id}`, { method: 'PATCH', body: JSON.stringify(data) }),
 
+  getCustomers: () => request('/customers/list'),
+  getCustomer: (id: string) => request(`/customers/${id}`),
+  updateCustomer: (id: string, data: object) => request(`/customers/${id}`, { method: 'PATCH', body: JSON.stringify(data) }),
+  deleteCustomer: (id: string) => request(`/customers/${id}`, { method: 'DELETE' }),
+  leadToCustomer: (id: string) => request(`/leads/${id}/customer`, { method: 'POST' }),
+
   searchCustomers: (q: string) =>
     request(`/customers?q=${encodeURIComponent(q)}`),
-  createCustomer: (data: { name: string; phone: string }) =>
+  createCustomer: (data: { name: string; phone: string; email?: string; note?: string }) =>
     request('/customers', { method: 'POST', body: JSON.stringify(data) }),
 };
