@@ -92,14 +92,15 @@ router.post('/vehicle/:id', auth, upload.array('images', 20), async (req, res) =
     if (!rows[0]) return res.status(403).json({ error: 'Машин олдсонгүй' });
 
     const { rows: existing } = await pool.query(
-      'SELECT COUNT(*) AS cnt FROM vehicle_images WHERE vehicle_id=$1', [vehicleId]
+      'SELECT COUNT(*)::int AS cnt, COALESCE(MAX(sort_order), -1)::int AS max FROM vehicle_images WHERE vehicle_id=$1', [vehicleId]
     );
-    let sortOrder = Number(existing[0].cnt);
+    const hasImages = existing[0].cnt > 0;
+    let sortOrder = existing[0].max + 1;
     const saved = [];
 
     for (const file of req.files) {
       const url    = await saveImage(file.buffer, `vehicles/${vehicleId}`);
-      const isMain = sortOrder === 0;
+      const isMain = !hasImages && saved.length === 0;
       const { rows: imgRows } = await pool.query(
         `INSERT INTO vehicle_images (vehicle_id, url, is_main, sort_order)
          VALUES ($1,$2,$3,$4) RETURNING *`,
@@ -194,6 +195,30 @@ router.patch('/image/:imageId/main', auth, async (req, res) => {
     await pool.query('UPDATE vehicle_images SET is_main=true  WHERE id=$1', [req.params.imageId]);
     res.json({ ok: true });
   } catch (err) { serverError(res, err); }
+});
+
+// PATCH /api/upload/vehicle/:id/order { ids: [...] } — зургийн дараалал. Эхний зураг нь үндсэн болно.
+router.patch('/vehicle/:id/order', auth, async (req, res) => {
+  const ids = Array.isArray(req.body.ids) ? req.body.ids.filter((x) => typeof x === 'string') : [];
+  if (!ids.length) return res.status(400).json({ error: 'Зургийн дараалал хоосон байна' });
+  const client = await pool.connect();
+  try {
+    const { rows: v } = await client.query('SELECT 1 FROM vehicles WHERE id=$1 AND company_id=$2', [req.params.id, req.user.company_id]);
+    if (!v.length) return res.status(404).json({ error: 'Машин олдсонгүй' });
+    const { rows: imgs } = await client.query('SELECT id FROM vehicle_images WHERE vehicle_id=$1', [req.params.id]);
+    const own = new Set(imgs.map((r) => r.id));
+    if (ids.length !== own.size || !ids.every((id) => own.has(id)))
+      return res.status(400).json({ error: 'Зургийн жагсаалт таарахгүй байна. Хуудсаа шинэчилнэ үү' });
+    await client.query('BEGIN');
+    for (const [i, id] of ids.entries())
+      await client.query('UPDATE vehicle_images SET sort_order=$1, is_main=$2 WHERE id=$3', [i, i === 0, id]);
+    await client.query('COMMIT');
+    res.json({ ok: true });
+  } catch (err) {
+    await client.query('ROLLBACK').catch(() => {});
+    if (err.code === '22P02') return res.status(404).json({ error: 'Машин олдсонгүй' });
+    serverError(res, err);
+  } finally { client.release(); }
 });
 
 router.deleteImage = deleteImage;

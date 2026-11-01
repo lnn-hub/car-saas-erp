@@ -90,6 +90,8 @@ function VehicleDetailContent() {
   const [showSale, setShowSale] = useState(false);
   const [msg, setMsg] = useState("");
   const [photoBusy, setPhotoBusy] = useState("");
+  const [dragId, setDragId] = useState<string | null>(null);
+  const [fileOver, setFileOver] = useState(false);
   const [editOpen, setEditOpen] = useState(false);
   const [editBusy, setEditBusy] = useState(false);
   const [edit, setEdit] = useState({
@@ -209,9 +211,23 @@ function VehicleDetailContent() {
     setMsg(failed ? `${failed} зураг оруулж чадсангүй` : "Зураг нэмэгдлээ");
     load();
   }
+  // Зургийн дараалал: эхний зураг нь үндсэн (сайт дээрх карт, hero)
+  async function saveOrder(ids: string[]) {
+    if (!vehicle) return;
+    const byId = new Map(vehicle.images.map((im) => [im.id, im]));
+    setVehicle({ ...vehicle, images: ids.map((x, i) => ({ ...byId.get(x)!, is_main: i === 0 })) });
+    try { await api.reorderImages(id, ids); }
+    catch (err: unknown) { setMsg(err instanceof Error ? err.message : "Алдаа"); load(); }
+  }
+  function moveImage(imageId: string, to: number) {
+    if (!vehicle) return;
+    const ids = vehicle.images.map((im) => im.id).filter((x) => x !== imageId);
+    ids.splice(Math.max(0, Math.min(to, ids.length)), 0, imageId);
+    saveOrder(ids);
+  }
   async function makeMain(imageId: string) {
-    try { await api.setMainImage(imageId); setMsg("Үндсэн зураг солигдлоо"); load(); }
-    catch (err: unknown) { setMsg(err instanceof Error ? err.message : "Алдаа"); }
+    moveImage(imageId, 0);
+    setMsg("Үндсэн зураг солигдлоо");
   }
   async function removePhoto(imageId: string) {
     if (!confirm("Энэ зургийг устгах уу?")) return;
@@ -284,7 +300,7 @@ function VehicleDetailContent() {
   const colorHex = COLORS.find((c) => c.value === vehicle.color)?.hex;
 
   return (
-    <div className="px-4 sm:px-8 py-5 sm:py-7 max-w-2xl mx-auto space-y-5">
+    <div className="px-4 sm:px-6 py-4 sm:py-6 max-w-6xl mx-auto w-full space-y-5">
       <button
         onClick={() => router.back()}
         className="flex items-center gap-1.5 py-2 pr-3 text-[#6f6a64] hover:text-[#1c1917] text-sm transition-colors"
@@ -295,7 +311,7 @@ function VehicleDetailContent() {
       {/* Header */}
       <div className="flex items-start justify-between">
         <div>
-          <h1 className="font-display text-2xl font-semibold tracking-[-0.02em] text-ink">
+          <h1 className="font-display text-2xl sm:text-[32px] font-semibold tracking-[-0.03em] text-ink leading-tight">
             {vehicle.brand} {vehicle.model}{" "}
             <span className="text-[#6f6a64] font-normal">{vehicle.year}</span>
           </h1>
@@ -342,49 +358,79 @@ function VehicleDetailContent() {
         </div>
       )}
 
+      <div className="grid grid-cols-1 lg:grid-cols-[minmax(0,1fr)_340px] gap-5 items-start">
+      <div className="space-y-5 min-w-0">
       {/* Gallery */}
-      <div className="bg-white ring-1 ring-ink/[0.06] rounded-2xl overflow-hidden">
-        <div className="px-4 py-3 border-b border-[#e6e0d8] flex items-center justify-between gap-3">
-          <span className="text-xs font-medium text-[#6f6a64]">
-            Зураг ({vehicle.images?.length || 0})
-          </span>
+      <div
+        className={`bg-white ring-1 rounded-[22px] overflow-hidden shadow-card transition-all ${fileOver ? "ring-2 ring-brand" : "ring-ink/[0.06]"}`}
+        onDragOver={(e) => { if (e.dataTransfer.types.includes("Files")) { e.preventDefault(); setFileOver(true); } }}
+        onDragLeave={() => setFileOver(false)}
+        onDrop={(e) => { if (e.dataTransfer.files.length) { e.preventDefault(); setFileOver(false); addPhotos(e.dataTransfer.files); } }}
+      >
+        <div className="px-5 py-4 border-b border-zinc-100 flex items-center justify-between gap-3">
           <div>
-            <input ref={photoRef} type="file" accept="image/*" multiple className="hidden"
-              onChange={(e) => addPhotos(e.target.files)} />
-            <button type="button" onClick={() => photoRef.current?.click()} disabled={!!photoBusy}
-              className="text-xs font-medium text-brand hover:text-brand-dark disabled:opacity-40 px-3 py-2 -mr-3">
-              {photoBusy || "+ Зураг нэмэх"}
-            </button>
+            <div className="font-display text-base font-semibold text-ink">Зураг ({vehicle.images?.length || 0})</div>
+            <div className="text-xs text-zinc-500 mt-0.5">Чирж дарааллыг солино. Эхний зураг нь сайт дээрх үндсэн зураг болно.</div>
           </div>
+          <input ref={photoRef} type="file" accept="image/*" multiple className="hidden" onChange={(e) => addPhotos(e.target.files)} />
+          <button type="button" onClick={() => photoRef.current?.click()} disabled={!!photoBusy}
+            className="shrink-0 h-10 px-4 rounded-full bg-ink hover:bg-brand disabled:opacity-50 text-white text-sm font-medium transition-colors">
+            {photoBusy || "+ Зураг нэмэх"}
+          </button>
         </div>
         {vehicle.images?.length ? (
-          <div className="p-3 grid grid-cols-2 sm:grid-cols-3 gap-3">
-            {vehicle.images.map((img) => (
-              <div key={img.id} className="group relative aspect-[4/3] rounded-md overflow-hidden border border-[#e6e0d8] bg-[#f3efe9]">
-                <img src={fileSrc(img.url)} alt="" className="w-full h-full object-cover" loading="lazy" />
-                {img.is_main && (
-                  <span className="absolute top-2 left-2 bg-brand text-white text-xs font-medium px-2 py-0.5 rounded-full">Үндсэн</span>
-                )}
-                <div className="absolute inset-x-0 bottom-0 flex gap-1 p-1.5 bg-gradient-to-t from-black/70 to-transparent opacity-100 sm:opacity-0 sm:group-hover:opacity-100 transition-opacity">
-                  {!img.is_main && (
-                    <button type="button" onClick={() => makeMain(img.id)}
-                      className="flex-1 bg-white/90 hover:bg-white text-[#111] text-xs font-bold py-2 rounded-sm">Үндсэн болгох</button>
+          <div className="p-3 sm:p-4 grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3">
+            {vehicle.images.map((img, i) => (
+              <div key={img.id}
+                draggable
+                onDragStart={(e) => { setDragId(img.id); e.dataTransfer.effectAllowed = "move"; e.dataTransfer.setData("text/plain", img.id); }}
+                onDragEnd={() => setDragId(null)}
+                onDragOver={(e) => { if (dragId) e.preventDefault(); }}
+                onDrop={(e) => { if (dragId && dragId !== img.id) { e.preventDefault(); e.stopPropagation(); moveImage(dragId, i); setDragId(null); } }}
+                className={`group relative aspect-[4/3] rounded-2xl overflow-hidden bg-zinc-100 cursor-grab active:cursor-grabbing transition-all ${dragId === img.id ? "opacity-40 scale-95" : ""} ${i === 0 ? "ring-2 ring-brand" : ""}`}>
+                <img src={fileSrc(img.url)} alt="" className="w-full h-full object-cover pointer-events-none" loading="lazy" />
+                <span className="absolute top-2 left-2 min-w-6 h-6 px-2 rounded-full bg-white/90 text-ink text-xs font-semibold flex items-center justify-center tabular-nums">
+                  {i === 0 ? "Үндсэн" : i + 1}
+                </span>
+                <div className="absolute inset-x-0 bottom-0 flex items-center gap-1 p-1.5 bg-gradient-to-t from-black/70 to-transparent opacity-100 sm:opacity-0 sm:group-hover:opacity-100 transition-opacity">
+                  <button type="button" onClick={() => moveImage(img.id, i - 1)} disabled={i === 0} aria-label="Өмнө гаргах"
+                    className="w-8 h-8 rounded-full bg-white/90 hover:bg-white text-ink disabled:opacity-30 flex items-center justify-center">
+                    <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2.2}><path d="M15 18l-6-6 6-6" /></svg>
+                  </button>
+                  <button type="button" onClick={() => moveImage(img.id, i + 1)} disabled={i === vehicle.images.length - 1} aria-label="Хойш шилжүүлэх"
+                    className="w-8 h-8 rounded-full bg-white/90 hover:bg-white text-ink disabled:opacity-30 flex items-center justify-center">
+                    <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2.2}><path d="M9 18l6-6-6-6" /></svg>
+                  </button>
+                  {i !== 0 && (
+                    <button type="button" onClick={() => makeMain(img.id)} aria-label="Үндсэн зураг болгох" title="Үндсэн зураг болгох"
+                      className="w-8 h-8 rounded-full bg-white/90 hover:bg-white text-ink flex items-center justify-center">
+                      <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinejoin="round"><path d="M12 3l2.7 5.6 6.1.9-4.4 4.3 1 6.1L12 17l-5.4 2.9 1-6.1-4.4-4.3 6.1-.9z" /></svg>
+                    </button>
                   )}
-                  <button type="button" onClick={() => removePhoto(img.id)}
-                    className="bg-white/90 hover:bg-brand hover:text-white text-brand text-xs font-bold px-3 py-2 rounded-full">Устгах</button>
+                  <button type="button" onClick={() => removePhoto(img.id)} aria-label="Устгах"
+                    className="ml-auto w-8 h-8 rounded-full bg-white/90 hover:bg-danger hover:text-white text-danger flex items-center justify-center">
+                    <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2}><path d="M3 6h18M8 6V4h8v2M19 6l-1 14H6L5 6" /></svg>
+                  </button>
                 </div>
               </div>
             ))}
+            <button type="button" onClick={() => photoRef.current?.click()}
+              className="aspect-[4/3] rounded-2xl border-2 border-dashed border-zinc-200 hover:border-brand hover:text-brand text-zinc-400 text-sm flex flex-col items-center justify-center gap-1 transition-colors">
+              <span className="text-2xl leading-none">+</span>Нэмэх
+            </button>
           </div>
         ) : (
-          <div className="text-center text-[#6f6a64] text-sm py-10">Зураг оруулаагүй байна</div>
+          <button type="button" onClick={() => photoRef.current?.click()}
+            className="m-4 w-[calc(100%-2rem)] py-12 rounded-2xl border-2 border-dashed border-zinc-200 hover:border-brand text-center text-zinc-500 text-sm transition-colors">
+            Зураг оруулаагүй байна. Энд дарж эсвэл файлаа чирж оруулна уу.
+          </button>
         )}
       </div>
 
       {/* Info grid */}
       <div className="bg-white ring-1 ring-ink/[0.06] rounded-2xl overflow-hidden">
         <div className="px-4 py-3 border-b border-[#e6e0d8]">
-          <span className="text-xs font-medium text-[#6f6a64]">
+          <span className="font-display text-base font-semibold text-ink">
             Мэдээлэл
           </span>
         </div>
@@ -415,7 +461,7 @@ function VehicleDetailContent() {
       {/* Edit info */}
       <div className="bg-white ring-1 ring-ink/[0.06] rounded-2xl overflow-hidden">
         <div className="px-4 py-3 border-b border-[#e6e0d8] flex items-center justify-between">
-          <span className="text-xs font-medium text-[#6f6a64]">Мэдээлэл засах</span>
+          <span className="font-display text-base font-semibold text-ink">Мэдээлэл засах</span>
           {!editOpen && (
             <button type="button" onClick={openEdit}
               className="text-xs font-medium text-brand hover:text-brand-dark px-3 py-2 -mr-3">Засах</button>
@@ -459,38 +505,12 @@ function VehicleDetailContent() {
         )}
       </div>
 
-      {/* Status change */}
-      {vehicle.status !== "SOLD" && (
-        <div className="bg-white ring-1 ring-ink/[0.06] rounded-2xl p-4">
-          <div className="text-xs font-medium text-[#6f6a64] mb-3">
-            Статус өөрчлөх
-          </div>
-          <div className="flex gap-2">
-            {STATUS_NEXT.map((s) => (
-              <button
-                key={s}
-                onClick={() => changeStatus(s)}
-                disabled={vehicle.status === s}
-                className={`inline-flex items-center gap-2 h-10 px-4 rounded-full text-sm font-medium transition-colors border ${
-                  vehicle.status === s
-                    ? "border-ink bg-ink text-white cursor-default"
-                    : "border-[#e6e0d8] bg-white text-[#5f5a54] hover:border-[#d4ccc2] hover:text-[#1c1917]"
-                }`}
-              >
-                <span className={`w-2 h-2 rounded-full ${STATUS[s]?.dot}`} />
-                {STATUS[s]?.label}
-              </button>
-            ))}
-          </div>
-        </div>
-      )}
-
       {/* Costs — зөвхөн өртөг харах эрхтэй хүнд */}
       {canSeeMoney && (
       <>
       <div className="bg-white ring-1 ring-ink/[0.06] rounded-2xl overflow-hidden">
         <div className="px-4 py-3 border-b border-[#e6e0d8] flex items-center justify-between">
-          <span className="text-xs font-medium text-[#6f6a64]">
+          <span className="font-display text-base font-semibold text-ink">
             Зардлууд
           </span>
           <span className="text-xs text-[#5f5a54]">
@@ -597,6 +617,34 @@ function VehicleDetailContent() {
       </>
       )}
 
+      </div>
+      <div className="space-y-5 lg:sticky lg:top-6">
+      {/* Status change */}
+      {vehicle.status !== "SOLD" && (
+        <div className="bg-white ring-1 ring-ink/[0.06] rounded-2xl p-4">
+          <div className="font-display text-base font-semibold text-ink mb-3">
+            Статус өөрчлөх
+          </div>
+          <div className="flex flex-wrap gap-2">
+            {STATUS_NEXT.map((s) => (
+              <button
+                key={s}
+                onClick={() => changeStatus(s)}
+                disabled={vehicle.status === s}
+                className={`inline-flex items-center gap-2 h-10 px-4 rounded-full text-sm font-medium transition-colors border ${
+                  vehicle.status === s
+                    ? "border-ink bg-ink text-white cursor-default"
+                    : "border-[#e6e0d8] bg-white text-[#5f5a54] hover:border-[#d4ccc2] hover:text-[#1c1917]"
+                }`}
+              >
+                <span className={`w-2 h-2 rounded-full ${STATUS[s]?.dot}`} />
+                {STATUS[s]?.label}
+              </button>
+            ))}
+          </div>
+        </div>
+      )}
+
       {/* Danger zone — зөвхөн админ */}
       {isAdmin && (
       <>
@@ -610,6 +658,9 @@ function VehicleDetailContent() {
       </div>
       </>
       )}
+
+      </div>
+      </div>
 
       {/* ── SALE MODAL ── */}
       {showSale && (

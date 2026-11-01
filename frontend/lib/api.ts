@@ -132,6 +132,10 @@ export const api = {
     invalidateCache('/vehicles');
     return data;
   },
+  reorderImages: (vehicleId: string, ids: string[]) => {
+    invalidateCache('/vehicles');
+    return request(`/upload/vehicle/${vehicleId}/order`, { method: 'PATCH', body: JSON.stringify({ ids }) });
+  },
   setMainImage: (imageId: string) => {
     invalidateCache('/vehicles');
     return request(`/upload/image/${imageId}/main`, { method: 'PATCH' });
