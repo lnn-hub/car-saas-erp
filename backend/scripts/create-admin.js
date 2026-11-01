@@ -13,7 +13,11 @@ if (!email || !password || password.length < 8) {
   await pool.query(
     `INSERT INTO users (name, email, password, role, is_active) VALUES ($1, lower($2), $3, 'ADMIN', TRUE)
      ON CONFLICT (email) DO UPDATE SET password = EXCLUDED.password, role = 'ADMIN', is_active = TRUE`,
-    [name, email, hash]);
+    [name, email, hash],
+  );
   console.log(`Админ бэлэн: ${email.toLowerCase()}`);
   await pool.end();
-})().catch((e) => { console.error(e.message); process.exit(1); });
+})().catch((e) => {
+  console.error(e.message);
+  process.exit(1);
+});

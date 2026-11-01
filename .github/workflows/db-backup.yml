@@ -8,7 +8,7 @@ name: DB backup
 
 on:
   schedule:
-    - cron: "0 18 * * 0" # Даваа гараг бүр 02:00 (Улаанбаатар)
+    - cron: '0 18 * * 0' # Даваа гараг бүр 02:00 (Улаанбаатар)
   workflow_dispatch: {}
 
 permissions:
@@ -50,6 +50,6 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: db-backup-${{ github.run_number }}
-          path: "*.sql.gz.gpg"
+          path: '*.sql.gz.gpg'
           retention-days: 90
           if-no-files-found: error

@@ -12,8 +12,11 @@ const INDEXES = [
 
 async function ensureIndexes() {
   for (const sql of INDEXES) {
-    try { await pool.query(sql); }
-    catch (err) { console.error('Индекс үүсгэхэд алдаа:', err.message); }
+    try {
+      await pool.query(sql);
+    } catch (err) {
+      console.error('Индекс үүсгэхэд алдаа:', err.message);
+    }
   }
 }
 
@@ -67,14 +70,14 @@ async function ensureSchema() {
   // Машины "зарын үнэ" (public) нь өртгөөс тусдаа талбар. Анх үүсэхэд нэг удаа өмнөх харагдаж байсан
   // үнийг (өртгийн нийлбэр) хуулж, сайтад үнэ алга болохоос сэргийлнэ. Админ дараа нь засна.
   const { rows: col } = await pool.query(
-    "SELECT 1 FROM information_schema.columns WHERE table_name='vehicles' AND column_name='price'"
+    "SELECT 1 FROM information_schema.columns WHERE table_name='vehicles' AND column_name='price'",
   );
   if (!col.length) {
     await pool.query('ALTER TABLE vehicles ADD COLUMN price NUMERIC(15,2)');
     await pool.query(
       `UPDATE vehicles v SET price = c.total
        FROM (SELECT vehicle_id, SUM(amount) AS total FROM vehicle_costs GROUP BY vehicle_id) c
-       WHERE c.vehicle_id = v.id AND c.total > 0`
+       WHERE c.vehicle_id = v.id AND c.total > 0`,
     );
   }
 }
@@ -86,21 +89,26 @@ const OLD_TENANT_TABLES = ['users', 'vehicles', 'customers', 'sales', 'leads', '
 async function dropTenancy() {
   const { rows } = await pool.query(
     `SELECT table_name, is_nullable FROM information_schema.columns
-     WHERE table_schema = 'public' AND column_name = 'company_id' AND table_name = ANY($1)`, [OLD_TENANT_TABLES]);
+     WHERE table_schema = 'public' AND column_name = 'company_id' AND table_name = ANY($1)`,
+    [OLD_TENANT_TABLES],
+  );
   if (!rows.some((r) => r.is_nullable === 'NO')) return;
   const client = await pool.connect();
   try {
     await client.query('BEGIN');
     const { rowCount } = await client.query(
       `UPDATE users SET is_active = FALSE
-       WHERE is_active AND company_id IS DISTINCT FROM (SELECT id FROM companies ORDER BY created_at ASC LIMIT 1)`);
+       WHERE is_active AND company_id IS DISTINCT FROM (SELECT id FROM companies ORDER BY created_at ASC LIMIT 1)`,
+    );
     if (rowCount) console.log(`Нэг компанит шилжилт: бусад компанийн ${rowCount} ажилтныг идэвхгүй болголоо`);
     for (const r of rows) await client.query(`ALTER TABLE ${r.table_name} ALTER COLUMN company_id DROP NOT NULL`);
     await client.query('COMMIT');
   } catch (err) {
     await client.query('ROLLBACK').catch(() => {});
     throw err;
-  } finally { client.release(); }
+  } finally {
+    client.release();
+  }
 }
 
 module.exports = async function run() {

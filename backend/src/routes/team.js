@@ -1,20 +1,21 @@
 const router = require('express').Router();
 const { serverError } = require('../utils/http');
-const pool   = require('../db/pool');
-const auth   = require('../middleware/auth');
+const pool = require('../db/pool');
+const auth = require('../middleware/auth');
 const { requireAdmin } = auth;
 
 router.use(auth);
-router.use((req, res, next) => req.method === 'GET' ? next() : requireAdmin(req, res, next));
+router.use((req, res, next) => (req.method === 'GET' ? next() : requireAdmin(req, res, next)));
 
 const FIELDS = 'id, name, position, bio, photo_url, sort_order';
 
 router.get('/', async (req, res) => {
   try {
-    const { rows } = await pool.query(
-      `SELECT ${FIELDS} FROM team_members ORDER BY sort_order, created_at`);
+    const { rows } = await pool.query(`SELECT ${FIELDS} FROM team_members ORDER BY sort_order, created_at`);
     res.json(rows);
-  } catch (err) { serverError(res, err); }
+  } catch (err) {
+    serverError(res, err);
+  }
 });
 
 router.post('/', async (req, res) => {
@@ -25,10 +26,12 @@ router.post('/', async (req, res) => {
       `INSERT INTO team_members (name, position, bio, sort_order)
        VALUES ($1,$2,$3,(SELECT COALESCE(MAX(sort_order),-1)+1 FROM team_members))
        RETURNING ${FIELDS}`,
-      [name.trim(), position || null, bio || null]
+      [name.trim(), position || null, bio || null],
     );
     res.status(201).json(rows[0]);
-  } catch (err) { serverError(res, err); }
+  } catch (err) {
+    serverError(res, err);
+  }
 });
 
 router.patch('/:id', async (req, res) => {
@@ -42,18 +45,22 @@ router.patch('/:id', async (req, res) => {
          bio      = COALESCE($3, bio)
        WHERE id=$4
        RETURNING ${FIELDS}`,
-      [name ? String(name).trim() : null, position ?? null, bio ?? null, req.params.id]
+      [name ? String(name).trim() : null, position ?? null, bio ?? null, req.params.id],
     );
     if (!rows[0]) return res.status(404).json({ error: 'Олдсонгүй' });
     res.json(rows[0]);
-  } catch (err) { serverError(res, err); }
+  } catch (err) {
+    serverError(res, err);
+  }
 });
 
 router.delete('/:id', async (req, res) => {
   try {
     await pool.query('DELETE FROM team_members WHERE id=$1', [req.params.id]);
     res.json({ ok: true });
-  } catch (err) { serverError(res, err); }
+  } catch (err) {
+    serverError(res, err);
+  }
 });
 
 module.exports = router;

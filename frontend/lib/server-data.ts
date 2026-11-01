@@ -1,7 +1,7 @@
-import { cacheLife } from "next/cache";
-import { type SiteInitial, type VehicleDetail } from "./site";
+import { cacheLife } from 'next/cache';
+import { type SiteInitial, type VehicleDetail } from './site';
 
-const API = process.env.NEXT_PUBLIC_API_URL || "http://localhost:4000";
+const API = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000';
 
 async function getJson(path: string) {
   // Render унтсан үед сэрэх хугацааг (~30с) тэсвэрлэнэ
@@ -13,7 +13,7 @@ async function getJson(path: string) {
 // Нийтийн сайтын өгөгдөл: Vercel дээр кэшлэгдэнэ, 1 минутад арын фонд шинэчлэгдэнэ.
 // Render унтсан үед ч хэрэглэгч кэшлэгдсэн хуудсыг шууд авна.
 export async function getSiteData(): Promise<SiteInitial | null> {
-  "use cache";
+  'use cache';
   let data: SiteInitial | null = null;
   try {
     const [company, vehicles, team] = await Promise.all([
@@ -36,7 +36,7 @@ export async function getSiteData(): Promise<SiteInitial | null> {
 }
 
 export async function getVehicle(id: string): Promise<VehicleDetail | null> {
-  "use cache";
+  'use cache';
   let data: VehicleDetail | null = null;
   try {
     const v = await getJson(`/api/public/vehicles/${encodeURIComponent(id)}`);

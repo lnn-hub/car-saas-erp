@@ -1,12 +1,12 @@
-const router     = require('express').Router();
+const router = require('express').Router();
 const { serverError } = require('../utils/http');
-const multer     = require('multer');
-const sharp      = require('sharp');
-const path       = require('path');
-const fs         = require('fs');
+const multer = require('multer');
+const sharp = require('sharp');
+const path = require('path');
+const fs = require('fs');
 const { v2: cloudinary } = require('cloudinary');
-const pool       = require('../db/pool');
-const auth       = require('../middleware/auth');
+const pool = require('../db/pool');
+const auth = require('../middleware/auth');
 const { requireAdmin } = auth;
 const { COMPANY_ROW, getCompany } = require('../db/company');
 
@@ -20,7 +20,7 @@ const USE_CLOUDINARY = !!(
 if (USE_CLOUDINARY) {
   cloudinary.config({
     cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
-    api_key:    process.env.CLOUDINARY_API_KEY,
+    api_key: process.env.CLOUDINARY_API_KEY,
     api_secret: process.env.CLOUDINARY_API_SECRET,
   });
 }
@@ -49,13 +49,12 @@ async function saveImage(buffer, folder) {
       .toBuffer();
 
     return new Promise((resolve, reject) => {
-      cloudinary.uploader.upload_stream(
-        { folder: `car-saas/${folder}`, resource_type: 'image', format: 'webp' },
-        (err, result) => {
+      cloudinary.uploader
+        .upload_stream({ folder: `car-saas/${folder}`, resource_type: 'image', format: 'webp' }, (err, result) => {
           if (err) reject(err);
           else resolve(result.secure_url);
-        }
-      ).end(webpBuf);
+        })
+        .end(webpBuf);
     });
   } else {
     // Local файл системд хадгалах
@@ -74,7 +73,9 @@ async function deleteImage(url) {
     // public_id: "car-saas/vehicles/<id>/<filename>" — extension-гүй
     const match = url.match(/\/upload\/(?:v\d+\/)?(.+?)(?:\.\w+)?$/);
     if (match) {
-      try { await cloudinary.uploader.destroy(match[1]); } catch (_) {}
+      try {
+        await cloudinary.uploader.destroy(match[1]);
+      } catch (_) {}
     }
   } else if (!USE_CLOUDINARY) {
     const filepath = path.join(UPLOAD_DIR, path.basename(url));
@@ -90,24 +91,27 @@ router.post('/vehicle/:id', auth, upload.array('images', 20), async (req, res) =
     if (!rows[0]) return res.status(404).json({ error: 'Машин олдсонгүй' });
 
     const { rows: existing } = await pool.query(
-      'SELECT COUNT(*)::int AS cnt, COALESCE(MAX(sort_order), -1)::int AS max FROM vehicle_images WHERE vehicle_id=$1', [vehicleId]
+      'SELECT COUNT(*)::int AS cnt, COALESCE(MAX(sort_order), -1)::int AS max FROM vehicle_images WHERE vehicle_id=$1',
+      [vehicleId],
     );
     const hasImages = existing[0].cnt > 0;
     let sortOrder = existing[0].max + 1;
     const saved = [];
 
     for (const file of req.files) {
-      const url    = await saveImage(file.buffer, `vehicles/${vehicleId}`);
+      const url = await saveImage(file.buffer, `vehicles/${vehicleId}`);
       const isMain = !hasImages && saved.length === 0;
       const { rows: imgRows } = await pool.query(
         `INSERT INTO vehicle_images (vehicle_id, url, is_main, sort_order)
          VALUES ($1,$2,$3,$4) RETURNING *`,
-        [vehicleId, url, isMain, sortOrder++]
+        [vehicleId, url, isMain, sortOrder++],
       );
       saved.push(imgRows[0]);
     }
     res.json(saved);
-  } catch (err) { serverError(res, err); }
+  } catch (err) {
+    serverError(res, err);
+  }
 });
 
 // POST /api/upload/team/:id  (гишүүний зураг)
@@ -121,10 +125,12 @@ router.post('/team/:id', auth, requireAdmin, upload.single('photo'), async (req,
     if (rows[0].photo_url) await deleteImage(rows[0].photo_url);
     const { rows: upd } = await pool.query(
       'UPDATE team_members SET photo_url=$1 WHERE id=$2 RETURNING id, name, position, bio, photo_url, sort_order',
-      [url, req.params.id]
+      [url, req.params.id],
     );
     res.json(upd[0]);
-  } catch (err) { serverError(res, err); }
+  } catch (err) {
+    serverError(res, err);
+  }
 });
 
 // POST /api/upload/logo  (компанийн лого)
@@ -136,7 +142,9 @@ router.post('/logo', auth, requireAdmin, upload.single('logo'), async (req, res)
     if (company?.logo_url) await deleteImage(company.logo_url);
     await pool.query(`UPDATE companies SET logo_url=$1 WHERE id = ${COMPANY_ROW}`, [url]);
     res.json({ logo_url: url });
-  } catch (err) { serverError(res, err); }
+  } catch (err) {
+    serverError(res, err);
+  }
 });
 
 // DELETE /api/upload/logo
@@ -146,7 +154,9 @@ router.delete('/logo', auth, requireAdmin, async (req, res) => {
     if (company?.logo_url) await deleteImage(company.logo_url);
     await pool.query(`UPDATE companies SET logo_url=NULL WHERE id = ${COMPANY_ROW}`);
     res.json({ ok: true });
-  } catch (err) { serverError(res, err); }
+  } catch (err) {
+    serverError(res, err);
+  }
 });
 
 // DELETE /api/upload/image/:imageId
@@ -162,11 +172,13 @@ router.delete('/image/:imageId', auth, async (req, res) => {
       await pool.query(
         `UPDATE vehicle_images SET is_main=true
          WHERE id = (SELECT id FROM vehicle_images WHERE vehicle_id=$1 ORDER BY sort_order LIMIT 1)`,
-        [rows[0].vehicle_id]
+        [rows[0].vehicle_id],
       );
     }
     res.json({ ok: true });
-  } catch (err) { serverError(res, err); }
+  } catch (err) {
+    serverError(res, err);
+  }
 });
 
 // PATCH /api/upload/vehicle/:id/order { ids: [...] } — зургийн дараалал. Эхний зураг нь үндсэн болно.
@@ -190,7 +202,9 @@ router.patch('/vehicle/:id/order', auth, async (req, res) => {
     await client.query('ROLLBACK').catch(() => {});
     if (err.code === '22P02') return res.status(404).json({ error: 'Машин олдсонгүй' });
     serverError(res, err);
-  } finally { client.release(); }
+  } finally {
+    client.release();
+  }
 });
 
 router.deleteImage = deleteImage;

@@ -1,8 +1,8 @@
-import { Suspense } from "react";
-import type { Metadata } from "next";
-import VehicleClient from "./VehicleClient";
-import { getVehicle } from "@/lib/server-data";
-import { optimizeImg } from "@/lib/site";
+import { Suspense } from 'react';
+import type { Metadata } from 'next';
+import VehicleClient from './VehicleClient';
+import { getVehicle } from '@/lib/server-data';
+import { optimizeImg } from '@/lib/site';
 
 type Props = { params: Promise<{ id: string }> };
 
@@ -23,15 +23,19 @@ export default function Page({ params }: Props) {
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { id } = await params;
   const v = await getVehicle(id);
-  if (!v) return { title: "Машин" };
+  if (!v) return { title: 'Машин' };
   const name = `${v.year} ${v.brand} ${v.model}`;
-  const price = Number(v.price) > 0 ? `${Number(v.price).toLocaleString("en-US")}₮ · ` : "";
-  const description = `${price}${v.mileage ? `${Number(v.mileage).toLocaleString("en-US")} км · ` : ""}${v.color || ""}`.replace(/ · $/, "");
+  const price = Number(v.price) > 0 ? `${Number(v.price).toLocaleString('en-US')}₮ · ` : '';
+  const description =
+    `${price}${v.mileage ? `${Number(v.mileage).toLocaleString('en-US')} км · ` : ''}${v.color || ''}`.replace(
+      / · $/,
+      '',
+    );
   const image = optimizeImg(v.images?.[0] ?? null, 1200);
   return {
     title: name,
     description,
     openGraph: { title: name, description, ...(image ? { images: [{ url: image, width: 1200 }] } : {}) },
-    twitter: { card: "summary_large_image", title: name, description, ...(image ? { images: [image] } : {}) },
+    twitter: { card: 'summary_large_image', title: name, description, ...(image ? { images: [image] } : {}) },
   };
 }

@@ -21,7 +21,7 @@ router.get('/', auth, async (req, res) => {
        LEFT JOIN (
          SELECT vehicle_id, SUM(amount) AS total_cost FROM vehicle_costs GROUP BY vehicle_id
        ) costs ON costs.vehicle_id = s.vehicle_id
-       ORDER BY s.sold_at DESC`
+       ORDER BY s.sold_at DESC`,
     );
     res.json(canSeeMoney(req.user) ? rows : rows.map(({ total_cost, net_profit, ...r }) => r));
   } catch (err) {
@@ -43,24 +43,31 @@ router.post('/', auth, async (req, res) => {
     await client.query('BEGIN');
 
     // Машин, үйлчлүүлэгч байгаа эсэхийг шалгаж, машиныг түгжинэ
-    const { rows: [vehicle] } = await client.query(
-      'SELECT id, status FROM vehicles WHERE id=$1 FOR UPDATE', [vehicle_id]);
-    if (!vehicle) { await client.query('ROLLBACK'); return res.status(404).json({ error: 'Машин олдсонгүй' }); }
-    if (vehicle.status === 'SOLD') { await client.query('ROLLBACK'); return res.status(409).json({ error: 'Энэ машин аль хэдийн зарагдсан байна' }); }
+    const {
+      rows: [vehicle],
+    } = await client.query('SELECT id, status FROM vehicles WHERE id=$1 FOR UPDATE', [vehicle_id]);
+    if (!vehicle) {
+      await client.query('ROLLBACK');
+      return res.status(404).json({ error: 'Машин олдсонгүй' });
+    }
+    if (vehicle.status === 'SOLD') {
+      await client.query('ROLLBACK');
+      return res.status(409).json({ error: 'Энэ машин аль хэдийн зарагдсан байна' });
+    }
 
     const cust = await client.query('SELECT 1 FROM customers WHERE id=$1', [customer_id]);
-    if (!cust.rowCount) { await client.query('ROLLBACK'); return res.status(404).json({ error: 'Үйлчлүүлэгч олдсонгүй' }); }
+    if (!cust.rowCount) {
+      await client.query('ROLLBACK');
+      return res.status(404).json({ error: 'Үйлчлүүлэгч олдсонгүй' });
+    }
 
     const { rows } = await client.query(
       `INSERT INTO sales (vehicle_id, customer_id, sold_by, sale_price, payment_type, note)
        VALUES ($1,$2,$3,$4,$5,$6) RETURNING *`,
-      [vehicle_id, customer_id, req.user.id, price, payment_type || 'CASH', note]
+      [vehicle_id, customer_id, req.user.id, price, payment_type || 'CASH', note],
     );
 
-    await client.query(
-      `UPDATE vehicles SET status = 'SOLD', updated_at = NOW() WHERE id = $1`,
-      [vehicle_id]
-    );
+    await client.query(`UPDATE vehicles SET status = 'SOLD', updated_at = NOW() WHERE id = $1`, [vehicle_id]);
 
     await client.query('COMMIT');
     res.status(201).json(rows[0]);
@@ -87,7 +94,7 @@ router.get('/summary', auth, async (req, res) => {
          -- Тайлантай адил: зөвхөн төгрөгийн зардал
          SELECT vehicle_id, SUM(amount) FILTER (WHERE COALESCE(currency, 'MNT') = 'MNT') AS total_cost
          FROM vehicle_costs GROUP BY vehicle_id
-       ) costs ON costs.vehicle_id = s.vehicle_id`
+       ) costs ON costs.vehicle_id = s.vehicle_id`,
     );
     const r = rows[0];
     res.json(canSeeMoney(req.user) ? r : { total_sold: r.total_sold, total_revenue: r.total_revenue });

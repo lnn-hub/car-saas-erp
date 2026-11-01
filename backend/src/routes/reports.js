@@ -24,7 +24,8 @@ function addMonths(ym, n) {
 const num = (x) => Number(x) || 0;
 
 async function monthSummary(ym) {
-  const start = monthStart(ym), end = monthStart(addMonths(ym, 1));
+  const start = monthStart(ym),
+    end = monthStart(addMonths(ym, 1));
   const [sold, arrived, stock] = await Promise.all([
     pool.query(
       `WITH ${MNT_COSTS}
@@ -33,29 +34,44 @@ async function monthSummary(ym) {
               COALESCE(AVG(s.sold_at::date - ${ARRIVED}), 0) AS avg_days
        FROM sales s JOIN vehicles v ON v.id = s.vehicle_id
        LEFT JOIN costs c ON c.vehicle_id = v.id
-       WHERE s.sold_at >= $1 AND s.sold_at < $2`, [start, end]),
+       WHERE s.sold_at >= $1 AND s.sold_at < $2`,
+      [start, end],
+    ),
     pool.query(
       `WITH ${MNT_COSTS}
        SELECT COUNT(*) AS count, COALESCE(SUM(COALESCE(c.cost, 0)), 0) AS cost
        FROM vehicles v LEFT JOIN costs c ON c.vehicle_id = v.id
-       WHERE ${ARRIVED} >= $1 AND ${ARRIVED} < $2`, [start, end]),
+       WHERE ${ARRIVED} >= $1 AND ${ARRIVED} < $2`,
+      [start, end],
+    ),
     // Сарын эцэст агуулахад байсан: тэр сарын төгсгөлөөс өмнө ирсэн, тэр үед зарагдаагүй
     pool.query(
       `WITH ${MNT_COSTS}
        SELECT COUNT(*) AS count, COALESCE(SUM(COALESCE(c.cost, 0)), 0) AS value
        FROM vehicles v LEFT JOIN costs c ON c.vehicle_id = v.id
        LEFT JOIN sales s ON s.vehicle_id = v.id
-       WHERE ${ARRIVED} < $1 AND (s.id IS NULL OR s.sold_at >= $1)`, [end]),
+       WHERE ${ARRIVED} < $1 AND (s.id IS NULL OR s.sold_at >= $1)`,
+      [end],
+    ),
   ]);
-  const so = sold.rows[0], ar = arrived.rows[0], st = stock.rows[0];
-  const revenue = num(so.revenue), cost = num(so.cost), profit = revenue - cost;
+  const so = sold.rows[0],
+    ar = arrived.rows[0],
+    st = stock.rows[0];
+  const revenue = num(so.revenue),
+    cost = num(so.cost),
+    profit = revenue - cost;
   return {
     month: ym,
-    sold: num(so.count), revenue, cost, profit,
+    sold: num(so.count),
+    revenue,
+    cost,
+    profit,
     margin: revenue > 0 ? (profit / revenue) * 100 : 0,
     avg_days_to_sell: Math.round(num(so.avg_days)),
-    arrived: num(ar.count), arrived_cost: num(ar.cost),
-    stock_count: num(st.count), stock_value: num(st.value),
+    arrived: num(ar.count),
+    arrived_cost: num(ar.cost),
+    stock_count: num(st.count),
+    stock_value: num(st.value),
   };
 }
 
@@ -63,7 +79,8 @@ async function monthSummary(ym) {
 router.get('/month', async (req, res) => {
   const ym = /^\d{4}-(0[1-9]|1[0-2])$/.test(req.query.month || '') ? req.query.month : null;
   if (!ym) return res.status(400).json({ error: 'Сарыг YYYY-MM хэлбэрээр өгнө үү' });
-  const start = monthStart(ym), end = monthStart(addMonths(ym, 1));
+  const start = monthStart(ym),
+    end = monthStart(addMonths(ym, 1));
   try {
     const [summary, prev, soldRows, arrivedRows, expenses] = await Promise.all([
       monthSummary(ym),
@@ -82,7 +99,9 @@ router.get('/month', async (req, res) => {
          LEFT JOIN customers cu ON cu.id = s.customer_id
          LEFT JOIN users u ON u.id = s.sold_by
          WHERE s.sold_at >= $1 AND s.sold_at < $2
-         ORDER BY s.sold_at`, [start, end]),
+         ORDER BY s.sold_at`,
+        [start, end],
+      ),
       pool.query(
         `WITH ${MNT_COSTS}
          SELECT v.id, v.brand, v.model, v.year, v.status, v.price,
@@ -90,34 +109,50 @@ router.get('/month', async (req, res) => {
                 COALESCE(c.cost, 0) AS cost, COALESCE(c.other_ccy, FALSE) AS other_ccy
          FROM vehicles v LEFT JOIN costs c ON c.vehicle_id = v.id
          WHERE ${ARRIVED} >= $1 AND ${ARRIVED} < $2
-         ORDER BY ${ARRIVED}`, [start, end]),
+         ORDER BY ${ARRIVED}`,
+        [start, end],
+      ),
       // Энэ сард бүртгэгдсэн зардал, төрлөөр
       pool.query(
         `SELECT vc.cost_type, COALESCE(vc.currency, 'MNT') AS currency, COUNT(*) AS count, SUM(vc.amount) AS amount
          FROM vehicle_costs vc JOIN vehicles v ON v.id = vc.vehicle_id
          WHERE vc.created_at >= $1 AND vc.created_at < $2
          GROUP BY vc.cost_type, COALESCE(vc.currency, 'MNT')
-         ORDER BY SUM(vc.amount) DESC`, [start, end]),
+         ORDER BY SUM(vc.amount) DESC`,
+        [start, end],
+      ),
     ]);
 
     const sold = soldRows.rows;
-    const group = (key) => Object.values(sold.reduce((m, r) => {
-      const k = r[key] || '-';
-      const g = (m[k] ||= { key: k, count: 0, revenue: 0, profit: 0 });
-      g.count++; g.revenue += num(r.sale_price); g.profit += num(r.profit);
-      return m;
-    }, {})).sort((a, b) => b.revenue - a.revenue);
+    const group = (key) =>
+      Object.values(
+        sold.reduce((m, r) => {
+          const k = r[key] || '-';
+          const g = (m[k] ||= { key: k, count: 0, revenue: 0, profit: 0 });
+          g.count++;
+          g.revenue += num(r.sale_price);
+          g.profit += num(r.profit);
+          return m;
+        }, {}),
+      ).sort((a, b) => b.revenue - a.revenue);
 
     res.json({
-      month: ym, summary, prev,
-      sold, arrived: arrivedRows.rows,
+      month: ym,
+      summary,
+      prev,
+      sold,
+      arrived: arrivedRows.rows,
       by_payment: group('payment_type'),
       by_brand: group('brand'),
-      expenses: expenses.rows.map(r => ({ ...r, count: num(r.count), amount: num(r.amount) })),
-      has_other_currency: sold.some(r => r.other_ccy) || arrivedRows.rows.some(r => r.other_ccy)
-        || expenses.rows.some(r => r.currency !== 'MNT'),
+      expenses: expenses.rows.map((r) => ({ ...r, count: num(r.count), amount: num(r.amount) })),
+      has_other_currency:
+        sold.some((r) => r.other_ccy) ||
+        arrivedRows.rows.some((r) => r.other_ccy) ||
+        expenses.rows.some((r) => r.currency !== 'MNT'),
     });
-  } catch (err) { serverError(res, err); }
+  } catch (err) {
+    serverError(res, err);
+  }
 });
 
 // GET /api/reports/year?year=YYYY — 12 сар, сар бүрээр
@@ -132,22 +167,35 @@ router.get('/year', async (req, res) => {
                 SUM(s.sale_price) AS revenue, SUM(s.sale_price - COALESCE(c.cost, 0)) AS profit
          FROM sales s LEFT JOIN costs c ON c.vehicle_id = s.vehicle_id
          WHERE s.sold_at >= $1 AND s.sold_at < $2
-         GROUP BY 1`, [`${y}-01-01`, `${y + 1}-01-01`]),
+         GROUP BY 1`,
+        [`${y}-01-01`, `${y + 1}-01-01`],
+      ),
       pool.query(
         `SELECT to_char(${ARRIVED}, 'YYYY-MM') AS month, COUNT(*) AS arrived
          FROM vehicles v WHERE ${ARRIVED} >= $1 AND ${ARRIVED} < $2
-         GROUP BY 1`, [`${y}-01-01`, `${y + 1}-01-01`]),
+         GROUP BY 1`,
+        [`${y}-01-01`, `${y + 1}-01-01`],
+      ),
     ]);
     const months = Array.from({ length: 12 }, (_, i) => {
       const k = `${y}-${String(i + 1).padStart(2, '0')}`;
-      const s = sales.rows.find(r => r.month === k) || {};
-      const a = arrived.rows.find(r => r.month === k) || {};
+      const s = sales.rows.find((r) => r.month === k) || {};
+      const a = arrived.rows.find((r) => r.month === k) || {};
       return { month: k, sold: num(s.sold), revenue: num(s.revenue), profit: num(s.profit), arrived: num(a.arrived) };
     });
-    const total = months.reduce((t, m) => ({ sold: t.sold + m.sold, revenue: t.revenue + m.revenue, profit: t.profit + m.profit, arrived: t.arrived + m.arrived }),
-      { sold: 0, revenue: 0, profit: 0, arrived: 0 });
+    const total = months.reduce(
+      (t, m) => ({
+        sold: t.sold + m.sold,
+        revenue: t.revenue + m.revenue,
+        profit: t.profit + m.profit,
+        arrived: t.arrived + m.arrived,
+      }),
+      { sold: 0, revenue: 0, profit: 0, arrived: 0 },
+    );
     res.json({ year: y, months, total });
-  } catch (err) { serverError(res, err); }
+  } catch (err) {
+    serverError(res, err);
+  }
 });
 
 module.exports = router;

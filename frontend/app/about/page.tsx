@@ -1,9 +1,9 @@
-import { Suspense } from "react";
-import type { Metadata } from "next";
-import AboutClient from "./AboutClient";
-import { getSiteData } from "@/lib/server-data";
+import { Suspense } from 'react';
+import type { Metadata } from 'next';
+import AboutClient from './AboutClient';
+import { getSiteData } from '@/lib/server-data';
 
-export const metadata: Metadata = { title: "Бидний тухай" };
+export const metadata: Metadata = { title: 'Бидний тухай' };
 
 async function About() {
   const initial = await getSiteData();

@@ -8,49 +8,84 @@ import { useToday } from '@/lib/client-state';
 import { Combobox } from '@/components/Combobox';
 
 const BACKEND = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000';
-const inp = "w-full bg-white border border-[#e6e0d8] rounded-xl px-3.5 py-2.5 text-sm text-[#1c1917] placeholder-[#6f6a64] focus:outline-none focus:border-brand transition-colors pr-8";
+const inp =
+  'w-full bg-white border border-[#e6e0d8] rounded-xl px-3.5 py-2.5 text-sm text-[#1c1917] placeholder-[#6f6a64] focus:outline-none focus:border-brand transition-colors pr-8';
 
 const CURRENT_YEAR = new Date().getFullYear();
 const YEARS = Array.from({ length: CURRENT_YEAR - 1989 }, (_, i) => String(CURRENT_YEAR - i));
 const BRANDS = Object.keys(BRANDS_MODELS).sort();
-const ENGINE_OPTIONS = ['1000','1200','1300','1400','1500','1600','1800','2000','2200','2400','2500','2700','3000','3500','4000','4500','5000']
-  .map(cc => `${(Number(cc)/1000).toFixed(1)}L`);
+const ENGINE_OPTIONS = [
+  '1000',
+  '1200',
+  '1300',
+  '1400',
+  '1500',
+  '1600',
+  '1800',
+  '2000',
+  '2200',
+  '2400',
+  '2500',
+  '2700',
+  '3000',
+  '3500',
+  '4000',
+  '4500',
+  '5000',
+].map((cc) => `${(Number(cc) / 1000).toFixed(1)}L`);
 
-interface ImageItem { file: File; preview: string; uploading: boolean; url: string | null; id: string | null; }
+interface ImageItem {
+  file: File;
+  preview: string;
+  uploading: boolean;
+  url: string | null;
+  id: string | null;
+}
 
 export default function NewVehiclePage() {
   const router = useRouter();
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const [form, setForm] = useState({
-    vin: '', brand: '', model: '', year: String(CURRENT_YEAR),
-    mileage: '', color: '', fuel_type: 'PETROL', transmission: 'AUTO',
-    engine_cc: '', description: '', arrived_at: null as string | null, // null = өнөөдөр
-    manufactured_date: '', has_plates: false, price: '',
+    vin: '',
+    brand: '',
+    model: '',
+    year: String(CURRENT_YEAR),
+    mileage: '',
+    color: '',
+    fuel_type: 'PETROL',
+    transmission: 'AUTO',
+    engine_cc: '',
+    description: '',
+    arrived_at: null as string | null, // null = өнөөдөр
+    manufactured_date: '',
+    has_plates: false,
+    price: '',
   });
-  const [models, setModels]   = useState<string[]>([]);
-  const [images, setImages]     = useState<ImageItem[]>([]);
-  const [error, setError]       = useState('');
-  const [loading, setLoading]   = useState(false);
+  const [models, setModels] = useState<string[]>([]);
+  const [images, setImages] = useState<ImageItem[]>([]);
+  const [error, setError] = useState('');
+  const [loading, setLoading] = useState(false);
   const [uploadDone, setUpDone] = useState(0);
   const [vehicleId, setVehicleId] = useState<string | null>(null);
-  const [step, setStep]       = useState<'form' | 'images'>('form');
-  const [dragOver, setDrag]   = useState(false);
+  const [step, setStep] = useState<'form' | 'images'>('form');
+  const [dragOver, setDrag] = useState(false);
 
   const today = useToday();
   const arrivedAt = form.arrived_at ?? today;
 
   function set(field: string, value: string | boolean) {
-    setForm(prev => ({ ...prev, [field]: value }));
+    setForm((prev) => ({ ...prev, [field]: value }));
     if (field === 'brand') {
       setModels(BRANDS_MODELS[value as string] || []);
-      setForm(prev => ({ ...prev, brand: value as string, model: '' }));
+      setForm((prev) => ({ ...prev, brand: value as string, model: '' }));
     }
   }
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
-    setLoading(true); setError('');
+    setLoading(true);
+    setError('');
     try {
       const payload = {
         ...form,
@@ -65,36 +100,49 @@ export default function NewVehiclePage() {
       setStep('images');
     } catch (err: unknown) {
       setError(err instanceof Error ? err.message : 'Алдаа гарлаа');
-    } finally { setLoading(false); }
+    } finally {
+      setLoading(false);
+    }
   }
 
   function addFiles(files: FileList | null) {
     if (!files) return;
-    const newImgs: ImageItem[] = Array.from(files).map(file => ({
-      file, preview: URL.createObjectURL(file),
-      uploading: false, url: null, id: null,
+    const newImgs: ImageItem[] = Array.from(files).map((file) => ({
+      file,
+      preview: URL.createObjectURL(file),
+      uploading: false,
+      url: null,
+      id: null,
     }));
-    setImages(prev => [...prev, ...newImgs]);
+    setImages((prev) => [...prev, ...newImgs]);
   }
 
   async function uploadAll() {
-    if (!vehicleId || images.length === 0) { router.push('/vehicles'); return; }
+    if (!vehicleId || images.length === 0) {
+      router.push('/vehicles');
+      return;
+    }
     const token = localStorage.getItem('token') || '';
-    const toUpload = images.filter(img => !img.url);
-    if (toUpload.length === 0) { router.push(`/vehicles/${vehicleId}`); return; }
+    const toUpload = images.filter((img) => !img.url);
+    if (toUpload.length === 0) {
+      router.push(`/vehicles/${vehicleId}`);
+      return;
+    }
 
     setUpDone(0);
-    setImages(prev => prev.map(img => img.url ? img : { ...img, uploading: true }));
+    setImages((prev) => prev.map((img) => (img.url ? img : { ...img, uploading: true })));
 
     // Нэг нэгээр upload хийж progress харуулна
     let done = 0;
-    const results: Array<{url: string; id: string} | null> = [];
+    const results: Array<{ url: string; id: string } | null> = [];
     for (const img of toUpload) {
       try {
         const formData = new FormData();
         formData.append('images', img.file);
         const res = await fetch(`${BACKEND}/api/upload/vehicle/${vehicleId}`, {
-          method: 'POST', headers: { Authorization: `Bearer ${token}` }, body: formData,
+          method: 'POST',
+          headers: { Authorization: `Bearer ${token}` },
+          body: formData,
         });
         const saved = await res.json();
         if (!res.ok) throw new Error(saved.error || 'Upload алдаа');
@@ -106,22 +154,22 @@ export default function NewVehiclePage() {
       setUpDone(done);
     }
 
-    setImages(prev => {
+    setImages((prev) => {
       let si = 0;
-      return prev.map(img => {
+      return prev.map((img) => {
         if (img.url) return img;
         const s = results[si++];
         return s ? { ...img, uploading: false, url: s.url, id: s.id } : { ...img, uploading: false };
       });
     });
 
-    const failed = results.filter(r => !r).length;
+    const failed = results.filter((r) => !r).length;
     if (failed > 0) setError(`${failed} зураг upload хийгдсэнгүй`);
     else router.push(`/vehicles/${vehicleId}`);
   }
 
   function removeImage(idx: number) {
-    setImages(prev => {
+    setImages((prev) => {
       const img = prev[idx];
       URL.revokeObjectURL(img.preview);
       return prev.filter((_, i) => i !== idx);
@@ -139,16 +187,40 @@ export default function NewVehiclePage() {
 
         {/* Drop zone */}
         <div
-          onDragOver={e => { e.preventDefault(); setDrag(true); }}
+          onDragOver={(e) => {
+            e.preventDefault();
+            setDrag(true);
+          }}
           onDragLeave={() => setDrag(false)}
-          onDrop={e => { e.preventDefault(); setDrag(false); addFiles(e.dataTransfer.files); }}
+          onDrop={(e) => {
+            e.preventDefault();
+            setDrag(false);
+            addFiles(e.dataTransfer.files);
+          }}
           onClick={() => fileInputRef.current?.click()}
           className={`border-2 border-dashed rounded-2xl p-10 text-center cursor-pointer transition-all mb-5 ${
             dragOver ? 'border-brand bg-[#faf8f5]' : 'border-[#e6e0d8] hover:border-[#d4ccc2] hover:bg-[#faf8f5]'
-          }`}>
-          <input ref={fileInputRef} type="file" multiple accept="image/*" className="hidden"
-            onChange={e => addFiles(e.target.files)} />
-          <svg className="w-10 h-10 text-[#d4ccc2] mx-auto mb-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.5}><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+          }`}
+        >
+          <input
+            ref={fileInputRef}
+            type="file"
+            multiple
+            accept="image/*"
+            className="hidden"
+            onChange={(e) => addFiles(e.target.files)}
+          />
+          <svg
+            className="w-10 h-10 text-[#d4ccc2] mx-auto mb-3"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth={1.5}
+          >
+            <rect x="3" y="3" width="18" height="18" rx="2" />
+            <circle cx="8.5" cy="8.5" r="1.5" />
+            <polyline points="21 15 16 10 5 21" />
+          </svg>
           <p className="text-sm font-medium text-[#1c1917]">Зураг сонгох эсвэл чирж оруулах</p>
           <p className="text-xs text-[#6f6a64] mt-1">JPG, PNG, WebP • Дээд тал нь 20MB</p>
         </div>
@@ -170,35 +242,64 @@ export default function NewVehiclePage() {
                   </div>
                 )}
                 {!img.uploading && (
-                  <button type="button"
+                  <button
+                    type="button"
                     onClick={() => removeImage(idx)}
-                    className="absolute top-2 right-2 w-6 h-6 bg-black/60 hover:bg-red-500 text-white rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all">
-                    <svg className="w-3 h-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2.5}><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+                    className="absolute top-2 right-2 w-6 h-6 bg-black/60 hover:bg-red-500 text-white rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all"
+                  >
+                    <svg className="w-3 h-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2.5}>
+                      <line x1="18" y1="6" x2="6" y2="18" />
+                      <line x1="6" y1="6" x2="18" y2="18" />
+                    </svg>
                   </button>
                 )}
               </div>
             ))}
             {/* Add more */}
-            <button type="button" onClick={() => fileInputRef.current?.click()}
-              className="aspect-[4/3] rounded-xl border-2 border-dashed border-[#e6e0d8] flex items-center justify-center hover:border-[#d4ccc2] hover:bg-[#faf8f5] transition-all">
-              <svg className="w-6 h-6 text-[#d4ccc2]" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2}><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+            <button
+              type="button"
+              onClick={() => fileInputRef.current?.click()}
+              className="aspect-[4/3] rounded-xl border-2 border-dashed border-[#e6e0d8] flex items-center justify-center hover:border-[#d4ccc2] hover:bg-[#faf8f5] transition-all"
+            >
+              <svg
+                className="w-6 h-6 text-[#d4ccc2]"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth={2}
+              >
+                <line x1="12" y1="5" x2="12" y2="19" />
+                <line x1="5" y1="12" x2="19" y2="12" />
+              </svg>
             </button>
           </div>
         )}
 
-        {error && <div className="bg-danger-soft border border-danger-line rounded-lg px-3 py-2 text-xs text-danger mb-4">{error}</div>}
+        {error && (
+          <div className="bg-danger-soft border border-danger-line rounded-lg px-3 py-2 text-xs text-danger mb-4">
+            {error}
+          </div>
+        )}
 
         <div className="flex gap-2">
-          <button type="button" onClick={() => router.push('/vehicles')}
-            className="px-4 py-2.5 text-sm text-[#5f5a54] border border-[#e6e0d8] rounded-lg hover:border-[#d4ccc2] transition-colors">
+          <button
+            type="button"
+            onClick={() => router.push('/vehicles')}
+            className="px-4 py-2.5 text-sm text-[#5f5a54] border border-[#e6e0d8] rounded-lg hover:border-[#d4ccc2] transition-colors"
+          >
             Зургийг алгасах
           </button>
-          <button type="button" onClick={uploadAll}
-            disabled={images.some(i => i.uploading)}
-            className="flex-1 py-2.5 text-sm font-medium bg-brand hover:bg-brand-dark disabled:opacity-60 text-white rounded-lg transition-colors">
-            {images.some(i => i.uploading)
-              ? `${uploadDone}/${images.filter(i => !i.url).length} upload хийгдэж байна...`
-              : images.length > 0 ? `${images.length} зураг хадгалах` : 'Дуусгах'}
+          <button
+            type="button"
+            onClick={uploadAll}
+            disabled={images.some((i) => i.uploading)}
+            className="flex-1 py-2.5 text-sm font-medium bg-brand hover:bg-brand-dark disabled:opacity-60 text-white rounded-lg transition-colors"
+          >
+            {images.some((i) => i.uploading)
+              ? `${uploadDone}/${images.filter((i) => !i.url).length} upload хийгдэж байна...`
+              : images.length > 0
+                ? `${images.length} зураг хадгалах`
+                : 'Дуусгах'}
           </button>
         </div>
       </div>
@@ -208,8 +309,10 @@ export default function NewVehiclePage() {
   // ── Step 1: Машины мэдээлэл ──
   return (
     <div className="px-4 sm:px-8 py-5 sm:py-7 max-w-2xl mx-auto">
-      <button onClick={() => router.back()}
-        className="flex items-center gap-1.5 py-2 pr-3 text-[#6f6a64] hover:text-[#1c1917] text-sm transition-colors mb-6">
+      <button
+        onClick={() => router.back()}
+        className="flex items-center gap-1.5 py-2 pr-3 text-[#6f6a64] hover:text-[#1c1917] text-sm transition-colors mb-6"
+      >
         <IconArrowLeft className="w-4 h-4" /> Буцах
       </button>
       <h1 className="font-display text-2xl font-semibold tracking-[-0.02em] text-ink mb-6">Машин нэмэх</h1>
@@ -219,31 +322,54 @@ export default function NewVehiclePage() {
         <Section title="Үндсэн мэдээлэл">
           <div className="grid grid-cols-2 gap-3">
             <Field label="Марк" required>
-              <Combobox value={form.brand} onChange={v => set('brand', v)}
-                options={BRANDS} placeholder="Toyota, Hyundai..." className={inp} />
+              <Combobox
+                value={form.brand}
+                onChange={(v) => set('brand', v)}
+                options={BRANDS}
+                placeholder="Toyota, Hyundai..."
+                className={inp}
+              />
             </Field>
 
             <Field label="Загвар" required>
-              <Combobox value={form.model} onChange={v => set('model', v)}
+              <Combobox
+                value={form.model}
+                onChange={(v) => set('model', v)}
                 options={models.length ? models : []}
-                placeholder="Camry, Tucson..." className={inp} />
+                placeholder="Camry, Tucson..."
+                className={inp}
+              />
             </Field>
 
             <Field label="Он" required>
-              <Combobox value={form.year} onChange={v => set('year', v)}
-                options={YEARS} placeholder={String(CURRENT_YEAR)} className={inp} />
+              <Combobox
+                value={form.year}
+                onChange={(v) => set('year', v)}
+                options={YEARS}
+                placeholder={String(CURRENT_YEAR)}
+                className={inp}
+              />
             </Field>
 
             <Field label="VIN код" required>
-              <input value={form.vin} onChange={e => set('vin', e.target.value.toUpperCase())}
-                placeholder="JT2BF22K1W0123456" maxLength={17}
-                className={inp.replace('pr-8','') + ' uppercase tracking-widest'} required />
+              <input
+                value={form.vin}
+                onChange={(e) => set('vin', e.target.value.toUpperCase())}
+                placeholder="JT2BF22K1W0123456"
+                maxLength={17}
+                className={inp.replace('pr-8', '') + ' uppercase tracking-widest'}
+                required
+              />
             </Field>
 
             <Field label="Орж ирсэн огноо">
               <div className="relative">
-                <input type="date" value={arrivedAt} onChange={e => set('arrived_at', e.target.value)}
-                  className={inp.replace('pr-8','')} />
+                <input
+                  type="date"
+                  value={arrivedAt}
+                  onChange={(e) => set('arrived_at', e.target.value)}
+                  className={inp.replace('pr-8', '')}
+                />
                 {weekday && (
                   <span className="absolute right-3 top-1/2 -translate-y-1/2 text-xs text-[#6f6a64] pointer-events-none">
                     {weekday}
@@ -253,16 +379,26 @@ export default function NewVehiclePage() {
             </Field>
 
             <Field label="Үйлдвэрлэсэн огноо">
-              <input type="month" value={form.manufactured_date}
-                onChange={e => set('manufactured_date', e.target.value)}
-                className={inp.replace('pr-8','')} />
+              <input
+                type="month"
+                value={form.manufactured_date}
+                onChange={(e) => set('manufactured_date', e.target.value)}
+                className={inp.replace('pr-8', '')}
+              />
             </Field>
 
             <Field label="Улсын дугаар" className="col-span-2">
               <div className="grid grid-cols-2 gap-1.5">
-                {[['false','Дугааргүй'],['true','Дугаартай']].map(([v, l]) => (
-                  <button key={v} type="button" onClick={() => set('has_plates', v === 'true')}
-                    className={`py-2.5 text-xs rounded-md border transition-colors ${String(form.has_plates) === v ? 'bg-brand text-white border-brand' : 'border-[#e6e0d8] text-[#5f5a54] hover:border-[#d4ccc2]'}`}>
+                {[
+                  ['false', 'Дугааргүй'],
+                  ['true', 'Дугаартай'],
+                ].map(([v, l]) => (
+                  <button
+                    key={v}
+                    type="button"
+                    onClick={() => set('has_plates', v === 'true')}
+                    className={`py-2.5 text-xs rounded-md border transition-colors ${String(form.has_plates) === v ? 'bg-brand text-white border-brand' : 'border-[#e6e0d8] text-[#5f5a54] hover:border-[#d4ccc2]'}`}
+                  >
                     {l}
                   </button>
                 ))}
@@ -275,22 +411,39 @@ export default function NewVehiclePage() {
         <Section title="Техникийн үзүүлэлт">
           <div className="grid grid-cols-2 gap-3">
             <Field label="Гүйлт (км)">
-              <input type="number" value={form.mileage} onChange={e => set('mileage', e.target.value)}
-                min={0} placeholder="50000" className={inp.replace('pr-8','')} />
+              <input
+                type="number"
+                value={form.mileage}
+                onChange={(e) => set('mileage', e.target.value)}
+                min={0}
+                placeholder="50000"
+                className={inp.replace('pr-8', '')}
+              />
             </Field>
 
             <Field label="Өнгө">
               <div className="space-y-2">
-                <Combobox value={form.color} onChange={v => set('color', v)}
-                  options={COLORS.map(c => c.value)}
-                  placeholder="Цагаан, Хар..." className={inp} />
+                <Combobox
+                  value={form.color}
+                  onChange={(v) => set('color', v)}
+                  options={COLORS.map((c) => c.value)}
+                  placeholder="Цагаан, Хар..."
+                  className={inp}
+                />
                 {form.color && (
                   <div className="flex gap-1.5 flex-wrap">
-                    {COLORS.map(c => (
-                      <button key={c.value} type="button" title={c.value}
+                    {COLORS.map((c) => (
+                      <button
+                        key={c.value}
+                        type="button"
+                        title={c.value}
                         onClick={() => set('color', c.value)}
                         className={`w-5 h-5 rounded-full border-2 transition-all ${form.color === c.value ? 'border-brand scale-110' : 'border-transparent hover:border-[#d4ccc2]'}`}
-                        style={{ backgroundColor: c.hex, boxShadow: c.hex === '#ffffff' ? 'inset 0 0 0 1px #e6e0d8' : undefined }} />
+                        style={{
+                          backgroundColor: c.hex,
+                          boxShadow: c.hex === '#ffffff' ? 'inset 0 0 0 1px #e6e0d8' : undefined,
+                        }}
+                      />
                     ))}
                   </div>
                 )}
@@ -299,9 +452,18 @@ export default function NewVehiclePage() {
 
             <Field label="Түлшний төрөл">
               <div className="grid grid-cols-2 gap-1.5">
-                {[['PETROL','Бензин'],['DIESEL','Дизель'],['HYBRID','Хибрид'],['ELECTRIC','Цахилгаан']].map(([v,l]) => (
-                  <button key={v} type="button" onClick={() => set('fuel_type', v)}
-                    className={`py-2.5 text-xs rounded-md border transition-colors ${form.fuel_type === v ? 'bg-brand text-white border-brand' : 'border-[#e6e0d8] text-[#5f5a54] hover:border-[#d4ccc2]'}`}>
+                {[
+                  ['PETROL', 'Бензин'],
+                  ['DIESEL', 'Дизель'],
+                  ['HYBRID', 'Хибрид'],
+                  ['ELECTRIC', 'Цахилгаан'],
+                ].map(([v, l]) => (
+                  <button
+                    key={v}
+                    type="button"
+                    onClick={() => set('fuel_type', v)}
+                    className={`py-2.5 text-xs rounded-md border transition-colors ${form.fuel_type === v ? 'bg-brand text-white border-brand' : 'border-[#e6e0d8] text-[#5f5a54] hover:border-[#d4ccc2]'}`}
+                  >
                     {l}
                   </button>
                 ))}
@@ -310,9 +472,16 @@ export default function NewVehiclePage() {
 
             <Field label="Хурдны хайрцаг">
               <div className="grid grid-cols-2 gap-1.5">
-                {[['AUTO','Автомат'],['MANUAL','Механик']].map(([v,l]) => (
-                  <button key={v} type="button" onClick={() => set('transmission', v)}
-                    className={`py-2.5 text-xs rounded-md border transition-colors ${form.transmission === v ? 'bg-brand text-white border-brand' : 'border-[#e6e0d8] text-[#5f5a54] hover:border-[#d4ccc2]'}`}>
+                {[
+                  ['AUTO', 'Автомат'],
+                  ['MANUAL', 'Механик'],
+                ].map(([v, l]) => (
+                  <button
+                    key={v}
+                    type="button"
+                    onClick={() => set('transmission', v)}
+                    className={`py-2.5 text-xs rounded-md border transition-colors ${form.transmission === v ? 'bg-brand text-white border-brand' : 'border-[#e6e0d8] text-[#5f5a54] hover:border-[#d4ccc2]'}`}
+                  >
                     {l}
                   </button>
                 ))}
@@ -320,13 +489,25 @@ export default function NewVehiclePage() {
             </Field>
 
             <Field label="Зарах үнэ (₮)">
-              <input type="number" min="0" inputMode="numeric" value={form.price} onChange={e => set('price', e.target.value)}
-                placeholder="85,000,000" className={inp} />
+              <input
+                type="number"
+                min="0"
+                inputMode="numeric"
+                value={form.price}
+                onChange={(e) => set('price', e.target.value)}
+                placeholder="85,000,000"
+                className={inp}
+              />
             </Field>
 
             <Field label="Хөдөлгүүр">
-              <Combobox value={form.engine_cc} onChange={v => set('engine_cc', v)}
-                options={ENGINE_OPTIONS} placeholder="2.0L" className={inp} />
+              <Combobox
+                value={form.engine_cc}
+                onChange={(v) => set('engine_cc', v)}
+                options={ENGINE_OPTIONS}
+                placeholder="2.0L"
+                className={inp}
+              />
             </Field>
           </div>
         </Section>
@@ -334,22 +515,35 @@ export default function NewVehiclePage() {
         {/* Нэмэлт */}
         <Section title="Нэмэлт тайлбар">
           <Field label="">
-            <textarea value={form.description} onChange={e => set('description', e.target.value)}
-              rows={3} placeholder="Машины онцлог, нэмэлт мэдээлэл..." className={inp.replace('pr-8','')} />
+            <textarea
+              value={form.description}
+              onChange={(e) => set('description', e.target.value)}
+              rows={3}
+              placeholder="Машины онцлог, нэмэлт мэдээлэл..."
+              className={inp.replace('pr-8', '')}
+            />
           </Field>
         </Section>
 
         {error && (
-          <div className="bg-danger-soft border border-danger-line rounded-md px-3 py-2 text-xs text-danger">{error}</div>
+          <div className="bg-danger-soft border border-danger-line rounded-md px-3 py-2 text-xs text-danger">
+            {error}
+          </div>
         )}
 
         <div className="flex gap-2 pt-1">
-          <button type="button" onClick={() => router.back()}
-            className="px-4 py-2 text-sm text-[#5f5a54] border border-[#e6e0d8] rounded-md hover:border-[#d4ccc2] transition-colors">
+          <button
+            type="button"
+            onClick={() => router.back()}
+            className="px-4 py-2 text-sm text-[#5f5a54] border border-[#e6e0d8] rounded-md hover:border-[#d4ccc2] transition-colors"
+          >
             Болих
           </button>
-          <button type="submit" disabled={loading}
-            className="px-6 py-2 text-sm font-medium bg-brand hover:bg-brand-dark disabled:opacity-40 text-white rounded-full transition-colors">
+          <button
+            type="submit"
+            disabled={loading}
+            className="px-6 py-2 text-sm font-medium bg-brand hover:bg-brand-dark disabled:opacity-40 text-white rounded-full transition-colors"
+          >
             {loading ? 'Хадгалж байна...' : 'Үргэлжлэх — зураг нэмэх →'}
           </button>
         </div>
@@ -368,12 +562,23 @@ function Section({ title, children }: { title: string; children: React.ReactNode
     </div>
   );
 }
-function Field({ label, children, required, className }: { label: string; children: React.ReactNode; required?: boolean; className?: string }) {
+function Field({
+  label,
+  children,
+  required,
+  className,
+}: {
+  label: string;
+  children: React.ReactNode;
+  required?: boolean;
+  className?: string;
+}) {
   return (
     <div className={className}>
       {label && (
         <label className="text-xs text-[#5f5a54] block mb-1.5">
-          {label}{required && <span className="text-brand ml-0.5">*</span>}
+          {label}
+          {required && <span className="text-brand ml-0.5">*</span>}
         </label>
       )}
       {children}

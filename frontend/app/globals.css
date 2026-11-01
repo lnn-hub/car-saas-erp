@@ -1,8 +1,8 @@
-@import "tailwindcss";
+@import 'tailwindcss';
 
 @theme {
   /* Фонт: Onest (бичвэр), Geologica (гарчиг) — монгол кирилл (Ө, Ү) бүрэн дэмжинэ */
-  --font-sans: var(--font-onest), ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
+  --font-sans: var(--font-onest), ui-sans-serif, system-ui, -apple-system, 'Segoe UI', sans-serif;
   --font-display: var(--font-geologica), var(--font-onest), ui-sans-serif, system-ui, sans-serif;
 
   --color-brand: #1f5c4a;
@@ -60,7 +60,9 @@
   --animate-reveal: reveal 0.8s var(--ease-out-expo) both;
 }
 
-* { box-sizing: border-box; }
+* {
+  box-sizing: border-box;
+}
 
 html {
   -webkit-text-size-adjust: 100%;
@@ -77,22 +79,50 @@ body {
   text-rendering: optimizeLegibility;
 }
 
-h1, h2, h3, .font-display { font-family: var(--font-display); letter-spacing: -0.015em; }
+h1,
+h2,
+h3,
+.font-display {
+  font-family: var(--font-display);
+  letter-spacing: -0.015em;
+}
 
-::selection { background: color-mix(in oklab, var(--color-brand) 18%, transparent); }
+::selection {
+  background: color-mix(in oklab, var(--color-brand) 18%, transparent);
+}
 
-::-webkit-scrollbar { width: 8px; height: 8px; }
-::-webkit-scrollbar-track { background: transparent; }
-::-webkit-scrollbar-thumb { background: #d6cfc6; border-radius: 8px; border: 2px solid var(--color-canvas); }
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: #d6cfc6;
+  border-radius: 8px;
+  border: 2px solid var(--color-canvas);
+}
 
-:focus-visible { outline: 2px solid var(--color-brand); outline-offset: 2px; }
+:focus-visible {
+  outline: 2px solid var(--color-brand);
+  outline-offset: 2px;
+}
 
-* { -webkit-tap-highlight-color: transparent; }
-button, a, select { touch-action: manipulation; }
+* {
+  -webkit-tap-highlight-color: transparent;
+}
+button,
+a,
+select {
+  touch-action: manipulation;
+}
 @media (max-width: 640px) {
-  input:not([type="checkbox"]):not([type="radio"]):not([type="file"]),
+  input:not([type='checkbox']):not([type='radio']):not([type='file']),
   select,
-  textarea { font-size: 16px; }
+  textarea {
+    font-size: 16px;
+  }
 }
 
 /* Шил (glass) гадаргуу — толгой, хөвөгч товчлуурууд */
@@ -111,13 +141,21 @@ button, a, select { touch-action: manipulation; }
 }
 @utility no-scrollbar {
   scrollbar-width: none;
-  &::-webkit-scrollbar { display: none; }
+  &::-webkit-scrollbar {
+    display: none;
+  }
 }
 
 /* Гүйлгэхэд аажмаар гарч ирэх (дэмждэг хөтөч дээр л) */
 @keyframes reveal {
-  from { opacity: 0; transform: translateY(28px) scale(0.985); }
-  to   { opacity: 1; transform: none; }
+  from {
+    opacity: 0;
+    transform: translateY(28px) scale(0.985);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
 }
 /* Зөвхөн хулгана ашигладаг томоохон дэлгэц дээр. Утсан дээр контент шууд харагдана (гүйлгэхэд хоцрохгүй). */
 @media (hover: hover) and (pointer: fine) and (min-width: 1024px) {
@@ -131,42 +169,89 @@ button, a, select { touch-action: manipulation; }
 }
 
 @keyframes kenburns {
-  from { transform: scale(1.02); }
-  to   { transform: scale(1.12); }
+  from {
+    transform: scale(1.02);
+  }
+  to {
+    transform: scale(1.12);
+  }
 }
 @keyframes progress {
-  from { transform: scaleX(0); }
-  to   { transform: scaleX(1); }
+  from {
+    transform: scaleX(0);
+  }
+  to {
+    transform: scaleX(1);
+  }
 }
 @keyframes fadeUp {
-  from { opacity: 0; transform: translateY(12px) scale(0.97); }
-  to   { opacity: 1; transform: translateY(0) scale(1); }
+  from {
+    opacity: 0;
+    transform: translateY(12px) scale(0.97);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
 }
 @keyframes sheetUp {
-  from { transform: translateY(100%); }
-  to   { transform: translateY(0); }
+  from {
+    transform: translateY(100%);
+  }
+  to {
+    transform: translateY(0);
+  }
 }
 @keyframes pageIn {
-  from { opacity: 0; transform: translateY(6px); }
-  to   { opacity: 1; transform: translateY(0); }
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 @keyframes pulseDot {
-  0%, 100% { box-shadow: 0 0 0 0 rgb(74 222 128 / 0.6); }
-  50%      { box-shadow: 0 0 0 6px rgb(74 222 128 / 0); }
+  0%,
+  100% {
+    box-shadow: 0 0 0 0 rgb(74 222 128 / 0.6);
+  }
+  50% {
+    box-shadow: 0 0 0 6px rgb(74 222 128 / 0);
+  }
 }
 
 @media (prefers-reduced-motion: reduce) {
-  *, *::before, *::after { animation-duration: 0.01ms !important; animation-iteration-count: 1 !important; transition-duration: 0.01ms !important; scroll-behavior: auto !important; }
-  .reveal { animation: none; }
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+  .reveal {
+    animation: none;
+  }
 }
-
 
 /* Хэвлэх үед: цагаан дэвсгэр, сүүдэргүй, хүснэгт хуваагдахгүй */
 @media print {
-  body { background: #fff !important; }
-  .shadow-card, .shadow-lift { box-shadow: none !important; }
-  tr, .print-avoid { break-inside: avoid; }
-  @page { margin: 12mm; }
+  body {
+    background: #fff !important;
+  }
+  .shadow-card,
+  .shadow-lift {
+    box-shadow: none !important;
+  }
+  tr,
+  .print-avoid {
+    break-inside: avoid;
+  }
+  @page {
+    margin: 12mm;
+  }
 }
 
 /* ─── Харанхуй горим (сайт + админ) ──────────────────────────────────────────
@@ -180,69 +265,177 @@ button, a, select { touch-action: manipulation; }
   --color-danger: #fca5a5;
   --color-danger-soft: rgb(220 38 38 / 0.15);
   --color-danger-line: rgb(220 38 38 / 0.35);
-  --color-zinc-50: #1f1d1b;  --color-gray-50: #1f1d1b;
-  --color-zinc-100: #262422; --color-gray-100: #262422;
-  --color-zinc-200: #33302d; --color-gray-200: #33302d;
-  --color-zinc-300: #45413d; --color-gray-300: #45413d;
-  --color-zinc-400: #6b655f; --color-gray-400: #6b655f;
-  --color-zinc-500: #9c958d; --color-gray-500: #9c958d;
-  --color-zinc-600: #b5aea6; --color-gray-600: #b5aea6;
-  --color-zinc-700: #cdc7bf; --color-gray-700: #cdc7bf;
-  --color-zinc-800: #e3ded7; --color-gray-800: #e3ded7;
-  --color-zinc-900: #efebe5; --color-gray-900: #efebe5;
+  --color-zinc-50: #1f1d1b;
+  --color-gray-50: #1f1d1b;
+  --color-zinc-100: #262422;
+  --color-gray-100: #262422;
+  --color-zinc-200: #33302d;
+  --color-gray-200: #33302d;
+  --color-zinc-300: #45413d;
+  --color-gray-300: #45413d;
+  --color-zinc-400: #6b655f;
+  --color-gray-400: #6b655f;
+  --color-zinc-500: #9c958d;
+  --color-gray-500: #9c958d;
+  --color-zinc-600: #b5aea6;
+  --color-gray-600: #b5aea6;
+  --color-zinc-700: #cdc7bf;
+  --color-gray-700: #cdc7bf;
+  --color-zinc-800: #e3ded7;
+  --color-gray-800: #e3ded7;
+  --color-zinc-900: #efebe5;
+  --color-gray-900: #efebe5;
   background-color: var(--color-canvas);
   color: var(--color-ink);
 }
-html.theme-dark, html.theme-dark body { background-color: #0f0e0d; }
+html.theme-dark,
+html.theme-dark body {
+  background-color: #0f0e0d;
+}
 
 /* Гадаргуу */
-.theme-dark .bg-white { background-color: #1b1917; }
-.theme-dark [class*="bg-white/"] { background-color: rgb(27 25 23 / 0.85); }
-.theme-dark .bg-ink { background-color: #34302c; }
-.theme-dark .border-ink { border-color: #34302c; }
-.theme-dark [class*="bg-ink/"] { background-color: rgb(0 0 0 / 0.55); }
-.theme-dark .glass { background: rgb(27 25 23 / 0.88); border-color: rgb(255 255 255 / 0.08); }
-.theme-dark .text-brand { color: #7cc4a6; }
+.theme-dark .bg-white {
+  background-color: #1b1917;
+}
+.theme-dark [class*='bg-white/'] {
+  background-color: rgb(27 25 23 / 0.85);
+}
+.theme-dark .bg-ink {
+  background-color: #34302c;
+}
+.theme-dark .border-ink {
+  border-color: #34302c;
+}
+.theme-dark [class*='bg-ink/'] {
+  background-color: rgb(0 0 0 / 0.55);
+}
+.theme-dark .glass {
+  background: rgb(27 25 23 / 0.88);
+  border-color: rgb(255 255 255 / 0.08);
+}
+.theme-dark .text-brand {
+  color: #7cc4a6;
+}
 
 /* Хатуу бичигдсэн өнгөнүүд */
-.theme-dark .text-\[\#1c1917\], .theme-dark .text-\[\#111\] { color: #f1ede6; }
-.theme-dark .text-\[\#46413c\] { color: #cdc7bf; }
-.theme-dark .text-\[\#5f5a54\] { color: #b5aea6; }
-.theme-dark .text-\[\#6f6a64\] { color: #9c958d; }
-.theme-dark .text-\[\#d4ccc2\] { color: #6b655f; }
-.theme-dark .placeholder-\[\#6f6a64\]::placeholder { color: #6b655f; }
-.theme-dark .border-\[\#e6e0d8\], .theme-dark .border-\[\#d4ccc2\], .theme-dark .border-\[\#f3efe9\] { border-color: #33302d; }
-.theme-dark .divide-\[\#f3efe9\] > :not(:last-child) { border-color: #33302d; }
-.theme-dark .bg-\[\#f3efe9\], .theme-dark .bg-\[\#faf8f5\] { background-color: #262422; }
-.theme-dark .hover\:bg-\[\#faf8f5\]:hover, .theme-dark .hover\:bg-\[\#f3efe9\]:hover { background-color: #2a2725; }
-.theme-dark .bg-\[\#e6e0d8\], .theme-dark .bg-\[\#d4ccc2\] { background-color: #33302d; }
-.theme-dark .bg-\[\#1c1917\], .theme-dark .bg-\[\#111\] { background-color: #34302c; }
-.theme-dark .hover\:text-\[\#1c1917\]:hover { color: #ffffff; }
-.theme-dark .hover\:border-\[\#d4ccc2\]:hover { border-color: #45413d; }
+.theme-dark .text-\[\#1c1917\],
+.theme-dark .text-\[\#111\] {
+  color: #f1ede6;
+}
+.theme-dark .text-\[\#46413c\] {
+  color: #cdc7bf;
+}
+.theme-dark .text-\[\#5f5a54\] {
+  color: #b5aea6;
+}
+.theme-dark .text-\[\#6f6a64\] {
+  color: #9c958d;
+}
+.theme-dark .text-\[\#d4ccc2\] {
+  color: #6b655f;
+}
+.theme-dark .placeholder-\[\#6f6a64\]::placeholder {
+  color: #6b655f;
+}
+.theme-dark .border-\[\#e6e0d8\],
+.theme-dark .border-\[\#d4ccc2\],
+.theme-dark .border-\[\#f3efe9\] {
+  border-color: #33302d;
+}
+.theme-dark .divide-\[\#f3efe9\] > :not(:last-child) {
+  border-color: #33302d;
+}
+.theme-dark .bg-\[\#f3efe9\],
+.theme-dark .bg-\[\#faf8f5\] {
+  background-color: #262422;
+}
+.theme-dark .hover\:bg-\[\#faf8f5\]:hover,
+.theme-dark .hover\:bg-\[\#f3efe9\]:hover {
+  background-color: #2a2725;
+}
+.theme-dark .bg-\[\#e6e0d8\],
+.theme-dark .bg-\[\#d4ccc2\] {
+  background-color: #33302d;
+}
+.theme-dark .bg-\[\#1c1917\],
+.theme-dark .bg-\[\#111\] {
+  background-color: #34302c;
+}
+.theme-dark .hover\:text-\[\#1c1917\]:hover {
+  color: #ffffff;
+}
+.theme-dark .hover\:border-\[\#d4ccc2\]:hover {
+  border-color: #45413d;
+}
 
 /* Статусын зөөлөн өнгөнүүд */
-.theme-dark .bg-emerald-50 { background-color: rgb(16 185 129 / 0.14); }
-.theme-dark .bg-amber-50 { background-color: rgb(245 158 11 / 0.14); }
-.theme-dark .bg-sky-50 { background-color: rgb(14 165 233 / 0.14); }
-.theme-dark .bg-violet-50 { background-color: rgb(139 92 246 / 0.16); }
-.theme-dark .border-emerald-200 { border-color: rgb(16 185 129 / 0.35); }
-.theme-dark .border-amber-200 { border-color: rgb(245 158 11 / 0.35); }
-.theme-dark .text-emerald-700, .theme-dark .text-emerald-800 { color: #6ee7b7; }
-.theme-dark .text-amber-700, .theme-dark .text-amber-800, .theme-dark .text-amber-900 { color: #fcd34d; }
-.theme-dark .text-sky-700 { color: #7dd3fc; }
-.theme-dark .text-violet-700 { color: #c4b5fd; }
+.theme-dark .bg-emerald-50 {
+  background-color: rgb(16 185 129 / 0.14);
+}
+.theme-dark .bg-amber-50 {
+  background-color: rgb(245 158 11 / 0.14);
+}
+.theme-dark .bg-sky-50 {
+  background-color: rgb(14 165 233 / 0.14);
+}
+.theme-dark .bg-violet-50 {
+  background-color: rgb(139 92 246 / 0.16);
+}
+.theme-dark .border-emerald-200 {
+  border-color: rgb(16 185 129 / 0.35);
+}
+.theme-dark .border-amber-200 {
+  border-color: rgb(245 158 11 / 0.35);
+}
+.theme-dark .text-emerald-700,
+.theme-dark .text-emerald-800 {
+  color: #6ee7b7;
+}
+.theme-dark .text-amber-700,
+.theme-dark .text-amber-800,
+.theme-dark .text-amber-900 {
+  color: #fcd34d;
+}
+.theme-dark .text-sky-700 {
+  color: #7dd3fc;
+}
+.theme-dark .text-violet-700 {
+  color: #c4b5fd;
+}
 /* Идэвхтэй шүүлтүүрийн чип (bg-ink + border-ink) харанхуйд тод харагдана */
-.theme-dark .bg-ink.border-ink { background-color: #f1ede6; border-color: #f1ede6; color: #121010; }
+.theme-dark .bg-ink.border-ink {
+  background-color: #f1ede6;
+  border-color: #f1ede6;
+  color: #121010;
+}
 /* Сайтын онцгой тохиолдлууд */
-.theme-dark .bg-amber-400.text-ink { color: #121010; }
-.theme-dark .shadow-card { box-shadow: 0 1px 2px rgb(0 0 0 / 0.3); }
-.theme-dark .shadow-lift { box-shadow: 0 24px 48px -16px rgb(0 0 0 / 0.6); }
-.theme-dark .contact-map { filter: invert(0.9) hue-rotate(180deg) saturate(0.6); }
-.theme-dark .map-sketch { --map-bg: #1d1b19; --map-block: #262321; --map-road: #36322e; --map-water: #1c2d29; }
-.theme-dark .keep-white { background-color: #ffffff; color: #121010; }
+.theme-dark .bg-amber-400.text-ink {
+  color: #121010;
+}
+.theme-dark .shadow-card {
+  box-shadow: 0 1px 2px rgb(0 0 0 / 0.3);
+}
+.theme-dark .shadow-lift {
+  box-shadow: 0 24px 48px -16px rgb(0 0 0 / 0.6);
+}
+.theme-dark .contact-map {
+  filter: invert(0.9) hue-rotate(180deg) saturate(0.6);
+}
+.theme-dark .map-sketch {
+  --map-bg: #1d1b19;
+  --map-block: #262321;
+  --map-road: #36322e;
+  --map-water: #1c2d29;
+}
+.theme-dark .keep-white {
+  background-color: #ffffff;
+  color: #121010;
+}
 /* Footer нь угаасаа бараан загвартай: харанхуй горимд цайвар горимын саарал өнгөөрөө үлдэнэ */
 .theme-dark .keep-palette {
-  --color-zinc-300: #d6cfc6; --color-zinc-400: #a39a8f; --color-zinc-500: #8a837a;
+  --color-zinc-300: #d6cfc6;
+  --color-zinc-400: #a39a8f;
+  --color-zinc-500: #8a837a;
   background-color: #191715;
 }
 
@@ -250,26 +443,59 @@ html.theme-dark, html.theme-dark body { background-color: #0f0e0d; }
 html:not(.theme-dark) .ring-ink\/\[0\.06\],
 html:not(.theme-dark) .ring-ink\/\[0\.05\],
 html:not(.theme-dark) .ring-ink\/5,
-html:not(.theme-dark) .ring-ink\/\[0\.08\] { --tw-ring-color: rgb(18 16 16 / 0.15); }
-html:not(.theme-dark) .ring-ink\/10 { --tw-ring-color: rgb(18 16 16 / 0.22); }
-html:not(.theme-dark) .border-ink\/\[0\.06\] { border-color: rgb(18 16 16 / 0.15); }
+html:not(.theme-dark) .ring-ink\/\[0\.08\] {
+  --tw-ring-color: rgb(18 16 16 / 0.15);
+}
+html:not(.theme-dark) .ring-ink\/10 {
+  --tw-ring-color: rgb(18 16 16 / 0.22);
+}
+html:not(.theme-dark) .border-ink\/\[0\.06\] {
+  border-color: rgb(18 16 16 / 0.15);
+}
 html:not(.theme-dark) .border-zinc-200,
 html:not(.theme-dark) .border-\[\#e6e0d8\],
-html:not(.theme-dark) .border-\[\#d4ccc2\] { border-color: #cfc7bc; }
+html:not(.theme-dark) .border-\[\#d4ccc2\] {
+  border-color: #cfc7bc;
+}
 html:not(.theme-dark) .border-zinc-100,
 html:not(.theme-dark) .border-\[\#f3efe9\],
 html:not(.theme-dark) .divide-zinc-100 > :not(:last-child),
-html:not(.theme-dark) .divide-\[\#f3efe9\] > :not(:last-child) { border-color: #e4ddd3; }
-html:not(.theme-dark) .glass { border-color: rgb(18 16 16 / 0.1); }
+html:not(.theme-dark) .divide-\[\#f3efe9\] > :not(:last-child) {
+  border-color: #e4ddd3;
+}
+html:not(.theme-dark) .glass {
+  border-color: rgb(18 16 16 / 0.1);
+}
 
 /* Утсан дээр blur (backdrop-filter) гүйлгэлтийг удаашруулдаг тул энгийн өнгөөр солино */
 @media (max-width: 1023px) {
-  .glass, .glass-dark { -webkit-backdrop-filter: none; backdrop-filter: none; }
-  .glass { background: rgb(255 255 255 / 0.96); }
-  .glass-dark { background: rgb(18 16 16 / 0.6); }
-  .theme-dark .glass { background: rgb(27 25 23 / 0.97); }
-  .backdrop-blur-md, .backdrop-blur-sm, .backdrop-blur-xl, .backdrop-blur { -webkit-backdrop-filter: none; backdrop-filter: none; }
+  .glass,
+  .glass-dark {
+    -webkit-backdrop-filter: none;
+    backdrop-filter: none;
+  }
+  .glass {
+    background: rgb(255 255 255 / 0.96);
+  }
+  .glass-dark {
+    background: rgb(18 16 16 / 0.6);
+  }
+  .theme-dark .glass {
+    background: rgb(27 25 23 / 0.97);
+  }
+  .backdrop-blur-md,
+  .backdrop-blur-sm,
+  .backdrop-blur-xl,
+  .backdrop-blur {
+    -webkit-backdrop-filter: none;
+    backdrop-filter: none;
+  }
 }
 
 /* Газрын зургийн урьдчилсан схем (холбоо барих хэсэг) */
-.map-sketch { --map-bg: #ece7df; --map-block: #e1d9ce; --map-road: #ffffff; --map-water: #cfe1db; }
+.map-sketch {
+  --map-bg: #ece7df;
+  --map-block: #e1d9ce;
+  --map-road: #ffffff;
+  --map-water: #cfe1db;
+}

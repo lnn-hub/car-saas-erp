@@ -3,7 +3,10 @@
 const GRAPH = `https://graph.facebook.com${process.env.FB_GRAPH_VERSION ? `/${process.env.FB_GRAPH_VERSION}` : ''}`;
 
 class FbError extends Error {
-  constructor(message, code) { super(message); this.code = code; }
+  constructor(message, code) {
+    super(message);
+    this.code = code;
+  }
 }
 
 async function graph(path, { method = 'GET', params = {}, token }) {
@@ -17,8 +20,10 @@ async function graph(path, { method = 'GET', params = {}, token }) {
   const data = await res.json().catch(() => ({}));
   if (!res.ok || data.error) {
     const e = data.error || {};
-    if (e.code === 190) throw new FbError('Facebook токен буруу эсвэл хугацаа нь дууссан байна. Тохиргооноос дахин холбоно уу', 190);
-    if (e.code === 200 || e.code === 10) throw new FbError('Пэйж рүү нийтлэх зөвшөөрөл (pages_manage_posts) алга байна', e.code);
+    if (e.code === 190)
+      throw new FbError('Facebook токен буруу эсвэл хугацаа нь дууссан байна. Тохиргооноос дахин холбоно уу', 190);
+    if (e.code === 200 || e.code === 10)
+      throw new FbError('Пэйж рүү нийтлэх зөвшөөрөл (pages_manage_posts) алга байна', e.code);
     throw new FbError(`Facebook: ${e.message || 'тодорхойгүй алдаа'}`, e.code);
   }
   return data;
@@ -31,11 +36,18 @@ async function resolvePage(token, pageId) {
   let accounts = null;
   try {
     accounts = await graph('/me/accounts', { params: { fields: 'id,name,access_token', limit: '100' }, token });
-  } catch { /* пэйжийн токен бол /me/accounts алдаа өгнө */ }
+  } catch {
+    /* пэйжийн токен бол /me/accounts алдаа өгнө */
+  }
   if (accounts?.data?.length) {
     const page = pageId ? accounts.data.find((p) => p.id === pageId) : accounts.data[0];
     if (!page) throw new FbError('Сонгосон пэйж олдсонгүй');
-    return { id: page.id, name: page.name, token: page.access_token, pages: accounts.data.map(({ id, name }) => ({ id, name })) };
+    return {
+      id: page.id,
+      name: page.name,
+      token: page.access_token,
+      pages: accounts.data.map(({ id, name }) => ({ id, name })),
+    };
   }
   if (accounts && !accounts.data?.length) throw new FbError('Энэ хэрэглэгч удирддаг пэйж алга байна');
   return { id: me.id, name: me.name, token, pages: [{ id: me.id, name: me.name }] };
@@ -54,7 +66,9 @@ async function publishPost({ pageId, token, message, imageUrls, link }) {
     }
   }
   const params = { message };
-  media.forEach((id, i) => { params[`attached_media[${i}]`] = JSON.stringify({ media_fbid: id }); });
+  media.forEach((id, i) => {
+    params[`attached_media[${i}]`] = JSON.stringify({ media_fbid: id });
+  });
   if (!media.length && link) params.link = link;
   const post = await graph(`/${pageId}/feed`, { method: 'POST', params, token });
   return { id: post.id, url: `https://www.facebook.com/${post.id}`, photos: media.length };

@@ -17,20 +17,78 @@ import { ChatIcon } from '@/components/site/ChatIcon';
 import { LeadForm } from '@/components/site/LeadForm';
 import { chatChannels } from '@/lib/contact';
 
-function imgSrc(u: string, w = 1400) { return optimizeImg(u, w) || u; }
+function imgSrc(u: string, w = 1400) {
+  return optimizeImg(u, w) || u;
+}
 
 /* ─── SVG icons ─── */
-const sv = { viewBox: '0 0 24 24', fill: 'none', stroke: 'currentColor', strokeWidth: 1.8, strokeLinecap: 'round' as const, strokeLinejoin: 'round' as const };
+const sv = {
+  viewBox: '0 0 24 24',
+  fill: 'none',
+  stroke: 'currentColor',
+  strokeWidth: 1.8,
+  strokeLinecap: 'round' as const,
+  strokeLinejoin: 'round' as const,
+};
 const Ic = {
-  back:   <svg className="w-4 h-4" {...sv} strokeWidth={2.2}><path d="M19 12H5M12 19l-7-7 7-7"/></svg>,
-  fuel:   <svg className="w-5 h-5" {...sv}><path d="M3 22V6a2 2 0 012-2h8a2 2 0 012 2v16M3 22h14M13 4h2l2 2v3.5a1.5 1.5 0 003 0V8l-2-2"/><path d="M7 14h4v4H7z"/></svg>,
-  gear:   <svg className="w-5 h-5" {...sv}><circle cx="6" cy="6" r="2"/><circle cx="12" cy="6" r="2"/><circle cx="18" cy="6" r="2"/><circle cx="6" cy="18" r="2"/><circle cx="12" cy="18" r="2"/><path d="M6 8v8M12 8v8M18 8v4H6"/></svg>,
-  odo:    <svg className="w-5 h-5" {...sv}><path d="M3.5 17a9 9 0 1117 0"/><path d="M12 13l4-4"/><circle cx="12" cy="13" r="1"/></svg>,
-  engine: <svg className="w-5 h-5" {...sv}><rect x="3" y="8" width="15" height="10" rx="2"/><path d="M7 8V5h6v3M18 11h3v4h-3M3 13H1"/></svg>,
-  check:  <svg className="w-3.5 h-3.5" {...sv} strokeWidth={3}><path d="M20 6L9 17l-5-5"/></svg>,
-  grid:   <svg className="w-4 h-4" {...sv}><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/></svg>,
-  link:   <svg className="w-4 h-4" {...sv} strokeWidth={2}><path d="M10 13a5 5 0 007.07 0l3-3a5 5 0 00-7.07-7.07l-1.5 1.5"/><path d="M14 11a5 5 0 00-7.07 0l-3 3a5 5 0 007.07 7.07l1.5-1.5"/></svg>,
-  arrow:  <svg className="w-4 h-4" {...sv} strokeWidth={2}><path d="M5 12h14M13 6l6 6-6 6"/></svg>,
+  back: (
+    <svg className="w-4 h-4" {...sv} strokeWidth={2.2}>
+      <path d="M19 12H5M12 19l-7-7 7-7" />
+    </svg>
+  ),
+  fuel: (
+    <svg className="w-5 h-5" {...sv}>
+      <path d="M3 22V6a2 2 0 012-2h8a2 2 0 012 2v16M3 22h14M13 4h2l2 2v3.5a1.5 1.5 0 003 0V8l-2-2" />
+      <path d="M7 14h4v4H7z" />
+    </svg>
+  ),
+  gear: (
+    <svg className="w-5 h-5" {...sv}>
+      <circle cx="6" cy="6" r="2" />
+      <circle cx="12" cy="6" r="2" />
+      <circle cx="18" cy="6" r="2" />
+      <circle cx="6" cy="18" r="2" />
+      <circle cx="12" cy="18" r="2" />
+      <path d="M6 8v8M12 8v8M18 8v4H6" />
+    </svg>
+  ),
+  odo: (
+    <svg className="w-5 h-5" {...sv}>
+      <path d="M3.5 17a9 9 0 1117 0" />
+      <path d="M12 13l4-4" />
+      <circle cx="12" cy="13" r="1" />
+    </svg>
+  ),
+  engine: (
+    <svg className="w-5 h-5" {...sv}>
+      <rect x="3" y="8" width="15" height="10" rx="2" />
+      <path d="M7 8V5h6v3M18 11h3v4h-3M3 13H1" />
+    </svg>
+  ),
+  check: (
+    <svg className="w-3.5 h-3.5" {...sv} strokeWidth={3}>
+      <path d="M20 6L9 17l-5-5" />
+    </svg>
+  ),
+  grid: (
+    <svg className="w-4 h-4" {...sv}>
+      <rect x="3" y="3" width="7" height="7" rx="1.5" />
+      <rect x="14" y="3" width="7" height="7" rx="1.5" />
+      <rect x="3" y="14" width="7" height="7" rx="1.5" />
+      <rect x="14" y="14" width="7" height="7" rx="1.5" />
+    </svg>
+  ),
+  link: (
+    <svg className="w-4 h-4" {...sv} strokeWidth={2}>
+      <path d="M10 13a5 5 0 007.07 0l3-3a5 5 0 00-7.07-7.07l-1.5 1.5" />
+      <path d="M14 11a5 5 0 00-7.07 0l-3 3a5 5 0 007.07 7.07l1.5-1.5" />
+    </svg>
+  ),
+  arrow: (
+    <svg className="w-4 h-4" {...sv} strokeWidth={2}>
+      <path d="M5 12h14M13 6l6 6-6 6" />
+    </svg>
+  ),
 };
 
 function Shell({ company, children }: { company: VehicleDetail['company'] | null; children: React.ReactNode }) {
@@ -76,72 +134,91 @@ function VehicleContent({ id, initial }: { id: string; initial: VehicleDetail | 
       }
     }
     fetch(`${BACKEND}/api/public/vehicles`)
-      .then(r => r.json())
-      .then(d => { if (!cancelled) setOthers((d.vehicles || []).filter((x: Vehicle) => x.id !== id).slice(0, 4)); })
-      .catch(() => { if (!cancelled) setOthers([]); });
+      .then((r) => r.json())
+      .then((d) => {
+        if (!cancelled) setOthers((d.vehicles || []).filter((x: Vehicle) => x.id !== id).slice(0, 4));
+      })
+      .catch(() => {
+        if (!cancelled) setOthers([]);
+      });
     load();
-    return () => { cancelled = true; document.title = prevTitle; };
+    return () => {
+      cancelled = true;
+      document.title = prevTitle;
+    };
   }, [id]);
 
   const company = v?.company ?? siteCompany;
 
-  if (loading) return (
-    <Shell company={company}>
-      <main className="flex-1 max-w-7xl w-full mx-auto px-4 pt-6 pb-20 animate-pulse">
-        <div className="h-4 w-40 bg-zinc-200 rounded-full mb-6" />
-        <div className="h-12 w-2/3 max-w-md bg-zinc-200 rounded-2xl mb-8" />
-        <div className="aspect-[16/9] lg:aspect-[21/9] bg-zinc-200 rounded-[32px]" />
-      </main>
-    </Shell>
-  );
+  if (loading)
+    return (
+      <Shell company={company}>
+        <main className="flex-1 max-w-7xl w-full mx-auto px-4 pt-6 pb-20 animate-pulse">
+          <div className="h-4 w-40 bg-zinc-200 rounded-full mb-6" />
+          <div className="h-12 w-2/3 max-w-md bg-zinc-200 rounded-2xl mb-8" />
+          <div className="aspect-[16/9] lg:aspect-[21/9] bg-zinc-200 rounded-[32px]" />
+        </main>
+      </Shell>
+    );
 
-  if (!v) return (
-    <Shell company={company}>
-      <main className="flex-1 flex items-center justify-center px-4 py-24">
-        <div className="text-center">
-          <div className="font-display text-[120px] leading-none font-semibold text-zinc-200 tracking-tighter">404</div>
-          <p className="font-display text-xl font-semibold text-ink mt-2">Машин олдсонгүй</p>
-          <p className="text-zinc-500 text-sm mt-1 mb-7">Зарагдсан эсвэл хасагдсан байж магадгүй.</p>
-          <Link href="/#cars" className="inline-flex items-center gap-2 h-12 px-6 rounded-full bg-ink text-white text-sm font-medium hover:bg-brand transition-colors">
-            {Ic.back} Бүх машин үзэх
-          </Link>
-        </div>
-      </main>
-    </Shell>
-  );
+  if (!v)
+    return (
+      <Shell company={company}>
+        <main className="flex-1 flex items-center justify-center px-4 py-24">
+          <div className="text-center">
+            <div className="font-display text-[120px] leading-none font-semibold text-zinc-200 tracking-tighter">
+              404
+            </div>
+            <p className="font-display text-xl font-semibold text-ink mt-2">Машин олдсонгүй</p>
+            <p className="text-zinc-500 text-sm mt-1 mb-7">Зарагдсан эсвэл хасагдсан байж магадгүй.</p>
+            <Link
+              href="/#cars"
+              className="inline-flex items-center gap-2 h-12 px-6 rounded-full bg-ink text-white text-sm font-medium hover:bg-brand transition-colors"
+            >
+              {Ic.back} Бүх машин үзэх
+            </Link>
+          </div>
+        </main>
+      </Shell>
+    );
 
   const images = v.images || [];
-  const fullImgs = images.map(u => imgSrc(u, 2000));
+  const fullImgs = images.map((u) => imgSrc(u, 2000));
   const price = fmtPrice(v.price);
   const km = v.mileage > 0 ? `${Number(v.mileage).toLocaleString('en-US')} км` : null;
   const engine = fmtEngine(v.engine_cc);
 
   const highlights = [
-    { icon: Ic.odo,    label: 'Гүйлт',          value: km || '—' },
-    { icon: Ic.fuel,   label: 'Түлш',           value: FUEL[v.fuel_type] || '—' },
-    { icon: Ic.gear,   label: 'Хурдны хайрцаг', value: TRANS[v.transmission] || '—' },
-    { icon: Ic.engine, label: 'Хөдөлгүүр',      value: engine ? `${engine}` : '—' },
+    { icon: Ic.odo, label: 'Гүйлт', value: km || '—' },
+    { icon: Ic.fuel, label: 'Түлш', value: FUEL[v.fuel_type] || '—' },
+    { icon: Ic.gear, label: 'Хурдны хайрцаг', value: TRANS[v.transmission] || '—' },
+    { icon: Ic.engine, label: 'Хөдөлгүүр', value: engine ? `${engine}` : '—' },
   ];
-  const mfg = v.manufactured_date ? `${v.manufactured_date.slice(0, 4)} оны ${Number(v.manufactured_date.slice(5, 7))}-р сар` : null;
+  const mfg = v.manufactured_date
+    ? `${v.manufactured_date.slice(0, 4)} оны ${Number(v.manufactured_date.slice(5, 7))}-р сар`
+    : null;
 
   const allSpecs = [
-    { label: 'Үйлдвэр',               value: v.brand },
-    { label: 'Загвар',                value: v.model },
-    { label: 'Үйлдвэрлэсэн он',       value: String(v.year) },
-    { label: 'Үйлдвэрлэсэн сар',      value: mfg },
-    { label: 'Өнгө',                  value: v.color || null },
-    { label: 'Гүйлт',                 value: km },
-    { label: 'Түлшний төрөл',         value: FUEL[v.fuel_type] },
-    { label: 'Хурдны хайрцаг',        value: TRANS[v.transmission] },
+    { label: 'Үйлдвэр', value: v.brand },
+    { label: 'Загвар', value: v.model },
+    { label: 'Үйлдвэрлэсэн он', value: String(v.year) },
+    { label: 'Үйлдвэрлэсэн сар', value: mfg },
+    { label: 'Өнгө', value: v.color || null },
+    { label: 'Гүйлт', value: km },
+    { label: 'Түлшний төрөл', value: FUEL[v.fuel_type] },
+    { label: 'Хурдны хайрцаг', value: TRANS[v.transmission] },
     { label: 'Хөдөлгүүрийн багтаамж', value: engine },
-    { label: 'Улсын дугаар',          value: v.has_plates ? 'Авсан' : 'Аваагүй' },
-  ].filter(s => s.value);
+    { label: 'Улсын дугаар', value: v.has_plates ? 'Авсан' : 'Аваагүй' },
+  ].filter((s) => s.value);
 
-  const descLines = (v.description || '').split('\n').map(l => l.trim());
-  const features  = descLines.filter(l => l.startsWith('•')).map(l => l.replace(/^•\s*/, ''));
-  const credit    = descLines.find(l => l.startsWith('Зургийн эх сурвалж'));
-  const intro     = descLines.filter(l => l && !l.startsWith('•') && !l.startsWith('Зургийн эх сурвалж')).join('\n\n');
-  const chats     = chatChannels(v.company, `Сайн байна уу, ${v.year} оны ${v.brand} ${v.model} машины талаар лавлах гэсэн юм.`);
+  const descLines = (v.description || '').split('\n').map((l) => l.trim());
+  const features = descLines.filter((l) => l.startsWith('•')).map((l) => l.replace(/^•\s*/, ''));
+  const credit = descLines.find((l) => l.startsWith('Зургийн эх сурвалж'));
+  const intro = descLines.filter((l) => l && !l.startsWith('•') && !l.startsWith('Зургийн эх сурвалж')).join('\n\n');
+  const chats = chatChannels(
+    v.company,
+    `Сайн байна уу, ${v.year} оны ${v.brand} ${v.model} машины талаар лавлах гэсэн юм.`,
+  );
 
   async function copyLink() {
     try {
@@ -150,7 +227,8 @@ function VehicleContent({ id, initial }: { id: string; initial: VehicleDetail | 
         return;
       }
       await navigator.clipboard.writeText(window.location.href);
-      setCopied(true); setTimeout(() => setCopied(false), 2000);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
     } catch {}
   }
 
@@ -168,13 +246,20 @@ function VehicleContent({ id, initial }: { id: string; initial: VehicleDetail | 
       <main className="max-w-7xl mx-auto px-4 pt-2 sm:pt-4">
         {/* Breadcrumb */}
         <nav className="flex items-center gap-2 text-sm text-zinc-500 mb-5 sm:mb-7">
-          <button onClick={() => router.back()} aria-label="Буцах"
-            className="w-10 h-10 rounded-full bg-white ring-1 ring-ink/[0.06] flex items-center justify-center text-ink hover:bg-ink hover:text-white transition-colors">
+          <button
+            onClick={() => router.back()}
+            aria-label="Буцах"
+            className="w-10 h-10 rounded-full bg-white ring-1 ring-ink/[0.06] flex items-center justify-center text-ink hover:bg-ink hover:text-white transition-colors"
+          >
             {Ic.back}
           </button>
-          <Link href="/#cars" className="px-2 py-2 hover:text-ink transition-colors">Машинууд</Link>
+          <Link href="/#cars" className="px-2 py-2 hover:text-ink transition-colors">
+            Машинууд
+          </Link>
           <span className="text-zinc-300">/</span>
-          <span className="text-ink font-medium truncate">{v.brand} {v.model}</span>
+          <span className="text-ink font-medium truncate">
+            {v.brand} {v.model}
+          </span>
         </nav>
 
         {/* Title */}
@@ -192,12 +277,22 @@ function VehicleContent({ id, initial }: { id: string; initial: VehicleDetail | 
                   {Ic.check} Дугаартай
                 </span>
               )}
-              {v.color && <span className="inline-flex items-center h-8 px-3 rounded-full bg-white ring-1 ring-ink/[0.08] text-sm text-zinc-700">{v.color}</span>}
-              {km && <span className="inline-flex items-center h-8 px-3 rounded-full bg-white ring-1 ring-ink/[0.08] text-sm text-zinc-700">{km}</span>}
+              {v.color && (
+                <span className="inline-flex items-center h-8 px-3 rounded-full bg-white ring-1 ring-ink/[0.08] text-sm text-zinc-700">
+                  {v.color}
+                </span>
+              )}
+              {km && (
+                <span className="inline-flex items-center h-8 px-3 rounded-full bg-white ring-1 ring-ink/[0.08] text-sm text-zinc-700">
+                  {km}
+                </span>
+              )}
             </div>
           </div>
-          <button onClick={copyLink}
-            className="hidden sm:inline-flex items-center gap-2 h-11 px-5 rounded-full bg-white ring-1 ring-ink/[0.08] text-sm font-medium text-ink hover:ring-ink/30 transition-all shrink-0">
+          <button
+            onClick={copyLink}
+            className="hidden sm:inline-flex items-center gap-2 h-11 px-5 rounded-full bg-white ring-1 ring-ink/[0.08] text-sm font-medium text-ink hover:ring-ink/30 transition-all shrink-0"
+          >
             {Ic.link} {copied ? 'Хуулагдлаа' : 'Хуваалцах'}
           </button>
         </div>
@@ -207,10 +302,23 @@ function VehicleContent({ id, initial }: { id: string; initial: VehicleDetail | 
           <>
             {/* Mobile: гулсуулах */}
             <div className="sm:hidden relative -mx-4">
-              <div ref={stripRef} onScroll={onStripScroll} className="flex overflow-x-auto snap-x snap-mandatory no-scrollbar px-4 gap-2">
+              <div
+                ref={stripRef}
+                onScroll={onStripScroll}
+                className="flex overflow-x-auto snap-x snap-mandatory no-scrollbar px-4 gap-2"
+              >
                 {images.map((u, i) => (
-                  <button key={u} onClick={() => setLightbox(i)} className="relative shrink-0 w-full snap-center aspect-[4/3] rounded-[24px] overflow-hidden bg-zinc-100">
-                    <img src={imgSrc(u, 900)} alt={i === 0 ? `${v.brand} ${v.model}` : ''} loading={i === 0 ? 'eager' : 'lazy'} className="w-full h-full object-cover" />
+                  <button
+                    key={u}
+                    onClick={() => setLightbox(i)}
+                    className="relative shrink-0 w-full snap-center aspect-[4/3] rounded-[24px] overflow-hidden bg-zinc-100"
+                  >
+                    <img
+                      src={imgSrc(u, 900)}
+                      alt={i === 0 ? `${v.brand} ${v.model}` : ''}
+                      loading={i === 0 ? 'eager' : 'lazy'}
+                      className="w-full h-full object-cover"
+                    />
                   </button>
                 ))}
               </div>
@@ -222,12 +330,21 @@ function VehicleContent({ id, initial }: { id: string; initial: VehicleDetail | 
             </div>
 
             {/* Desktop: bento */}
-            <div className={`hidden sm:grid gap-2 sm:gap-3 h-[420px] lg:h-[560px] ${images.length >= 3 ? 'grid-cols-[2fr_1fr] grid-rows-2' : images.length === 2 ? 'grid-cols-2' : 'grid-cols-1'}`}>
+            <div
+              className={`hidden sm:grid gap-2 sm:gap-3 h-[420px] lg:h-[560px] ${images.length >= 3 ? 'grid-cols-[2fr_1fr] grid-rows-2' : images.length === 2 ? 'grid-cols-2' : 'grid-cols-1'}`}
+            >
               {images.slice(0, 3).map((u, i) => (
-                <button key={u} onClick={() => setLightbox(i)}
-                  className={`group relative overflow-hidden bg-zinc-100 rounded-[24px] ${i === 0 && images.length >= 3 ? 'row-span-2' : ''} ${i === 0 ? 'lg:rounded-[32px]' : ''}`}>
-                  <img src={imgSrc(u, i === 0 ? 1600 : 900)} alt={i === 0 ? `${v.brand} ${v.model}` : ''} loading={i === 0 ? 'eager' : 'lazy'}
-                    className="w-full h-full object-cover group-hover:scale-[1.03] transition-transform duration-[1.2s] ease-out-expo" />
+                <button
+                  key={u}
+                  onClick={() => setLightbox(i)}
+                  className={`group relative overflow-hidden bg-zinc-100 rounded-[24px] ${i === 0 && images.length >= 3 ? 'row-span-2' : ''} ${i === 0 ? 'lg:rounded-[32px]' : ''}`}
+                >
+                  <img
+                    src={imgSrc(u, i === 0 ? 1600 : 900)}
+                    alt={i === 0 ? `${v.brand} ${v.model}` : ''}
+                    loading={i === 0 ? 'eager' : 'lazy'}
+                    className="w-full h-full object-cover group-hover:scale-[1.03] transition-transform duration-[1.2s] ease-out-expo"
+                  />
                   <span className="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-colors" />
                   {i === Math.min(2, images.length - 1) && images.length > 1 && (
                     <span className="absolute bottom-4 right-4 inline-flex items-center gap-2 glass rounded-full px-4 h-10 text-sm font-medium text-ink">
@@ -251,7 +368,9 @@ function VehicleContent({ id, initial }: { id: string; initial: VehicleDetail | 
             <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
               {highlights.map(({ icon, label, value }) => (
                 <div key={label} className={`${card} p-4 sm:p-5`}>
-                  <div className="w-10 h-10 rounded-full bg-zinc-100 text-ink flex items-center justify-center">{icon}</div>
+                  <div className="w-10 h-10 rounded-full bg-zinc-100 text-ink flex items-center justify-center">
+                    {icon}
+                  </div>
                   <div className="text-xs sm:text-sm text-zinc-500 mt-4">{label}</div>
                   <div className="font-display text-base sm:text-lg font-semibold text-ink mt-0.5">{value}</div>
                 </div>
@@ -262,7 +381,9 @@ function VehicleContent({ id, initial }: { id: string; initial: VehicleDetail | 
               <section className={`${card} p-6 sm:p-8`}>
                 <h2 className="font-display text-xl sm:text-2xl font-semibold text-ink mb-4">Тайлбар</h2>
                 <div className="space-y-3 text-[15px] sm:text-base text-zinc-700 leading-7 max-w-prose">
-                  {intro.split(/\n{2,}/).map((para, i) => <p key={i}>{para}</p>)}
+                  {intro.split(/\n{2,}/).map((para, i) => (
+                    <p key={i}>{para}</p>
+                  ))}
                 </div>
               </section>
             )}
@@ -273,7 +394,9 @@ function VehicleContent({ id, initial }: { id: string; initial: VehicleDetail | 
                 <ul className="grid grid-cols-1 sm:grid-cols-2 gap-x-8 gap-y-3">
                   {features.map((f) => (
                     <li key={f} className="flex items-start gap-3 text-[15px] text-zinc-700 leading-6">
-                      <span className="mt-0.5 w-5 h-5 shrink-0 rounded-full bg-brand-soft text-brand flex items-center justify-center">{Ic.check}</span>
+                      <span className="mt-0.5 w-5 h-5 shrink-0 rounded-full bg-brand-soft text-brand flex items-center justify-center">
+                        {Ic.check}
+                      </span>
                       <span>{f}</span>
                     </li>
                   ))}
@@ -285,7 +408,10 @@ function VehicleContent({ id, initial }: { id: string; initial: VehicleDetail | 
               <h2 className="font-display text-xl sm:text-2xl font-semibold text-ink mb-2">Техникийн үзүүлэлт</h2>
               <dl className="grid grid-cols-1 sm:grid-cols-2 sm:gap-x-10">
                 {allSpecs.map(({ label, value }) => (
-                  <div key={label} className="flex items-baseline justify-between gap-4 py-3.5 border-b border-zinc-100">
+                  <div
+                    key={label}
+                    className="flex items-baseline justify-between gap-4 py-3.5 border-b border-zinc-100"
+                  >
                     <dt className="text-[15px] text-zinc-500">{label}</dt>
                     <dd className="text-[15px] font-medium text-ink text-right">{value}</dd>
                   </div>
@@ -304,33 +430,57 @@ function VehicleContent({ id, initial }: { id: string; initial: VehicleDetail | 
                 <>
                   {fmtDrop(v.prev_price, v.price) && (
                     <div className="flex items-center gap-2 mt-1">
-                      <span className="text-base text-zinc-400 line-through tabular-nums">{fmtPrice(v.prev_price)}</span>
-                      <span className="rounded-full bg-amber-400 px-2.5 py-0.5 text-xs font-semibold text-ink">Үнэ буурсан {fmtDrop(v.prev_price, v.price)}</span>
+                      <span className="text-base text-zinc-400 line-through tabular-nums">
+                        {fmtPrice(v.prev_price)}
+                      </span>
+                      <span className="rounded-full bg-amber-400 px-2.5 py-0.5 text-xs font-semibold text-ink">
+                        Үнэ буурсан {fmtDrop(v.prev_price, v.price)}
+                      </span>
                     </div>
                   )}
-                  <div className={`font-display text-4xl sm:text-[44px] font-semibold tabular-nums tracking-tight leading-tight mt-1 ${fmtDrop(v.prev_price, v.price) ? 'text-brand' : 'text-ink'}`}>{price}</div>
+                  <div
+                    className={`font-display text-4xl sm:text-[44px] font-semibold tabular-nums tracking-tight leading-tight mt-1 ${fmtDrop(v.prev_price, v.price) ? 'text-brand' : 'text-ink'}`}
+                  >
+                    {price}
+                  </div>
                 </>
               ) : (
                 <div className="font-display text-2xl font-semibold text-ink mt-1">Тохиролцоно</div>
               )}
-              <div className="text-sm text-zinc-500 mt-2">{v.year} он{v.color ? ` · ${v.color}` : ''}{km ? ` · ${km}` : ''}</div>
+              <div className="text-sm text-zinc-500 mt-2">
+                {v.year} он{v.color ? ` · ${v.color}` : ''}
+                {km ? ` · ${km}` : ''}
+              </div>
 
               {v.company?.phone && (
                 <div className="space-y-2 mt-5">
-                  <a href={`tel:${v.company.phone}`}
-                    className="flex items-center justify-center gap-2 w-full h-14 rounded-full bg-brand hover:bg-brand-dark text-white font-medium transition-colors">
+                  <a
+                    href={`tel:${v.company.phone}`}
+                    className="flex items-center justify-center gap-2 w-full h-14 rounded-full bg-brand hover:bg-brand-dark text-white font-medium transition-colors"
+                  >
                     <IcPhone cls="w-4 h-4" /> Залгах · {v.company.phone}
                   </a>
-                  <button type="button" onClick={() => setLeadOpen(true)}
-                    className="flex items-center justify-center gap-2 w-full h-14 rounded-full bg-ink hover:bg-ink/90 text-white font-medium transition-colors">
-                    <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2}><rect x="3" y="4" width="18" height="18" rx="3" /><path d="M16 2v4M8 2v4M3 10h18" /></svg>
+                  <button
+                    type="button"
+                    onClick={() => setLeadOpen(true)}
+                    className="flex items-center justify-center gap-2 w-full h-14 rounded-full bg-ink hover:bg-ink/90 text-white font-medium transition-colors"
+                  >
+                    <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2}>
+                      <rect x="3" y="4" width="18" height="18" rx="3" />
+                      <path d="M16 2v4M8 2v4M3 10h18" />
+                    </svg>
                     Үзэх цаг товлох
                   </button>
                   {chats.length > 0 && (
                     <div className={`grid gap-2 ${chats.length > 1 ? 'grid-cols-2' : 'grid-cols-1'}`}>
                       {chats.map((ch) => (
-                        <a key={ch.key} href={ch.href} target="_blank" rel="noreferrer"
-                          className="flex items-center justify-center gap-2 h-12 rounded-full bg-white ring-1 ring-ink/10 hover:ring-ink/30 text-ink text-sm font-medium transition-all">
+                        <a
+                          key={ch.key}
+                          href={ch.href}
+                          target="_blank"
+                          rel="noreferrer"
+                          className="flex items-center justify-center gap-2 h-12 rounded-full bg-white ring-1 ring-ink/10 hover:ring-ink/30 text-ink text-sm font-medium transition-all"
+                        >
                           <ChatIcon ch={ch.key} /> {ch.label}
                         </a>
                       ))}
@@ -344,12 +494,25 @@ function VehicleContent({ id, initial }: { id: string; initial: VehicleDetail | 
                 const full = !inCompare && compareIds.length >= COMPARE_MAX;
                 return (
                   <div className="flex items-center gap-2 mt-2">
-                    <button type="button" onClick={() => toggleCompare(v.id)} disabled={full}
-                      className={`flex-1 flex items-center justify-center gap-2 h-12 rounded-full text-sm font-medium transition-colors disabled:opacity-40 ${inCompare ? 'bg-brand-soft text-brand' : 'bg-zinc-50 text-ink hover:bg-zinc-100'}`}>
-                      {inCompare ? <>{Ic.check} Харьцуулалтад нэмэгдсэн</> : full ? `Дээд тал нь ${COMPARE_MAX} машин` : '+ Харьцуулахад нэмэх'}
+                    <button
+                      type="button"
+                      onClick={() => toggleCompare(v.id)}
+                      disabled={full}
+                      className={`flex-1 flex items-center justify-center gap-2 h-12 rounded-full text-sm font-medium transition-colors disabled:opacity-40 ${inCompare ? 'bg-brand-soft text-brand' : 'bg-zinc-50 text-ink hover:bg-zinc-100'}`}
+                    >
+                      {inCompare ? (
+                        <>{Ic.check} Харьцуулалтад нэмэгдсэн</>
+                      ) : full ? (
+                        `Дээд тал нь ${COMPARE_MAX} машин`
+                      ) : (
+                        '+ Харьцуулахад нэмэх'
+                      )}
                     </button>
                     {compareIds.length >= 2 && (
-                      <Link href="/#cars" className="shrink-0 h-12 px-4 rounded-full bg-ink text-white text-sm font-medium flex items-center gap-1.5">
+                      <Link
+                        href="/#cars"
+                        className="shrink-0 h-12 px-4 rounded-full bg-ink text-white text-sm font-medium flex items-center gap-1.5"
+                      >
                         Харьцуулах <span className="opacity-60 tabular-nums">{compareIds.length}</span>
                       </Link>
                     )}
@@ -363,8 +526,12 @@ function VehicleContent({ id, initial }: { id: string; initial: VehicleDetail | 
                   <div className="text-xs text-zinc-500">Худалдагч</div>
                   <div className="font-medium text-ink text-sm truncate">{v.company?.name}</div>
                 </div>
-                <button onClick={copyLink} aria-label="Холбоос хуулах" title={copied ? 'Хуулагдлаа' : 'Холбоос хуулах'}
-                  className="sm:hidden w-10 h-10 rounded-full bg-zinc-100 text-ink flex items-center justify-center">
+                <button
+                  onClick={copyLink}
+                  aria-label="Холбоос хуулах"
+                  title={copied ? 'Хуулагдлаа' : 'Холбоос хуулах'}
+                  className="sm:hidden w-10 h-10 rounded-full bg-zinc-100 text-ink flex items-center justify-center"
+                >
                   {Ic.link}
                 </button>
               </div>
@@ -381,16 +548,25 @@ function VehicleContent({ id, initial }: { id: string; initial: VehicleDetail | 
             <div className="flex items-end justify-between gap-4 mb-6 sm:mb-8">
               <div>
                 <div className="text-xs font-semibold uppercase tracking-[0.14em] text-brand mb-2">Бусад машинууд</div>
-                <h2 className="font-display text-2xl sm:text-4xl font-semibold tracking-[-0.02em] text-ink">Төстэй машинууд</h2>
+                <h2 className="font-display text-2xl sm:text-4xl font-semibold tracking-[-0.02em] text-ink">
+                  Төстэй машинууд
+                </h2>
               </div>
-              <Link href="/#cars" className="hidden sm:inline-flex items-center gap-2 h-11 px-5 rounded-full bg-white ring-1 ring-ink/[0.08] text-sm font-medium text-ink hover:ring-ink/30 transition-all whitespace-nowrap">
+              <Link
+                href="/#cars"
+                className="hidden sm:inline-flex items-center gap-2 h-11 px-5 rounded-full bg-white ring-1 ring-ink/[0.08] text-sm font-medium text-ink hover:ring-ink/30 transition-all whitespace-nowrap"
+              >
                 Бүгдийг үзэх {Ic.arrow}
               </Link>
             </div>
             <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-6">
               {others === null
                 ? [...Array(4)].map((_, i) => <VehicleCardSkeleton key={i} />)
-                : others.map((o) => <div key={o.id} className="reveal flex"><VehicleCard v={o} /></div>)}
+                : others.map((o) => (
+                    <div key={o.id} className="reveal flex">
+                      <VehicleCard v={o} />
+                    </div>
+                  ))}
             </div>
           </div>
         </section>
@@ -403,26 +579,44 @@ function VehicleContent({ id, initial }: { id: string; initial: VehicleDetail | 
       {/* Mobile: хөвөгч доод мөр */}
       {v.company?.phone && (
         <div className="lg:hidden fixed inset-x-3 bottom-[calc(0.75rem+env(safe-area-inset-bottom))] z-40 glass rounded-full p-1.5 flex gap-1.5">
-          <a href={`tel:${v.company.phone}`}
-            className="flex-1 flex items-center justify-center gap-2 bg-brand active:bg-brand-dark text-white text-sm font-medium h-12 rounded-full">
+          <a
+            href={`tel:${v.company.phone}`}
+            className="flex-1 flex items-center justify-center gap-2 bg-brand active:bg-brand-dark text-white text-sm font-medium h-12 rounded-full"
+          >
             <IcPhone cls="w-4 h-4" /> Залгах
           </a>
-          <button type="button" onClick={() => setLeadOpen(true)}
-            className="flex-1 flex items-center justify-center gap-2 bg-white border border-zinc-200 text-ink text-sm font-medium h-12 rounded-full">
+          <button
+            type="button"
+            onClick={() => setLeadOpen(true)}
+            className="flex-1 flex items-center justify-center gap-2 bg-white border border-zinc-200 text-ink text-sm font-medium h-12 rounded-full"
+          >
             Цаг товлох
           </button>
         </div>
       )}
 
-      <LeadForm open={leadOpen} onClose={() => setLeadOpen(false)} kind="VIEWING"
-        vehicle={{ id: v.id, title: `${v.year} ${v.brand} ${v.model}` }} />
+      <LeadForm
+        open={leadOpen}
+        onClose={() => setLeadOpen(false)}
+        kind="VIEWING"
+        vehicle={{ id: v.id, title: `${v.year} ${v.brand} ${v.model}` }}
+      />
 
-      <LeasingWidget key={v.id} price={price ? Number(v.price) : null} phone={v.company?.phone}
-        chatHref={chats[0]?.href} chatLabel={chats[0]?.label} />
+      <LeasingWidget
+        key={v.id}
+        price={price ? Number(v.price) : null}
+        phone={v.company?.phone}
+        chatHref={chats[0]?.href}
+        chatLabel={chats[0]?.label}
+      />
     </div>
   );
 }
 
 export default function VehicleClient({ id, initial }: { id: string; initial: VehicleDetail | null }) {
-  return <Suspense><VehicleContent id={id} initial={initial} /></Suspense>;
+  return (
+    <Suspense>
+      <VehicleContent id={id} initial={initial} />
+    </Suspense>
+  );
 }

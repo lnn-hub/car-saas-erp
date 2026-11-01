@@ -1,12 +1,14 @@
-export const BACKEND = process.env.NEXT_PUBLIC_API_URL || "http://localhost:4000";
+export const BACKEND = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000';
 
 // Сайтын үндсэн хаяг (Facebook/Google-д зориулсан холбоос). Vercel production хаягийг автоматаар авна.
 export const SITE_URL =
   process.env.NEXT_PUBLIC_SITE_URL ||
-  (process.env.VERCEL_PROJECT_PRODUCTION_URL ? `https://${process.env.VERCEL_PROJECT_PRODUCTION_URL}` : "http://localhost:3000");
+  (process.env.VERCEL_PROJECT_PRODUCTION_URL
+    ? `https://${process.env.VERCEL_PROJECT_PRODUCTION_URL}`
+    : 'http://localhost:3000');
 
 // Танилцуулгын горим: админ руу нууц үггүй шууд орно (backend дээр DEMO_LOGIN=true хамт хэрэгтэй)
-export const DEMO_LOGIN = process.env.NEXT_PUBLIC_DEMO_LOGIN === "true";
+export const DEMO_LOGIN = process.env.NEXT_PUBLIC_DEMO_LOGIN === 'true';
 
 export interface TeamMember {
   id: string;
@@ -45,7 +47,7 @@ export interface Vehicle {
 
 export function imgUrl(u: string | null) {
   if (!u) return null;
-  return u.startsWith("http") ? u : `${BACKEND}${u}`;
+  return u.startsWith('http') ? u : `${BACKEND}${u}`;
 }
 
 export interface SiteInitial {
@@ -55,35 +57,47 @@ export interface SiteInitial {
 }
 
 export interface VehicleDetail {
-  id: string; brand: string; model: string; year: number; color: string;
-  fuel_type: string; transmission: string; engine_cc: string; mileage: number;
-  description: string; has_plates: boolean; manufactured_date: string | null;
-  price: string | null; prev_price?: string | null; images: string[];
+  id: string;
+  brand: string;
+  model: string;
+  year: number;
+  color: string;
+  fuel_type: string;
+  transmission: string;
+  engine_cc: string;
+  mileage: number;
+  description: string;
+  has_plates: boolean;
+  manufactured_date: string | null;
+  price: string | null;
+  prev_price?: string | null;
+  images: string[];
   company: Company;
 }
 
-const isCld = (url: string) => url.includes("res.cloudinary.com") && url.includes("/upload/") && !url.includes("/upload/f_auto");
+const isCld = (url: string) =>
+  url.includes('res.cloudinary.com') && url.includes('/upload/') && !url.includes('/upload/f_auto');
 
 // Хэд хэдэн өргөнтэй хувилбар: хөтөч дэлгэцдээ тохирохыг нь сонгож татна (утсанд жижиг файл)
 export function imgSrcSet(u: string | null, widths: number[]) {
   const url = imgUrl(u);
   if (!url || !isCld(url)) return undefined;
-  return widths.map((w) => `${url.replace("/upload/", `/upload/f_auto,q_auto,w_${w}/`)} ${w}w`).join(", ");
+  return widths.map((w) => `${url.replace('/upload/', `/upload/f_auto,q_auto,w_${w}/`)} ${w}w`).join(', ');
 }
 
 // Маш жижиг (≈1KB) бүдэг хувилбар — зураг ачаалагдах хүртэл саарал хайрцагны оронд харагдана
 export function imgBlur(u: string | null) {
   const url = imgUrl(u);
   if (!url || !isCld(url)) return undefined;
-  return url.replace("/upload/", "/upload/f_auto,q_auto:low,w_40,e_blur:400/");
+  return url.replace('/upload/', '/upload/f_auto,q_auto:low,w_40,e_blur:400/');
 }
 
 // Cloudinary зургийг хэрэгтэй хэмжээгээр нь (багаар, auto format) авна
 export function optimizeImg(u: string | null, width: number) {
   const url = imgUrl(u);
   if (!url) return null;
-  if (url.includes("res.cloudinary.com") && url.includes("/upload/") && !url.includes("/upload/f_auto")) {
-    return url.replace("/upload/", `/upload/f_auto,q_auto,w_${width}/`);
+  if (url.includes('res.cloudinary.com') && url.includes('/upload/') && !url.includes('/upload/f_auto')) {
+    return url.replace('/upload/', `/upload/f_auto,q_auto,w_${width}/`);
   }
   return url;
 }

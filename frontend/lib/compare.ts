@@ -1,15 +1,15 @@
-"use client";
-import { useEffect, useState } from "react";
+'use client';
+import { useEffect, useState } from 'react';
 
 // Харьцуулах машинуудын жагсаалт — хуудас хооронд хадгалагдана (нүүр ↔ машины хуудас)
-const KEY = "compare";
-const EVT = "compare-change";
+const KEY = 'compare';
+const EVT = 'compare-change';
 export const COMPARE_MAX = 3;
 
 function read(): string[] {
   try {
-    const v = JSON.parse(localStorage.getItem(KEY) || "[]");
-    return Array.isArray(v) ? v.filter((x) => typeof x === "string").slice(0, COMPARE_MAX) : [];
+    const v = JSON.parse(localStorage.getItem(KEY) || '[]');
+    return Array.isArray(v) ? v.filter((x) => typeof x === 'string').slice(0, COMPARE_MAX) : [];
   } catch {
     return [];
   }
@@ -29,10 +29,10 @@ export function useCompare() {
     const sync = () => setIds(read());
     sync();
     window.addEventListener(EVT, sync);
-    window.addEventListener("storage", sync);
+    window.addEventListener('storage', sync);
     return () => {
       window.removeEventListener(EVT, sync);
-      window.removeEventListener("storage", sync);
+      window.removeEventListener('storage', sync);
     };
   }, []);
 

@@ -16,7 +16,7 @@ router.get('/', auth, async (req, res) => {
        FROM vehicles v
        LEFT JOIN vehicle_costs vc ON vc.vehicle_id = v.id
        GROUP BY v.id
-       ORDER BY v.created_at DESC`
+       ORDER BY v.created_at DESC`,
     );
     res.json(canSeeMoney(req.user) ? rows : rows.map(({ total_cost, ...r }) => r));
   } catch (err) {
@@ -41,8 +41,22 @@ router.get('/:id', auth, async (req, res) => {
 
 // POST /api/vehicles — машин нэмэх
 router.post('/', auth, async (req, res) => {
-  const { vin, brand, model, year, mileage, color, fuel_type, transmission, engine_cc, description,
-          arrived_at, manufactured_date, has_plates, price } = req.body;
+  const {
+    vin,
+    brand,
+    model,
+    year,
+    mileage,
+    color,
+    fuel_type,
+    transmission,
+    engine_cc,
+    description,
+    arrived_at,
+    manufactured_date,
+    has_plates,
+    price,
+  } = req.body;
   if (!vin || !brand || !model || !year)
     return res.status(400).json({ error: 'VIN, марк, загвар,он заавал шаардлагатай' });
 
@@ -56,8 +70,23 @@ router.post('/', auth, async (req, res) => {
     const { rows } = await pool.query(
       `INSERT INTO vehicles (vin, brand, model, year, mileage, color, fuel_type, transmission, engine_cc, description, arrived_at, manufactured_date, has_plates, created_by, price, status)
        VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15,'PUBLISHED') RETURNING *`,
-      [vin, brand, model, year, mileage || 0, color, fuel_type || 'PETROL', transmission || 'AUTO',
-       engine_cc, description, arrived_at || null, mfgDate, has_plates === true || has_plates === 'true', req.user.id, listPrice]
+      [
+        vin,
+        brand,
+        model,
+        year,
+        mileage || 0,
+        color,
+        fuel_type || 'PETROL',
+        transmission || 'AUTO',
+        engine_cc,
+        description,
+        arrived_at || null,
+        mfgDate,
+        has_plates === true || has_plates === 'true',
+        req.user.id,
+        listPrice,
+      ],
     );
     res.status(201).json(rows[0]);
   } catch (err) {
@@ -67,10 +96,24 @@ router.post('/', auth, async (req, res) => {
 });
 
 // PATCH /api/vehicles/:id — мэдээлэл засах
-const EDITABLE = ['brand', 'model', 'year', 'mileage', 'color', 'fuel_type', 'transmission',
-                  'engine_cc', 'description', 'has_plates', 'manufactured_date', 'arrived_at', 'price'];
+const EDITABLE = [
+  'brand',
+  'model',
+  'year',
+  'mileage',
+  'color',
+  'fuel_type',
+  'transmission',
+  'engine_cc',
+  'description',
+  'has_plates',
+  'manufactured_date',
+  'arrived_at',
+  'price',
+];
 router.patch('/:id', auth, async (req, res) => {
-  const sets = [], vals = [];
+  const sets = [],
+    vals = [];
   for (const key of EDITABLE) {
     if (req.body[key] === undefined) continue;
     let v = req.body[key];
@@ -86,7 +129,9 @@ router.patch('/:id', auth, async (req, res) => {
   try {
     // Үнэ буурвал өмнөх өндөр үнийг хадгална (сайтад "Үнэ буурсан" гэж харагдана)
     if (req.body.price !== undefined) {
-      const { rows: [cur] } = await pool.query('SELECT price, prev_price FROM vehicles WHERE id=$1', [req.params.id]);
+      const {
+        rows: [cur],
+      } = await pool.query('SELECT price, prev_price FROM vehicles WHERE id=$1', [req.params.id]);
       if (cur) {
         const next = req.body.price === '' || req.body.price === null ? null : Number(req.body.price);
         const old = cur.price != null ? Number(cur.price) : null;
@@ -95,7 +140,8 @@ router.patch('/:id', auth, async (req, res) => {
           let newPrev = null;
           if (next != null && old != null && next < old) newPrev = Math.max(prev || 0, old);
           else if (next != null && prev != null && next < prev) newPrev = prev;
-          vals.push(newPrev); sets.push(`prev_price = $${vals.length}`);
+          vals.push(newPrev);
+          sets.push(`prev_price = $${vals.length}`);
           sets.push('price_changed_at = NOW()');
         }
       }
@@ -104,11 +150,13 @@ router.patch('/:id', auth, async (req, res) => {
     const { rows } = await pool.query(
       `UPDATE vehicles SET ${sets.join(', ')}, updated_at = NOW()
        WHERE id = $${vals.length} RETURNING *`,
-      vals
+      vals,
     );
     if (!rows[0]) return res.status(404).json({ error: 'Машин олдсонгүй' });
     res.json(rows[0]);
-  } catch (err) { serverError(res, err); }
+  } catch (err) {
+    serverError(res, err);
+  }
 });
 
 // DELETE /api/vehicles/:id — борлуулалтгүй машиныг устгах
@@ -121,25 +169,28 @@ router.delete('/:id', auth, requireAdmin, async (req, res) => {
 
     const { rows: imgs } = await pool.query('SELECT url FROM vehicle_images WHERE vehicle_id=$1', [req.params.id]);
     for (const img of imgs) {
-      try { await require('./upload').deleteImage(img.url); } catch (_) {}
+      try {
+        await require('./upload').deleteImage(img.url);
+      } catch (_) {}
     }
     await pool.query('DELETE FROM vehicles WHERE id=$1', [req.params.id]);
     res.json({ ok: true });
-  } catch (err) { serverError(res, err); }
+  } catch (err) {
+    serverError(res, err);
+  }
 });
 
 // PATCH /api/vehicles/:id/status — статус өөрчлөх
 router.patch('/:id/status', auth, async (req, res) => {
   const { status } = req.body;
   const allowed = ['ARRIVED', 'PUBLISHED', 'RESERVED', 'SOLD'];
-  if (!allowed.includes(status))
-    return res.status(400).json({ error: 'Буруу статус' });
+  if (!allowed.includes(status)) return res.status(400).json({ error: 'Буруу статус' });
 
   try {
     const { rows } = await pool.query(
       `UPDATE vehicles SET status = $1, updated_at = NOW()
        WHERE id = $2 RETURNING *`,
-      [status, req.params.id]
+      [status, req.params.id],
     );
     if (!rows[0]) return res.status(404).json({ error: 'Машин олдсонгүй' });
     res.json(rows[0]);
@@ -162,7 +213,7 @@ router.post('/:id/costs', auth, requireMoney, async (req, res) => {
     const { rows } = await pool.query(
       `INSERT INTO vehicle_costs (vehicle_id, cost_type, amount, currency, note, created_by)
        VALUES ($1,$2,$3,$4,$5,$6) RETURNING *`,
-      [req.params.id, cost_type, amt, currency || 'MNT', note, req.user.id]
+      [req.params.id, cost_type, amt, currency || 'MNT', note, req.user.id],
     );
     res.status(201).json(rows[0]);
   } catch (err) {
@@ -173,14 +224,21 @@ router.post('/:id/costs', auth, requireMoney, async (req, res) => {
 
 // ─── Facebook пэйж рүү нийтлэх ──────────────────────────────────────────────
 const FUEL = { PETROL: 'Бензин', DIESEL: 'Дизель', HYBRID: 'Хибрид', ELECTRIC: 'Цахилгаан' };
-const siteUrl = () => process.env.PUBLIC_SITE_URL
-  || (process.env.FRONTEND_URL || '').split(',').map((s) => s.trim()).find((u) => u && !u.includes('localhost'))
-  || '';
-const fmtMoney = (n) => (n >= 1e6 ? `${(n / 1e6).toFixed(1).replace(/\.0$/, '')} сая ₮` : `${Math.round(n).toLocaleString('en-US')} ₮`);
+const siteUrl = () =>
+  process.env.PUBLIC_SITE_URL ||
+  (process.env.FRONTEND_URL || '')
+    .split(',')
+    .map((s) => s.trim())
+    .find((u) => u && !u.includes('localhost')) ||
+  '';
+const fmtMoney = (n) =>
+  n >= 1e6 ? `${(n / 1e6).toFixed(1).replace(/\.0$/, '')} сая ₮` : `${Math.round(n).toLocaleString('en-US')} ₮`;
 // Facebook зөвхөн нийтэд нээлттэй https зургийг татна. Cloudinary бол JPG, 1600px болгоно.
 const fbImage = (u) => {
   if (!/^https:\/\//.test(u || '')) return null;
-  return u.includes('res.cloudinary.com') && u.includes('/upload/') ? u.replace('/upload/', '/upload/f_jpg,q_auto,w_1600/') : u;
+  return u.includes('res.cloudinary.com') && u.includes('/upload/')
+    ? u.replace('/upload/', '/upload/f_jpg,q_auto,w_1600/')
+    : u;
 };
 
 function buildMessage(v, company) {
@@ -189,7 +247,9 @@ function buildMessage(v, company) {
     FUEL[v.fuel_type],
     v.transmission === 'AUTO' ? 'Автомат' : v.transmission === 'MANUAL' ? 'Механик' : null,
     v.engine_cc ? `${(v.engine_cc / 1000).toFixed(1)}L` : null,
-  ].filter(Boolean).join(' · ');
+  ]
+    .filter(Boolean)
+    .join(' · ');
   const lines = (v.description || '').split('\n').map((l) => l.trim());
   const about = lines.filter((l) => l && !l.startsWith('Зургийн эх сурвалж')).join('\n');
   const url = siteUrl() ? `${siteUrl().replace(/\/$/, '')}/vehicle/${v.id}` : '';
@@ -201,27 +261,42 @@ function buildMessage(v, company) {
     about ? `\n${about}` : '',
     url ? `\nДэлгэрэнгүй: ${url}` : '',
     company.phone ? `Утас: ${company.phone}` : '',
-  ].filter(Boolean).join('\n');
+  ]
+    .filter(Boolean)
+    .join('\n');
 }
 
 // POST /api/vehicles/:id/facebook
 router.post('/:id/facebook', auth, async (req, res) => {
   try {
-    const [{ rows: [v] }, company, { rows: imgs }] = await Promise.all([
+    const [
+      {
+        rows: [v],
+      },
+      company,
+      { rows: imgs },
+    ] = await Promise.all([
       pool.query('SELECT * FROM vehicles WHERE id=$1', [req.params.id]),
       getCompany('phone, show_prices, fb_page_id, fb_page_token'),
       pool.query('SELECT url FROM vehicle_images WHERE vehicle_id=$1 ORDER BY sort_order', [req.params.id]),
     ]);
     if (!v) return res.status(404).json({ error: 'Машин олдсонгүй' });
-    if (!company?.fb_page_token) return res.status(400).json({ error: 'Facebook пэйж холбоогүй байна. Тохиргоо хэсгээс холбоно уу' });
+    if (!company?.fb_page_token)
+      return res.status(400).json({ error: 'Facebook пэйж холбоогүй байна. Тохиргоо хэсгээс холбоно уу' });
     const imageUrls = imgs.map((i) => fbImage(i.url)).filter(Boolean);
     const message = buildMessage(v, company);
     const post = await publishPost({
-      pageId: company.fb_page_id, token: company.fb_page_token, message, imageUrls,
+      pageId: company.fb_page_id,
+      token: company.fb_page_token,
+      message,
+      imageUrls,
       link: siteUrl() ? `${siteUrl().replace(/\/$/, '')}/vehicle/${v.id}` : null,
     });
     await pool.query('UPDATE vehicles SET fb_post_url=$1, fb_posted_at=NOW() WHERE id=$2', [post.url, v.id]);
-    res.json({ ...post, skipped_images: imgs.length - Math.min(imageUrls.length, 10) > 0 ? imgs.length - post.photos : 0 });
+    res.json({
+      ...post,
+      skipped_images: imgs.length - Math.min(imageUrls.length, 10) > 0 ? imgs.length - post.photos : 0,
+    });
   } catch (err) {
     if (err instanceof FbError) return res.status(400).json({ error: err.message });
     if (err.code === '22P02') return res.status(404).json({ error: 'Машин олдсонгүй' });
@@ -232,7 +307,12 @@ router.post('/:id/facebook', auth, async (req, res) => {
 // GET /api/vehicles/:id/facebook/preview — постын бичвэрийг урьдчилан харах
 router.get('/:id/facebook/preview', auth, async (req, res) => {
   try {
-    const [{ rows: [v] }, company] = await Promise.all([
+    const [
+      {
+        rows: [v],
+      },
+      company,
+    ] = await Promise.all([
       pool.query('SELECT * FROM vehicles WHERE id=$1', [req.params.id]),
       getCompany('phone, show_prices'),
     ]);

@@ -1,9 +1,13 @@
-import type { MetadataRoute } from "next";
-import { SITE_URL } from "@/lib/site";
+import type { MetadataRoute } from 'next';
+import { SITE_URL } from '@/lib/site';
 
 export default function robots(): MetadataRoute.Robots {
   return {
-    rules: { userAgent: "*", allow: "/", disallow: ["/dashboard", "/vehicles", "/sales", "/reports", "/settings", "/leads", "/login", "/admin"] },
+    rules: {
+      userAgent: '*',
+      allow: '/',
+      disallow: ['/dashboard', '/vehicles', '/sales', '/reports', '/settings', '/leads', '/login', '/admin'],
+    },
     sitemap: `${SITE_URL}/sitemap.xml`,
   };
 }
