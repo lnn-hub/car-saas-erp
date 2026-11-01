@@ -50,7 +50,6 @@ function VehicleContent({ id, initial }: { id: string; initial: VehicleDetail | 
   const [v, setV] = useState<VehicleDetail | null>(initial);
   const [others, setOthers] = useState<Vehicle[] | null>(null);
   const [copied, setCopied] = useState(false);
-  const [calcOpen, setCalcOpen] = useState(false);
   const [leadOpen, setLeadOpen] = useState(false);
   const [lightbox, setLightbox] = useState<number | null>(null);
   const [slide, setSlide] = useState(0);
@@ -144,6 +143,8 @@ function VehicleContent({ id, initial }: { id: string; initial: VehicleDetail | 
   const credit    = descLines.find(l => l.startsWith('Зургийн эх сурвалж'));
   const intro     = descLines.filter(l => l && !l.startsWith('•') && !l.startsWith('Зургийн эх сурвалж')).join('\n\n');
   const chats     = chatChannels(v.company, `Сайн байна уу, ${v.year} оны ${v.brand} ${v.model} машины талаар лавлах гэсэн юм.`);
+
+  const goLeasing = () => document.getElementById('leasing')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
 
   async function copyLink() {
     try {
@@ -258,6 +259,11 @@ function VehicleContent({ id, initial }: { id: string; initial: VehicleDetail | 
               ))}
             </div>
 
+            {leasingOn && (
+              <LeasingCalculator price={price ? Number(v.price) : null} phone={v.company?.phone}
+                chatHref={chats[0]?.href} chatLabel={chats[0]?.label} />
+            )}
+
             {intro && (
               <section className={`${card} p-6 sm:p-8`}>
                 <h2 className="font-display text-xl sm:text-2xl font-semibold text-ink mb-4">Машины тухай</h2>
@@ -314,7 +320,7 @@ function VehicleContent({ id, initial }: { id: string; initial: VehicleDetail | 
               <div className="text-sm text-zinc-500 mt-2">{v.year} он{v.color ? ` · ${v.color}` : ''}{km ? ` · ${km}` : ''}</div>
 
               {leasingOn && (
-                <button type="button" onClick={() => setCalcOpen(true)}
+                <button type="button" onClick={goLeasing}
                   className="group w-full mt-5 flex items-center justify-between gap-3 rounded-2xl bg-zinc-50 hover:bg-brand-soft px-4 py-3.5 text-left transition-colors">
                   <span className="flex items-center gap-3">
                     <span className="w-9 h-9 rounded-full bg-white ring-1 ring-ink/[0.06] text-brand flex items-center justify-center">{Ic.calc}</span>
@@ -412,15 +418,11 @@ function VehicleContent({ id, initial }: { id: string; initial: VehicleDetail | 
 
       <Lightbox images={fullImgs} index={lightbox} onClose={() => setLightbox(null)} onIndex={(i) => setLightbox(i)} />
 
-      {leasingOn && <LeasingCalculator open={calcOpen} onClose={() => setCalcOpen(false)}
-        price={price ? Number(v.price) : null}
-        carName={`${v.year} ${v.brand} ${v.model}`} phone={v.company?.phone} chatHref={chats[0]?.href} chatLabel={chats[0]?.label} />}
-
       {/* Mobile: хөвөгч доод мөр */}
       {v.company?.phone && (
         <div className="lg:hidden fixed inset-x-3 bottom-[calc(0.75rem+env(safe-area-inset-bottom))] z-40 glass rounded-full p-1.5 flex gap-1.5">
           {leasingOn && (
-            <button type="button" onClick={() => setCalcOpen(true)} aria-label="Лизингийн тооцоолол"
+            <button type="button" onClick={goLeasing} aria-label="Лизингийн тооцоолол"
               className="shrink-0 w-12 h-12 flex items-center justify-center rounded-full bg-white border border-zinc-200 text-ink">
               {Ic.calc}
             </button>

@@ -1,168 +1,112 @@
 "use client";
-import { useEffect, useMemo, useState } from "react";
+import { useMemo, useState } from "react";
 
 const fmt = (n: number) => Math.round(n).toLocaleString("en-US");
-const toNum = (s: string) => Number(s.replace(/[^\d]/g, "")) || 0;
-const clamp = (n: number, min: number, max: number) => Math.min(max, Math.max(min, n));
+const short = (n: number) => (n >= 1_000_000 ? `${(n / 1_000_000).toFixed(1).replace(/\.0$/, "")} сая ₮` : `${fmt(n)} ₮`);
 
-function Range({ value, min, max, step, onChange }: {
-  value: number; min: number; max: number; step: number; onChange: (v: number) => void;
+const DOWNS = [0, 10, 20, 30, 50];
+const TERMS = [12, 24, 36, 48, 60];
+
+// Машины хуудсан дээр шууд харагдах энгийн лизингийн тооцоолуур
+export function LeasingCalculator({ price, chatHref, chatLabel, phone }: {
+  price: number | null; chatHref?: string; chatLabel?: string; phone?: string;
 }) {
-  const pct = ((clamp(value, min, max) - min) / (max - min)) * 100;
-  return (
-    <input
-      type="range" className="calc-range w-full" min={min} max={max} step={step} value={clamp(value, min, max)}
-      onChange={(e) => onChange(Number(e.target.value))}
-      style={{ backgroundImage: `linear-gradient(to right, var(--color-brand) ${pct}%, var(--color-zinc-200) ${pct}%)` }}
-    />
-  );
-}
-
-function Field({ label, children, hint }: { label: string; children: React.ReactNode; hint?: string }) {
-  return (
-    <div>
-      <div className="flex items-center justify-between gap-3 mb-2">
-        <span className="text-sm text-zinc-500">{label}</span>
-        {hint && <span className="text-sm font-medium text-brand">{hint}</span>}
-      </div>
-      {children}
-    </div>
-  );
-}
-
-const boxCls =
-  "w-full text-right bg-zinc-50 border border-zinc-200 focus:bg-white focus:border-ink/40 focus:ring-4 focus:ring-ink/5 focus:outline-none rounded-2xl px-4 py-2.5 font-display font-semibold text-ink text-lg tabular-nums transition";
-
-export function LeasingCalculator({ open, onClose, price, carName, phone, chatHref, chatLabel }: {
-  open: boolean; onClose: () => void; price: number | null; carName?: string; phone?: string; chatHref?: string; chatLabel?: string;
-}) {
-  const startPrice = price && price > 0 ? Math.round(price) : 100_000_000;
-  const [carPrice, setCarPrice] = useState(startPrice);
-  const [months, setMonths] = useState(48);
+  const [customPrice, setCustomPrice] = useState("");
   const [downPct, setDownPct] = useState(20);
-  const [rate, setRate] = useState(1.5);
+  const [months, setMonths] = useState(36);
+  const [rate, setRate] = useState("1.5");
 
-  useEffect(() => { if (open) setCarPrice(startPrice); }, [open, startPrice]);
-
-  useEffect(() => {
-    if (!open) return;
-    const onKey = (e: KeyboardEvent) => { if (e.key === "Escape") onClose(); };
-    window.addEventListener("keydown", onKey);
-    const prev = document.body.style.overflow;
-    document.body.style.overflow = "hidden";
-    return () => { window.removeEventListener("keydown", onKey); document.body.style.overflow = prev; };
-  }, [open, onClose]);
+  const carPrice = price && price > 0 ? price : Number(customPrice.replace(/\D/g, "")) || 0;
 
   const calc = useMemo(() => {
     const down = (carPrice * downPct) / 100;
     const loan = Math.max(0, carPrice - down);
-    const r = rate / 100;
+    const r = (Number(rate.replace(",", ".")) || 0) / 100;
     const monthly = loan === 0 ? 0 : r > 0 ? (loan * r) / (1 - Math.pow(1 + r, -months)) : loan / months;
-    const paidLoan = monthly * months;
-    return { down, loan, monthly, total: paidLoan + down, interest: paidLoan - loan };
-  }, [carPrice, months, downPct, rate]);
+    return { down, loan, monthly, interest: monthly * months - loan };
+  }, [carPrice, downPct, months, rate]);
 
-  const maxPrice = Math.max(500_000_000, startPrice * 2);
+  const chip = (on: boolean) =>
+    `h-10 min-w-[3.25rem] px-3 rounded-full text-sm font-medium border transition-colors ${
+      on ? "bg-ink border-ink text-white" : "bg-white border-zinc-200 text-zinc-700 hover:border-zinc-400"
+    }`;
+  const askHref = chatHref || (phone ? `tel:${phone}` : null);
 
   return (
-    <div className={`fixed inset-0 z-[90] overflow-hidden ${open ? "" : "pointer-events-none"}`} aria-hidden={!open}>
-      <div onClick={onClose}
-        className={`absolute inset-0 bg-ink/40 backdrop-blur-md transition-opacity duration-300 ${open ? "opacity-100" : "opacity-0"}`} />
-      <aside role="dialog" aria-label="Лизингийн тооцоолуур"
-        className={`absolute right-0 top-0 sm:top-3 sm:right-3 sm:bottom-3 h-full sm:h-auto w-full sm:w-[440px] bg-white sm:rounded-[28px] shadow-lift flex flex-col overflow-hidden transition-transform duration-500 ease-out-expo ${open ? "translate-x-0" : "translate-x-[110%]"}`}>
-        <div className="flex items-center justify-between px-6 h-[72px] shrink-0 border-b border-zinc-100">
+    <section id="leasing" className="bg-white rounded-[28px] ring-1 ring-ink/[0.06] shadow-card p-6 sm:p-8 scroll-mt-28">
+      <div className="flex items-baseline justify-between gap-3">
+        <h2 className="font-display text-xl sm:text-2xl font-semibold text-ink">Лизингийн тооцоолуур</h2>
+        <span className="text-xs text-zinc-500">Ойролцоо тооцоо</span>
+      </div>
+
+      <div className="grid grid-cols-1 md:grid-cols-[1fr_minmax(0,300px)] gap-6 mt-6">
+        <div className="space-y-5">
+          {!(price && price > 0) && (
+            <div>
+              <div className="text-sm text-zinc-500 mb-2">Машины үнэ</div>
+              <div className="relative">
+                <input value={customPrice} onChange={(e) => setCustomPrice(e.target.value.replace(/[^\d]/g, "") ? fmt(Number(e.target.value.replace(/[^\d]/g, ""))) : "")}
+                  inputMode="numeric" placeholder="Жишээ: 60,000,000"
+                  className="w-full bg-zinc-50 border border-zinc-200 rounded-2xl pl-4 pr-9 h-12 text-base font-medium text-ink tabular-nums focus:outline-none focus:border-ink/40" />
+                <span className="absolute right-4 top-1/2 -translate-y-1/2 text-zinc-500">₮</span>
+              </div>
+            </div>
+          )}
+
+          <div>
+            <div className="flex items-baseline justify-between gap-3 mb-2">
+              <span className="text-sm text-zinc-500">Урьдчилгаа</span>
+              {carPrice > 0 && <span className="text-sm font-medium text-ink tabular-nums">{short(calc.down)}</span>}
+            </div>
+            <div className="flex flex-wrap gap-2">
+              {DOWNS.map((d) => <button key={d} type="button" onClick={() => setDownPct(d)} className={chip(downPct === d)}>{d}%</button>)}
+            </div>
+          </div>
+
+          <div>
+            <div className="flex items-baseline justify-between gap-3 mb-2">
+              <span className="text-sm text-zinc-500">Хугацаа</span>
+              <span className="text-sm font-medium text-ink">{months / 12} жил</span>
+            </div>
+            <div className="flex flex-wrap gap-2">
+              {TERMS.map((m) => <button key={m} type="button" onClick={() => setMonths(m)} className={chip(months === m)}>{m} сар</button>)}
+            </div>
+          </div>
+
           <div className="flex items-center gap-3">
-            <svg className="w-5 h-5 text-brand" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2}>
-              <rect x="4" y="2" width="16" height="20" rx="2" /><path d="M8 6h8M8 11h2M14 11h2M8 15h2M14 15h2M8 19h2M14 19h2" />
-            </svg>
-            <span className="font-display text-lg font-semibold text-ink">Лизингийн тооцоолуур</span>
+            <span className="text-sm text-zinc-500">Сарын хүү</span>
+            <div className="relative w-24">
+              <input value={rate} onChange={(e) => setRate(e.target.value.replace(/[^\d.,]/g, "").slice(0, 4))} inputMode="decimal"
+                className="w-full bg-zinc-50 border border-zinc-200 rounded-xl pl-3 pr-7 h-10 text-sm font-medium text-ink tabular-nums focus:outline-none focus:border-ink/40" />
+              <span className="absolute right-3 top-1/2 -translate-y-1/2 text-sm text-zinc-500">%</span>
+            </div>
+            <span className="text-xs text-zinc-500">банкнаас хамаарна</span>
           </div>
-          <button onClick={onClose} aria-label="Хаах" className="w-10 h-10 flex items-center justify-center rounded-full bg-zinc-100 hover:bg-zinc-200 text-ink transition-colors">
-            <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2}><path d="M18 6L6 18M6 6l12 12" /></svg>
-          </button>
         </div>
 
-        <div className="flex-1 overflow-y-auto px-6 py-6 space-y-6">
-          {carName && <div className="inline-flex items-center h-8 px-3 rounded-full bg-zinc-100 text-sm font-medium text-ink">{carName}</div>}
-
-          <Field label="Машины үнэ">
-            <div className="relative">
-              <input inputMode="numeric" className={boxCls + " pr-9"} value={fmt(carPrice)}
-                onChange={(e) => setCarPrice(clamp(toNum(e.target.value), 1_000_000, 5_000_000_000))} />
-              <span className="absolute right-3 top-1/2 -translate-y-1/2 font-bold text-zinc-500">₮</span>
-            </div>
-            <div className="mt-2"><Range value={carPrice} min={10_000_000} max={maxPrice} step={1_000_000} onChange={setCarPrice} /></div>
-          </Field>
-
-          <Field label="Хугацаа" hint={`${(months / 12).toFixed(months % 12 ? 1 : 0)} жил`}>
-            <div className="relative">
-              <input inputMode="numeric" className={boxCls + " pr-12"} value={months}
-                onChange={(e) => setMonths(clamp(toNum(e.target.value), 1, 120))} />
-              <span className="absolute right-3 top-1/2 -translate-y-1/2 font-bold text-zinc-500 text-sm">сар</span>
-            </div>
-            <div className="mt-2"><Range value={months} min={6} max={84} step={6} onChange={setMonths} /></div>
-          </Field>
-
-          <Field label="Урьдчилгаа" hint={`${downPct}%`}>
-            <div className="relative">
-              <input inputMode="numeric" className={boxCls + " pr-9"} value={fmt(calc.down)}
-                onChange={(e) => setDownPct(clamp(Math.round((toNum(e.target.value) / carPrice) * 100), 0, 90))} />
-              <span className="absolute right-3 top-1/2 -translate-y-1/2 font-bold text-zinc-500">₮</span>
-            </div>
-            <div className="mt-2"><Range value={downPct} min={0} max={90} step={5} onChange={setDownPct} /></div>
-          </Field>
-
-          <Field label="Сарын хүү">
-            <div className="relative">
-              <input inputMode="decimal" className={boxCls + " pr-9"} value={rate}
-                onChange={(e) => setRate(clamp(Number(e.target.value.replace(/[^\d.]/g, "")) || 0, 0, 10))} />
-              <span className="absolute right-3 top-1/2 -translate-y-1/2 font-bold text-zinc-500">%</span>
-            </div>
-            <div className="mt-2"><Range value={rate} min={0} max={4} step={0.1} onChange={(v) => setRate(Math.round(v * 10) / 10)} /></div>
-          </Field>
-
-          <div className="relative overflow-hidden bg-ink text-white rounded-[24px] p-6">
-            <div className="pointer-events-none absolute -right-16 -top-20 w-56 h-56 rounded-full bg-brand/70 blur-3xl" />
-            <div className="relative text-center text-sm text-white/60 mb-2">Сарын төлбөр</div>
-            <div className="relative text-center font-display text-[40px] font-semibold tabular-nums tracking-tight">{fmt(calc.monthly)}₮</div>
-            <dl className="relative mt-6 pt-5 border-t border-white/10 space-y-3 text-sm">
-              {[
-                ["Зээлэх дүн", calc.loan],
-                ["Урьдчилгаа", calc.down],
-                ["Нийт хүү", calc.interest],
-                ["Нийт төлөх дүн", calc.total],
-              ].map(([k, v]) => (
-                <div key={k as string} className="flex items-center justify-between">
-                  <dt className="text-white/55">{k}</dt>
-                  <dd className="font-medium tabular-nums">{fmt(v as number)}₮</dd>
-                </div>
-              ))}
+        <div className="rounded-[22px] bg-brand-soft p-5 sm:p-6 flex flex-col">
+          <div className="text-sm text-zinc-600">Сарын төлбөр</div>
+          <div className="font-display text-[34px] sm:text-[40px] font-semibold text-brand tabular-nums tracking-tight leading-tight mt-1">
+            {carPrice > 0 ? `${fmt(calc.monthly)}₮` : "—"}
+          </div>
+          {carPrice > 0 && (
+            <dl className="mt-4 space-y-1.5 text-sm">
+              <div className="flex justify-between gap-3"><dt className="text-zinc-600">Зээлийн дүн</dt><dd className="font-medium text-ink tabular-nums">{short(calc.loan)}</dd></div>
+              <div className="flex justify-between gap-3"><dt className="text-zinc-600">Нийт хүү</dt><dd className="font-medium text-ink tabular-nums">{short(calc.interest)}</dd></div>
             </dl>
-          </div>
-
-          <p className="text-xs text-zinc-500 leading-relaxed bg-zinc-50 rounded-2xl px-4 py-3">
-            * Зөвхөн дундаж нөхцөлөөр тооцсон урьдчилсан дүн. Бодит зээлийн нөхцөл, хүү банк болон лизингийн
-            байгууллагаас хамаарч өөр байж болно.
-          </p>
-        </div>
-
-        <div className="shrink-0 border-t border-zinc-100 bg-white px-5 pt-4 pb-[calc(1rem+env(safe-area-inset-bottom))] sm:pb-5 space-y-2">
-          <div className="flex items-baseline justify-between gap-3 pb-1">
-            <span className="text-sm text-zinc-500">Сарын төлбөр</span>
-            <span className="font-display text-2xl font-semibold text-brand tabular-nums tracking-tight">{fmt(calc.monthly)}₮</span>
-          </div>
-          {(chatHref || phone) && (
-            <a href={chatHref || `tel:${phone}`} {...(chatHref ? { target: "_blank", rel: "noreferrer" } : {})}
-              className="flex items-center justify-center h-12 ring-1 ring-ink/10 hover:ring-ink/30 text-ink text-sm rounded-full transition-all font-medium">
+          )}
+          {askHref && (
+            <a href={askHref} {...(chatHref ? { target: "_blank", rel: "noreferrer" } : {})}
+              className="mt-5 h-11 rounded-full bg-brand hover:bg-brand-dark text-white text-sm font-medium flex items-center justify-center transition-colors">
               Лизингийн талаар лавлах{chatHref && chatLabel ? ` (${chatLabel})` : ""}
             </a>
           )}
-          <button onClick={onClose}
-            className="w-full bg-ink hover:bg-brand text-white text-sm h-12 rounded-full transition-colors font-medium">
-            Тооцоолуурыг хаах
-          </button>
         </div>
-      </aside>
-    </div>
+      </div>
+
+      <p className="text-xs text-zinc-500 mt-5">
+        Дундаж нөхцөлөөр тооцсон урьдчилсан дүн. Бодит хүү, нөхцөл нь банк, лизингийн байгууллагаас хамаарна.
+      </p>
+    </section>
   );
 }
