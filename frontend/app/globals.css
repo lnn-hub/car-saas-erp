@@ -119,11 +119,14 @@ button, a, select { touch-action: manipulation; }
   from { opacity: 0; transform: translateY(28px) scale(0.985); }
   to   { opacity: 1; transform: none; }
 }
-@supports (animation-timeline: view()) {
-  .reveal {
-    animation: reveal linear both;
-    animation-timeline: view();
-    animation-range: entry 0% entry 60%;
+/* Зөвхөн хулгана ашигладаг томоохон дэлгэц дээр. Утсан дээр контент шууд харагдана (гүйлгэхэд хоцрохгүй). */
+@media (hover: hover) and (pointer: fine) and (min-width: 1024px) {
+  @supports (animation-timeline: view()) {
+    .reveal {
+      animation: reveal linear both;
+      animation-timeline: view();
+      animation-range: entry 0% entry 35%;
+    }
   }
 }
 
@@ -257,3 +260,12 @@ html:not(.theme-dark) .border-\[\#f3efe9\],
 html:not(.theme-dark) .divide-zinc-100 > :not(:last-child),
 html:not(.theme-dark) .divide-\[\#f3efe9\] > :not(:last-child) { border-color: #e4ddd3; }
 html:not(.theme-dark) .glass { border-color: rgb(18 16 16 / 0.1); }
+
+/* Утсан дээр blur (backdrop-filter) гүйлгэлтийг удаашруулдаг тул энгийн өнгөөр солино */
+@media (max-width: 1023px) {
+  .glass, .glass-dark { -webkit-backdrop-filter: none; backdrop-filter: none; }
+  .glass { background: rgb(255 255 255 / 0.96); }
+  .glass-dark { background: rgb(18 16 16 / 0.6); }
+  .theme-dark .glass { background: rgb(27 25 23 / 0.97); }
+  .backdrop-blur-md, .backdrop-blur-sm, .backdrop-blur-xl, .backdrop-blur { -webkit-backdrop-filter: none; backdrop-filter: none; }
+}
