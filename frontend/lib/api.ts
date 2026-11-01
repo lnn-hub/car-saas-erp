@@ -144,6 +144,8 @@ export const api = {
   },
 
   getVehicleReport: (qs: string) => request(`/reports/vehicles?${qs}`),
+  getMonthReport: (month: string) => request(`/reports/month?month=${month}`),
+  getYearReport: (year: number) => request(`/reports/year?year=${year}`),
 
   uploadLogo: async (file: File) => {
     const fd = new FormData();

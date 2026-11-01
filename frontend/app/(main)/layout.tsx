@@ -140,12 +140,12 @@ function MainLayoutInner({ children }: { children: React.ReactNode }) {
     <div className="min-h-screen bg-canvas flex">
 
       {/* ── Desktop sidebar ── */}
-      <aside className="hidden lg:flex w-64 shrink-0 flex-col fixed h-full z-30 bg-canvas border-r border-ink/[0.06]">
+      <aside className="print:hidden hidden lg:flex w-64 shrink-0 flex-col fixed h-full z-30 bg-canvas border-r border-ink/[0.06]">
         <SidebarContent />
       </aside>
 
       {/* ── Mobile top header ── */}
-      <header className="lg:hidden fixed top-0 left-0 right-0 z-40 h-14 px-4 flex items-center justify-between bg-canvas/80 backdrop-blur-xl border-b border-ink/[0.06]">
+      <header className="print:hidden lg:hidden fixed top-0 left-0 right-0 z-40 h-14 px-4 flex items-center justify-between bg-canvas/80 backdrop-blur-xl border-b border-ink/[0.06]">
         <BrandMark logoUrl={logoUrl} name={companyName || 'Удирдлага'} size={30} nameClassName="font-display text-sm font-semibold text-ink max-w-[200px]" />
         <button onClick={() => setDrawer(v => !v)} aria-label="Цэс"
           className="w-10 h-10 flex items-center justify-center rounded-full bg-white ring-1 ring-ink/[0.08] text-ink">
@@ -164,12 +164,12 @@ function MainLayoutInner({ children }: { children: React.ReactNode }) {
       )}
 
       {/* ── Main content ── */}
-      <main className="[&>*]:animate-[pageIn_0.25s_ease-out] flex-1 lg:ml-64 min-w-0 overflow-auto pt-14 lg:pt-0 pb-[calc(6rem+env(safe-area-inset-bottom))] lg:pb-0">
+      <main className="[&>*]:animate-[pageIn_0.25s_ease-out] flex-1 lg:ml-64 print:!ml-0 print:!p-0 min-w-0 overflow-auto pt-14 lg:pt-0 pb-[calc(6rem+env(safe-area-inset-bottom))] lg:pb-0">
         {children}
       </main>
 
       {/* ── Mobile bottom tab bar ── */}
-      <nav className="lg:hidden fixed inset-x-3 bottom-[calc(0.75rem+env(safe-area-inset-bottom))] z-40 glass rounded-full p-1.5">
+      <nav className="print:hidden lg:hidden fixed inset-x-3 bottom-[calc(0.75rem+env(safe-area-inset-bottom))] z-40 glass rounded-full p-1.5">
         <div className="flex items-center h-14">
           {TAB_NAV.map(({ href, label, Icon }) => {
             const active = isActive(href);

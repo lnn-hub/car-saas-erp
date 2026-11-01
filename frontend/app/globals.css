@@ -161,3 +161,11 @@ button, a, select { touch-action: manipulation; }
 .calc-range { -webkit-appearance: none; appearance: none; height: 6px; padding: 10px 0; box-sizing: content-box; background-clip: content-box; background-repeat: no-repeat; border-radius: 6px; outline: none; cursor: pointer; touch-action: pan-y; }
 .calc-range::-webkit-slider-thumb { -webkit-appearance: none; appearance: none; width: 22px; height: 22px; border-radius: 50%; background: var(--color-brand); border: 3px solid #fff; box-shadow: 0 1px 4px rgba(0,0,0,.35); }
 .calc-range::-moz-range-thumb { width: 18px; height: 18px; border-radius: 50%; background: var(--color-brand); border: 3px solid #fff; box-shadow: 0 1px 4px rgba(0,0,0,.35); }
+
+/* Хэвлэх үед: цагаан дэвсгэр, сүүдэргүй, хүснэгт хуваагдахгүй */
+@media print {
+  body { background: #fff !important; }
+  .shadow-card, .shadow-lift { box-shadow: none !important; }
+  tr, .print-avoid { break-inside: avoid; }
+  @page { margin: 12mm; }
+}
