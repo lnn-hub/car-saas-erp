@@ -12,7 +12,7 @@ async function About() {
 
 export default function Page() {
   return (
-    <Suspense fallback={<div className="min-h-screen" />}>
+    <Suspense fallback={<AboutClient initial={null} />}>
       <About />
     </Suspense>
   );

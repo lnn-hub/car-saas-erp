@@ -205,7 +205,7 @@ function HomeContent({ initial }: { initial: SiteInitial | null }) {
         </div>
 
         {/* Хайлтын самбар */}
-        <div className="relative z-10 -mt-6 sm:-mt-5 px-2 sm:px-8">
+        <div className="relative z-10 mt-3 sm:mt-6 px-0 sm:px-8">
           {/* Утас: хайх мөр + шүүлтүүрийн товч */}
           <form
             onSubmit={(e) => {

@@ -1,3 +1,5 @@
+"use client";
+import { useEffect, useState } from "react";
 import Link from "next/link";
 import { Company } from "@/lib/site";
 import { IcPhone, IcWa, IcPin } from "./icons";
@@ -52,7 +54,9 @@ export function SiteCta({ company }: { company: Company | null }) {
 
 export function SiteFooter({ company }: { company: Company | null }) {
   const cname = company?.name ?? "";
-  const year = new Date().getFullYear();
+  // Оныг хөтөч дээр тооцно (render үед new Date() дуудвал Next.js хуудсыг prerender-ээс хасдаг)
+  const [year, setYear] = useState<number | null>(null);
+  useEffect(() => setYear(new Date().getFullYear()), []);
   return (
     <footer className="relative mt-6 bg-ink text-zinc-400 rounded-t-[28px] sm:rounded-t-[40px] overflow-hidden">
       <div className="relative max-w-7xl mx-auto px-6 sm:px-8 pt-14 sm:pt-20 pb-8">
@@ -110,7 +114,7 @@ export function SiteFooter({ company }: { company: Company | null }) {
         </div>
 
         <div className="mt-14 pt-6 border-t border-white/10 flex flex-col sm:flex-row items-center justify-between gap-3 text-xs text-zinc-500">
-          <span>© {year} {cname}. Бүх эрх хуулиар хамгаалагдсан.</span>
+          <span>© {year ? `${year} ` : ""}{cname}. Бүх эрх хуулиар хамгаалагдсан.</span>
           <a href="#" className="hover:text-white transition-colors py-2">Дээш буцах ↑</a>
         </div>
       </div>

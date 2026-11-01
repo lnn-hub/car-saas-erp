@@ -9,7 +9,7 @@ async function Home() {
 
 export default function Page() {
   return (
-    <Suspense fallback={<div className="min-h-screen" />}>
+    <Suspense fallback={<HomeClient initial={null} />}>
       <Home />
     </Suspense>
   );
