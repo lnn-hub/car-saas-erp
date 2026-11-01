@@ -47,7 +47,7 @@ jobs:
           ls -lh "$FILE"
 
       - name: Хадгалах (90 хоног)
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: db-backup-${{ github.run_number }}
           path: '*.sql.gz.gpg'
