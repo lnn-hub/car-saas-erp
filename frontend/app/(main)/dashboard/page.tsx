@@ -54,7 +54,8 @@ export default function DashboardPage() {
   const counts = { ARRIVED: 0, PUBLISHED: 0, RESERVED: 0, SOLD: 0 };
   vehicles.forEach(v => { if (v.status in counts) counts[v.status as keyof typeof counts]++; });
   const inStock    = vehicles.filter(v => v.status !== 'SOLD').length;
-  const totalCost  = vehicles.reduce((s, v) => s + Number(v.total_cost), 0);
+  // Зөвхөн агуулахад байгаа (зарагдаагүй) машинуудын өртөг
+  const totalCost  = vehicles.filter(v => v.status !== 'SOLD').reduce((s, v) => s + Number(v.total_cost), 0);
   const recent     = vehicles.slice(0, 6);
 
   const greeting = hour < 12 ? 'Өглөөний мэнд' : hour < 17 ? 'Өдрийн мэнд' : 'Оройн мэнд';

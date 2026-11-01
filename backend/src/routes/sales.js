@@ -80,11 +80,14 @@ router.get('/summary', auth, async (req, res) => {
     const { rows } = await pool.query(
       `SELECT
         COUNT(*) AS total_sold,
-        SUM(s.sale_price) AS total_revenue,
-        SUM(s.sale_price - COALESCE(costs.total_cost, 0)) AS total_profit
+        COALESCE(SUM(s.sale_price), 0) AS total_revenue,
+        COALESCE(SUM(s.sale_price - COALESCE(costs.total_cost, 0)), 0) AS total_profit,
+        COALESCE(AVG(s.sale_price - COALESCE(costs.total_cost, 0)), 0) AS avg_profit
        FROM sales s
        LEFT JOIN (
-         SELECT vehicle_id, SUM(amount) AS total_cost FROM vehicle_costs GROUP BY vehicle_id
+         -- Тайлантай адил: зөвхөн төгрөгийн зардал
+         SELECT vehicle_id, SUM(amount) FILTER (WHERE COALESCE(currency, 'MNT') = 'MNT') AS total_cost
+         FROM vehicle_costs GROUP BY vehicle_id
        ) costs ON costs.vehicle_id = s.vehicle_id
        WHERE s.company_id = $1`,
       [req.user.company_id]
