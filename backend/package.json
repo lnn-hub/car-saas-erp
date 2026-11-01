@@ -2,15 +2,15 @@
   "name": "backend",
   "version": "1.0.0",
   "description": "Автосалоны удирдлагын системийн API (Express + PostgreSQL)",
-  "main": "src/index.js",
+  "main": "src/index.ts",
   "scripts": {
-    "start": "node src/index.js",
-    "dev": "nodemon src/index.js",
-    "check": "node --check src/index.js && node -e \"for (const f of require('fs').readdirSync('src/routes')) require('./src/routes/' + f)\" && echo 'backend: OK'",
+    "start": "tsx src/index.ts",
+    "dev": "tsx watch src/index.ts",
+    "typecheck": "tsc --noEmit",
     "test": "vitest run",
-    "migrate": "node src/db/migrate.js",
-    "create-admin": "node scripts/create-admin.js",
-    "seed-demo": "node scripts/seed-demo.js"
+    "migrate": "tsx src/db/migrate.ts",
+    "create-admin": "tsx scripts/create-admin.ts",
+    "seed-demo": "tsx scripts/seed-demo.ts"
   },
   "keywords": [],
   "author": "",
@@ -39,7 +39,6 @@
     "@types/node": "^26.6.6",
     "@types/pg": "^8.23.1",
     "@types/supertest": "^7.2.1",
-    "nodemon": "^3.1.14",
     "supertest": "^7.3.1",
     "typescript": "^7.0.2",
     "vitest": "^5.0.5"

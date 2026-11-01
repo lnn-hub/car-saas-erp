@@ -44,7 +44,7 @@ jobs:
           NEXT_PUBLIC_API_URL: http://localhost:4001
 
   backend:
-    name: Backend (modules, migrations)
+    name: Backend (typecheck, migrations, tests)
     runs-on: ubuntu-latest
     services:
       postgres:
@@ -67,8 +67,12 @@ jobs:
           cache: npm
           cache-dependency-path: backend/package-lock.json
       - run: npm ci
-      - run: npm run check
+      - run: npm run typecheck
       # Хоосон сан дээр бүх migration ажиллах ёстой, хоёр дахь удаа юу ч хийхгүй байх ёстой
       - run: npm run migrate
       - run: npm run migrate
       - run: npm run create-admin -- ci@example.mn ci-password-123
+      # API тестүүд (тусдаа тестийн сан ашиглана, нэрэнд "ci" байгаа тул цэвэрлэхийг зөвшөөрнө)
+      - run: npm test
+        env:
+          TEST_DATABASE_URL: postgresql://postgres:postgres@localhost:5432/car_saas_ci

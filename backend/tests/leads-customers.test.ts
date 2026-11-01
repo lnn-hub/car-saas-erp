@@ -14,15 +14,13 @@ describe('сайтаас ирэх хүсэлт', () => {
     const bad = await api().post('/api/public/leads').send({ name: 'Бат', phone: '123' });
     expect(bad.status).toBe(400);
     const v = await createVehicle(admin);
-    const ok = await api()
-      .post('/api/public/leads')
-      .send({
-        name: '  Бат  ',
-        phone: '9911-2233',
-        kind: 'VIEWING',
-        preferred_time: 'Маргааш 14:00',
-        vehicle_id: v.id,
-      });
+    const ok = await api().post('/api/public/leads').send({
+      name: '  Бат  ',
+      phone: '9911-2233',
+      kind: 'VIEWING',
+      preferred_time: 'Маргааш 14:00',
+      vehicle_id: v.id,
+    });
     expect(ok.status).toBe(201);
     const list = await api().get('/api/leads').set(auth(sales));
     expect(list.body[0]).toMatchObject({ name: 'Бат', phone: '99112233', status: 'NEW', brand: 'Toyota' });

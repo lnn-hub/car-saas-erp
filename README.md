@@ -9,12 +9,33 @@
 
 ```
 frontend/   Next.js 16 (App Router, Tailwind v4) — нийтийн сайт + админ. Vercel дээр.
-backend/    Express + PostgreSQL (pg) — REST API. Render дээр.
+backend/    Express + TypeScript + PostgreSQL (pg) — REST API. Render дээр.
 docs/       нэмэлт заавар (нөөцлөлт)
-.github/    CI (формат, lint, build) ба долоо хоног тутмын шифрлэгдсэн нөөцлөлт
+.github/    CI (формат, lint, typecheck, build, тест) ба долоо хоног тутмын шифрлэгдсэн нөөцлөлт
 ```
 
 Өгөгдлийн сан: Neon (PostgreSQL). Зураг: Cloudinary.
+
+### Backend-ийн бүтэц
+
+```
+backend/src/
+├─ index.ts            сервер асаах (эхлээд migration ажиллуулна)
+├─ app.ts              Express апп: middleware, route-ууд, алдааны боловсруулалт
+├─ config.ts           орчны хувьсагчдыг zod-оор шалгана
+├─ db/                 pool, migrate.ts, migrations/*.sql
+├─ lib/                http (HttpError, errorHandler), validate (zod parse), sql
+├─ middleware/auth.ts  JWT шалгалт, эрх (requireAuth, requireAdmin, requireMoney)
+└─ modules/<нэр>/      модуль бүр өөрийн давхаргуудтай:
+     *.routes.ts       HTTP: оролтыг zod схемээр шалгаад service/repo дуудна
+     *.service.ts      бизнес логик, транзакц (зөвхөн хэрэгтэй үед)
+     *.repo.ts         SQL — зөвхөн энд query бичигдэнэ
+     *.schema.ts       zod схем (том модульд тусдаа)
+```
+
+Модулиуд: `auth`, `users`, `company` (тохиргоо), `vehicles`, `images`, `sales`, `customers`, `leads`, `reports`, `team`, `public` (сайтын API), `facebook`.
+
+Дүрэм: route дотор SQL бичихгүй; алдааг `throw badRequest('...')` гэх мэтээр шидэхэд `errorHandler` зөв статустай JSON болгоно; 500 алдааны дэлгэрэнгүй хэрэглэгчид харагдахгүй.
 
 ### Эрхийн түвшин
 
@@ -52,7 +73,7 @@ cd frontend && npm run dev      # http://localhost:3000
 
 `./start.sh` нь дээрх 4-р алхмыг нэг дор хийнэ.
 
-Жишээ машин (зурагтай) оруулах: `cd backend && npm run seed-demo`.
+Backend нь TypeScript-ийг `tsx`-ээр шууд ажиллуулдаг (build алхамгүй). Жишээ машин (зурагтай) оруулах: `cd backend && npm run seed-demo`.
 
 Утаснаас шалгах: Mac болон утас нэг сүлжээнд байх ёстой. Mac-ийн IP-гаар frontend-ийг асаана:
 `DEV_ORIGIN=<IP> NEXT_PUBLIC_API_URL=http://<IP>:4001 npx next dev -H 0.0.0.0`.
@@ -64,8 +85,12 @@ cd frontend && npm run dev      # http://localhost:3000
 npm run format          # бүх кодыг Prettier-ээр форматлана
 npm run format:check
 cd frontend && npm run lint && npm run typecheck && npm run build
-cd backend && npm run check
+cd backend && npm run typecheck && npm test
 ```
+
+Backend-ийн тестүүд (`backend/tests/`) бодит PostgreSQL дээр API-г бүхэлд нь шалгадаг. Тусдаа сан хэрэгтэй:
+`createdb car_saas_test` (нэрэнд `test` эсвэл `ci` байх ёстой, тест бүрийн өмнө бүрэн цэвэрлэгддэг).
+Өөр сан ашиглах бол `TEST_DATABASE_URL=...` гэж өгнө.
 
 GitHub дээр push болон pull request бүрт CI (`.github/workflows/ci.yml`) эдгээрийг автоматаар ажиллуулна.
 
