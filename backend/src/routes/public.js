@@ -102,6 +102,7 @@ const leadLimiter = rateLimit({
   limit: 5,
   standardHeaders: true,
   legacyHeaders: false,
+  skip: () => process.env.NODE_ENV === 'test',
   message: { error: 'Хэт олон хүсэлт илгээлээ. Түр хүлээгээд дахин оролдоно уу' },
 });
 router.post('/leads', leadLimiter, async (req, res) => {
