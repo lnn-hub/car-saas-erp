@@ -59,7 +59,7 @@ export function SalesChart({ sales }: { sales: Sale[] | null }) {
       ) : maxVal === 0 ? (
         <div className="px-5 py-12 text-center">
           <div className="text-sm text-[#46413c]">Сүүлийн {MONTHS} сард борлуулалт бүртгэгдээгүй байна</div>
-          <div className="text-xs text-[#6f6a64] mt-1">Машиныг "Зарах" товчоор бүртгэхэд энд график харагдана</div>
+          <div className="text-xs text-[#6f6a64] mt-1">Машиныг «Зарах» товчоор бүртгэхэд энд график харагдана</div>
         </div>
       ) : table ? (
         <table className="w-full text-sm">

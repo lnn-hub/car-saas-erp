@@ -3,6 +3,7 @@ import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { api } from '@/lib/api';
 import { useRole } from '@/lib/role';
+import { useSessionUser } from '@/lib/client-state';
 
 interface Summary {
   month: string; sold: number; revenue: number; cost: number; profit: number; margin: number;
@@ -119,23 +120,19 @@ export default function ReportsPage() {
   const [month, setMonth] = useState(thisMonth);
   const [data, setData] = useState<MonthReport | null>(null);
   const [year, setYear] = useState<YearReport | null>(null);
-  const [error, setError] = useState('');
-  const [loading, setLoading] = useState(true);
-  const [company, setCompany] = useState('');
+  // Аль сарын хариу ирснийг хадгална: сонгосон сар өөр бол ачаалж байна гэсэн үг
+  const [done, setDone] = useState<{ month: string; error: string } | null>(null);
+  const loading = done?.month !== month;
+  const error = loading ? '' : done.error;
+  const company = useSessionUser()?.company_name || '';
   const yearNum = Number(month.slice(0, 4));
   const isCurrent = month >= thisMonth();
 
   useEffect(() => {
-    try { setCompany(JSON.parse(localStorage.getItem('user') || '{}').company_name || ''); } catch {}
-  }, []);
-
-  useEffect(() => {
     let off = false;
-    setLoading(true); setError('');
     api.getMonthReport(month)
-      .then((d: MonthReport) => { if (!off) setData(d); })
-      .catch((e: unknown) => { if (!off) setError(e instanceof Error ? e.message : 'Алдаа гарлаа'); })
-      .finally(() => { if (!off) setLoading(false); });
+      .then((d: MonthReport) => { if (!off) { setData(d); setDone({ month, error: '' }); } })
+      .catch((e: unknown) => { if (!off) setDone({ month, error: e instanceof Error ? e.message : 'Алдаа гарлаа' }); });
     return () => { off = true; };
   }, [month]);
 

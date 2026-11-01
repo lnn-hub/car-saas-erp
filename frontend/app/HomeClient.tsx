@@ -431,7 +431,6 @@ function HomeContent({ initial }: { initial: SiteInitial | null }) {
               {company?.phone && (
                 <div className="reveal relative overflow-hidden bg-[#121010] text-white rounded-[24px] sm:rounded-[28px] p-6 sm:p-10 flex flex-col justify-between gap-10 min-h-[320px] sm:min-h-[400px]">
                   {contactPhoto && (
-                    // eslint-disable-next-line @next/next/no-img-element
                     <img src={optimizeImg(contactPhoto, 1200) || undefined} srcSet={imgSrcSet(contactPhoto, [640, 960, 1280])}
                       sizes="(max-width: 1024px) 100vw, 50vw" alt="" loading="lazy" decoding="async"
                       className="absolute inset-0 w-full h-full object-cover" />

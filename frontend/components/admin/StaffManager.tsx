@@ -1,6 +1,7 @@
 'use client';
 import { useEffect, useState } from 'react';
 import { api } from '@/lib/api';
+import { useSessionUser } from '@/lib/client-state';
 import { ROLE_LABEL } from '@/lib/role';
 
 interface User { id: string; name: string; email: string; role: 'ADMIN' | 'SALES' | 'FINANCE'; is_active: boolean }
@@ -15,7 +16,7 @@ const inp = 'w-full bg-white border border-zinc-200 rounded-xl px-3.5 py-2.5 tex
 // Админ ажилтан нэмэх, эрх солих, идэвхгүй болгох, нууц үг шинэчлэх
 export function StaffManager() {
   const [users, setUsers] = useState<User[]>([]);
-  const [me, setMe] = useState('');
+  const me = useSessionUser()?.id || '';
   const [adding, setAdding] = useState(false);
   const [form, setForm] = useState({ name: '', email: '', password: '', role: 'SALES' });
   const [busy, setBusy] = useState(false);
@@ -23,10 +24,7 @@ export function StaffManager() {
   const [error, setError] = useState('');
 
   const load = () => api.getUsers().then(setUsers).catch((e: unknown) => setError(e instanceof Error ? e.message : 'Алдаа'));
-  useEffect(() => {
-    try { setMe(JSON.parse(localStorage.getItem('user') || '{}').id || ''); } catch {}
-    load();
-  }, []);
+  useEffect(() => { load(); }, []);
 
   const flash = (t: string) => { setMsg(t); setTimeout(() => setMsg(''), 2500); };
 

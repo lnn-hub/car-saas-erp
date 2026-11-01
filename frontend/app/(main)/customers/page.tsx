@@ -29,7 +29,9 @@ export default function CustomersPage() {
   const [list, setList] = useState<Customer[] | null>(null);
   const [q, setQ] = useState('');
   const [openId, setOpenId] = useState<string | null>(null);
-  const [detail, setDetail] = useState<Detail | null>(null);
+  // Ачаалсан дэлгэрэнгүй. Нээлттэй үйлчлүүлэгчийнх биш бол харуулахгүй (ачаалж байна)
+  const [loaded, setLoaded] = useState<Detail | null>(null);
+  const detail = loaded && loaded.id === openId ? loaded : null;
   const [form, setForm] = useState({ name: '', phone: '', email: '', register: '', address: '', note: '' });
   const [creating, setCreating] = useState(false);
   const [busy, setBusy] = useState(false);
@@ -39,10 +41,9 @@ export default function CustomersPage() {
   useEffect(() => { load(); }, []);
 
   useEffect(() => {
-    if (!openId) { setDetail(null); return; }
-    setDetail(null); setError('');
+    if (!openId) return;
     api.getCustomer(openId).then((d: Detail) => {
-      setDetail(d);
+      setLoaded(d);
       setForm({ name: d.name || '', phone: d.phone || '', email: d.email || '', register: d.register || '', address: d.address || '', note: d.note || '' });
     }).catch((e: unknown) => setError(e instanceof Error ? e.message : 'Алдаа'));
   }, [openId]);
@@ -112,7 +113,7 @@ export default function CustomersPage() {
         <ul className="bg-white rounded-[22px] ring-1 ring-ink/[0.06] shadow-card divide-y divide-zinc-100 overflow-hidden">
           {shown.map((c) => (
             <li key={c.id}>
-              <button onClick={() => { setCreating(false); setOpenId(c.id); }} className="w-full text-left px-4 sm:px-5 py-3.5 flex items-center gap-3 hover:bg-zinc-50 transition-colors">
+              <button onClick={() => { setCreating(false); setError(''); setOpenId(c.id); }} className="w-full text-left px-4 sm:px-5 py-3.5 flex items-center gap-3 hover:bg-zinc-50 transition-colors">
                 <span className={`w-10 h-10 rounded-full flex items-center justify-center text-xs font-semibold shrink-0 ${c.purchases ? 'bg-brand text-white' : 'bg-zinc-100 text-zinc-600'}`}>{initials(c.name)}</span>
                 <span className="flex-1 min-w-0">
                   <span className="block text-sm font-medium text-ink truncate">{c.name}</span>

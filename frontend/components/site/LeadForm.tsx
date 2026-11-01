@@ -23,10 +23,15 @@ export function LeadForm({ open, onClose, kind, vehicle }: {
   const [error, setError] = useState("");
   const [done, setDone] = useState(false);
 
+  // Цонх дахин нээгдэхэд өмнөх илгээлтийн төлөвийг цэвэрлэнэ (render үед, effect-гүйгээр)
+  const [wasOpen, setWasOpen] = useState(open);
+  if (open !== wasOpen) {
+    setWasOpen(open);
+    if (open) { setDone(false); setError(""); }
+  }
+
   useEffect(() => {
     if (!open) return;
-    setDone(false);
-    setError("");
     const prev = document.body.style.overflow;
     document.body.style.overflow = "hidden";
     const onKey = (e: KeyboardEvent) => e.key === "Escape" && onClose();

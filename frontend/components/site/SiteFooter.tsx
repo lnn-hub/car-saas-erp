@@ -1,5 +1,5 @@
 "use client";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import Link from "next/link";
 import { Company } from "@/lib/site";
 import { IcPhone, IcPin } from "./icons";
@@ -7,6 +7,7 @@ import { BrandMark } from "./BrandMark";
 import { ChatIcon } from "./ChatIcon";
 import { LeadForm } from "./LeadForm";
 import { chatChannels } from "@/lib/contact";
+import { useClientValue } from "@/lib/client-state";
 
 export function SiteCta({ company }: { company: Company | null }) {
   const [formOpen, setFormOpen] = useState(false);
@@ -58,8 +59,7 @@ export function SiteCta({ company }: { company: Company | null }) {
 export function SiteFooter({ company }: { company: Company | null }) {
   const cname = company?.name ?? "";
   // Оныг хөтөч дээр тооцно (render үед new Date() дуудвал Next.js хуудсыг prerender-ээс хасдаг)
-  const [year, setYear] = useState<number | null>(null);
-  useEffect(() => setYear(new Date().getFullYear()), []);
+  const year = useClientValue(() => new Date().getFullYear(), null);
   return (
     <footer className="keep-palette relative mt-6 bg-ink text-zinc-400 rounded-t-[28px] sm:rounded-t-[40px] overflow-hidden">
       <div className="relative max-w-7xl mx-auto px-6 sm:px-8 pt-14 sm:pt-20 pb-8">

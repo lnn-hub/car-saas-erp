@@ -7,8 +7,9 @@ function handleUnauthorized() {
   if (typeof window === "undefined") return;
   localStorage.removeItem("token");
   localStorage.removeItem("user");
+  // Бүрэн дахин ачаалж (кэш, төлөвийг цэвэрлэнэ) нэвтрэх хуудас руу шилжинэ
   if (!window.location.pathname.startsWith("/login"))
-    window.location.href = "/login";
+    window.location.href = "/login"; // eslint-disable-line @next/next/no-location-assign-relative-destination
 }
 
 function getToken() {
@@ -36,12 +37,13 @@ export function invalidateCache(prefix?: string) {
   for (const k of cache.keys()) if (k.startsWith(prefix)) cache.delete(k);
 }
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
 async function request(
   path: string,
   options: RequestInit = {},
   useCache = false,
   _retry = 0,
+  // Хариуны төрлийг дуудаж буй газар нь заана (backend-ийн төрлүүд хуваалцагдах хүртэл)
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
 ): Promise<any> {
   const token = getToken();
   const cacheKey = path + (token || "");

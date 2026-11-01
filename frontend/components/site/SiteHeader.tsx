@@ -1,10 +1,12 @@
 "use client";
+import Link from "next/link";
 import { useEffect, useState } from "react";
 import { usePathname, useRouter } from "next/navigation";
 import { BACKEND, Company, DEMO_LOGIN } from "@/lib/site";
 import { IcPhone, IcPin } from "./icons";
 import { BrandMark } from "./BrandMark";
 import { useTheme } from "@/lib/theme";
+import { useNowMinute } from "@/lib/client-state";
 
 const NAV: [string, string][] = [
   ["/", "Нүүр"],
@@ -134,13 +136,9 @@ function AdminModal({ onClose, company }: { onClose: () => void; company: Compan
 }
 
 function useClock() {
-  const [now, setNow] = useState<Date | null>(null);
-  useEffect(() => {
-    setNow(new Date());
-    const t = setInterval(() => setNow(new Date()), 1000);
-    return () => clearInterval(t);
-  }, []);
-  if (!now) return "";
+  const ts = useNowMinute();
+  if (ts === null) return "";
+  const now = new Date(ts);
   const days = ["Ням", "Даваа", "Мягмар", "Лхагва", "Пүрэв", "Баасан", "Бямба"];
   return `${now.getFullYear()}.${String(now.getMonth() + 1).padStart(2, "0")}.${String(now.getDate()).padStart(2, "0")} · ${days[now.getDay()]} · ${String(now.getHours()).padStart(2, "0")}:${String(now.getMinutes()).padStart(2, "0")}`;
 }
@@ -193,9 +191,9 @@ export function SiteHeader({ company }: { company: Company | null }) {
             scrolled || menuOpen ? "glass" : "bg-white/60 border border-white/80 shadow-card backdrop-blur-md"
           }`}
         >
-          <a href="/" className="flex items-center min-w-0" aria-label={cname || "Нүүр"}>
+          <Link href="/" className="flex items-center min-w-0" aria-label={cname || "Нүүр"}>
             <BrandMark logoUrl={company?.logo_url} name={cname} size={30} nameClassName="font-display font-semibold text-ink text-[15px] sm:text-[17px] tracking-tight" />
-          </a>
+          </Link>
 
           <nav className="hidden md:flex items-center gap-0.5 rounded-full bg-zinc-100/70 p-1">
             {NAV.map(([h, l]) => (

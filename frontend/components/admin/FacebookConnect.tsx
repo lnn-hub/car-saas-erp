@@ -43,7 +43,7 @@ export function FacebookConnect({ connected, pageName, onChange }: {
           <div className="flex flex-wrap items-center justify-between gap-3">
             <div>
               <div className="text-sm font-medium text-ink">{pageName}</div>
-              <div className="text-xs text-zinc-500 mt-0.5">Машины хуудсанд "Facebook-т нийтлэх" товч гарна.</div>
+              <div className="text-xs text-zinc-500 mt-0.5">Машины хуудсанд «Facebook-т нийтлэх» товч гарна.</div>
             </div>
             <button type="button" onClick={disconnect} className="h-9 px-4 rounded-full text-sm text-zinc-600 hover:text-danger hover:bg-danger-soft">Салгах</button>
           </div>
@@ -70,7 +70,7 @@ export function FacebookConnect({ connected, pageName, onChange }: {
         {help && (
           <>
             <ol className="text-sm text-zinc-600 space-y-2 list-decimal pl-5">
-              <li><a href="https://developers.facebook.com/apps" target="_blank" rel="noreferrer" className="text-brand underline">developers.facebook.com/apps</a> → <b>Create App</b> → "Other" → <b>Business</b> төрөлтэй апп үүсгэнэ.</li>
+              <li><a href="https://developers.facebook.com/apps" target="_blank" rel="noreferrer" className="text-brand underline">developers.facebook.com/apps</a> → <b>Create App</b> → «Other» → <b>Business</b> төрөлтэй апп үүсгэнэ.</li>
               <li><a href="https://developers.facebook.com/tools/explorer" target="_blank" rel="noreferrer" className="text-brand underline">Graph API Explorer</a> дээр аппаа сонгоод, <b>Permissions</b>-д <code className="bg-zinc-100 rounded px-1">pages_show_list</code>, <code className="bg-zinc-100 rounded px-1">pages_read_engagement</code>, <code className="bg-zinc-100 rounded px-1">pages_manage_posts</code> нэмж <b>Generate Access Token</b> дарна. Пэйжээ сонгож зөвшөөрнө.</li>
               <li>Гарсан токеныг <a href="https://developers.facebook.com/tools/debug/accesstoken" target="_blank" rel="noreferrer" className="text-brand underline">Access Token Debugger</a> дээр шалгаад доод талын <b>Extend Access Token</b> дарна. Урт хугацааны токен гарна.</li>
               <li>Тэр урт токеныг доор буулгаад <b>Холбох</b> дарна. Систем пэйжийн хугацаагүй токеныг өөрөө авна.</li>

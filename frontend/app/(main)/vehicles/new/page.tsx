@@ -1,9 +1,10 @@
 'use client';
-import { useEffect, useState, useRef } from 'react';
+import { useState, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import { api } from '@/lib/api';
 import { IconArrowLeft } from '@/components/icons';
 import { BRANDS_MODELS, COLORS, getWeekday } from '@/lib/vehicle-data';
+import { useToday } from '@/lib/client-state';
 import { Combobox } from '@/components/Combobox';
 
 const BACKEND = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000';
@@ -24,7 +25,7 @@ export default function NewVehiclePage() {
   const [form, setForm] = useState({
     vin: '', brand: '', model: '', year: String(CURRENT_YEAR),
     mileage: '', color: '', fuel_type: 'PETROL', transmission: 'AUTO',
-    engine_cc: '', description: '', arrived_at: '',
+    engine_cc: '', description: '', arrived_at: null as string | null, // null = өнөөдөр
     manufactured_date: '', has_plates: false, price: '',
   });
   const [models, setModels]   = useState<string[]>([]);
@@ -36,10 +37,8 @@ export default function NewVehiclePage() {
   const [step, setStep]       = useState<'form' | 'images'>('form');
   const [dragOver, setDrag]   = useState(false);
 
-  useEffect(() => {
-    const today = new Date().toISOString().slice(0, 10);
-    setForm(prev => ({ ...prev, arrived_at: today }));
-  }, []);
+  const today = useToday();
+  const arrivedAt = form.arrived_at ?? today;
 
   function set(field: string, value: string | boolean) {
     setForm(prev => ({ ...prev, [field]: value }));
@@ -55,6 +54,7 @@ export default function NewVehiclePage() {
     try {
       const payload = {
         ...form,
+        arrived_at: arrivedAt,
         year: Number(form.year),
         mileage: Number(form.mileage) || 0,
         price: form.price ? Number(form.price) : '',
@@ -128,7 +128,7 @@ export default function NewVehiclePage() {
     });
   }
 
-  const weekday = getWeekday(form.arrived_at);
+  const weekday = getWeekday(arrivedAt);
 
   // ── Step 2: Зураг оруулах ──
   if (step === 'images') {
@@ -242,7 +242,7 @@ export default function NewVehiclePage() {
 
             <Field label="Орж ирсэн огноо">
               <div className="relative">
-                <input type="date" value={form.arrived_at} onChange={e => set('arrived_at', e.target.value)}
+                <input type="date" value={arrivedAt} onChange={e => set('arrived_at', e.target.value)}
                   className={inp.replace('pr-8','')} />
                 {weekday && (
                   <span className="absolute right-3 top-1/2 -translate-y-1/2 text-xs text-[#6f6a64] pointer-events-none">

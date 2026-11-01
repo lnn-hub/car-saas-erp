@@ -28,9 +28,10 @@ export async function getSiteData(): Promise<SiteInitial | null> {
     };
   } catch {}
   if (data) cacheLife({ stale: 30, revalidate: 60, expire: 60 * 60 * 24 });
-  // Backend унтсан үед ч хуудас prerender-д орно (expire < 5 мин бол "dynamic hole" болж хоосон харагддаг).
-  // Өгөгдлийг хөтөч дээр useSiteData/VehicleClient өөрөө татна, 30с-ийн дараа дахин шинэчлэгдэнэ.
-  else cacheLife({ stale: 0, revalidate: 30, expire: 300 });
+  // Backend унтсан үед ч хуудас prerender-д орно (stale < 30с эсвэл expire < 5 мин бол Next.js үүнийг
+  // "dynamic hole" болгож build унадаг). Өгөгдлийг хөтөч дээр useSiteData/VehicleClient өөрөө татна,
+  // 30с-ийн дараа арын фонд дахин шинэчлэгдэнэ.
+  else cacheLife({ stale: 30, revalidate: 30, expire: 300 });
   return data;
 }
 
@@ -42,8 +43,9 @@ export async function getVehicle(id: string): Promise<VehicleDetail | null> {
     data = v?.error ? null : v;
   } catch {}
   if (data) cacheLife({ stale: 30, revalidate: 60, expire: 60 * 60 * 24 });
-  // Backend унтсан үед ч хуудас prerender-д орно (expire < 5 мин бол "dynamic hole" болж хоосон харагддаг).
-  // Өгөгдлийг хөтөч дээр useSiteData/VehicleClient өөрөө татна, 30с-ийн дараа дахин шинэчлэгдэнэ.
-  else cacheLife({ stale: 0, revalidate: 30, expire: 300 });
+  // Backend унтсан үед ч хуудас prerender-д орно (stale < 30с эсвэл expire < 5 мин бол Next.js үүнийг
+  // "dynamic hole" болгож build унадаг). Өгөгдлийг хөтөч дээр useSiteData/VehicleClient өөрөө татна,
+  // 30с-ийн дараа арын фонд дахин шинэчлэгдэнэ.
+  else cacheLife({ stale: 30, revalidate: 30, expire: 300 });
   return data;
 }

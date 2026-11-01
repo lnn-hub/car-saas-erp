@@ -8,6 +8,7 @@ import { BrandMark } from '@/components/site/BrandMark';
 import { api } from '@/lib/api';
 import { ROLE_LABEL } from '@/lib/role';
 import { useTheme } from '@/lib/theme';
+import { useSessionUser } from '@/lib/client-state';
 
 const BACKEND = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000';
 
@@ -58,27 +59,25 @@ export default function MainLayout({ children }: { children: React.ReactNode }) 
 function MainLayoutInner({ children }: { children: React.ReactNode }) {
   const pathname  = usePathname();
   const router    = useRouter();
-  const [userName, setUserName]   = useState('');
-  const [userRole, setUserRole]   = useState('');
+  const user      = useSessionUser();
+  const userName  = user?.name || '';
+  const userRole  = user?.role || '';
   const [companyName, setCompany] = useState('');
   const [logoUrl, setLogoUrl]   = useState<string | null>(null);
-  const [drawerOpen, setDrawer]   = useState(false);
+  // Цэс нээгдсэн хуудасны зам. Өөр хуудас руу шилжихэд автоматаар хаагдана.
+  const [drawerPath, setDrawerPath] = useState<string | null>(null);
+  const drawerOpen = drawerPath === pathname;
   const [newLeads, setNewLeads]   = useState(0);
   const { dark, toggle: toggleDark } = useTheme();
 
   useEffect(() => {
     warmUp(); // Render cold start-аас сэргийлэх
     if (!localStorage.getItem('token')) { router.push('/login'); return; }
-    const u = JSON.parse(localStorage.getItem('user') || '{}');
-    setUserName(u.name || ''); setUserRole(u.role || '');
     fetch(`${BACKEND}/api/settings`, {
       headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
     }).then(r => { if (r.status === 401) { localStorage.clear(); router.push('/login'); throw new Error('unauthorized'); } return r.json(); })
       .then(d => { setCompany(d.name || ''); setLogoUrl(d.logo_url || null); }).catch(() => {});
   }, [router]);
-
-  // Drawer хаах хуудас солигдоход
-  useEffect(() => { setDrawer(false); }, [pathname]);
 
   // Шинэ хүсэлтийн тоо (минут тутам шинэчилнэ)
   useEffect(() => {
@@ -101,7 +100,7 @@ function MainLayoutInner({ children }: { children: React.ReactNode }) {
 
   const logout = () => { localStorage.removeItem('token'); localStorage.removeItem('user'); router.push('/login'); };
 
-  const SidebarContent = () => (
+  const sidebarContent = (
     <>
       {/* Компани */}
       <div className="px-5 pt-6 pb-5">
@@ -176,13 +175,13 @@ function MainLayoutInner({ children }: { children: React.ReactNode }) {
 
       {/* ── Desktop sidebar ── */}
       <aside className="print:hidden hidden lg:flex w-64 shrink-0 flex-col fixed h-full z-30 bg-canvas border-r border-ink/[0.06]">
-        <SidebarContent />
+        {sidebarContent}
       </aside>
 
       {/* ── Mobile top header ── */}
       <header className="print:hidden lg:hidden fixed top-0 left-0 right-0 z-40 h-14 px-4 flex items-center justify-between bg-canvas/80 backdrop-blur-xl border-b border-ink/[0.06]">
         <BrandMark logoUrl={logoUrl} name={companyName || 'Удирдлага'} size={30} nameClassName="font-display text-sm font-semibold text-ink max-w-[200px]" />
-        <button onClick={() => setDrawer(v => !v)} aria-label="Цэс"
+        <button onClick={() => setDrawerPath(drawerOpen ? null : pathname)} aria-label="Цэс"
           className="w-10 h-10 flex items-center justify-center rounded-full bg-white ring-1 ring-ink/[0.08] text-ink">
           {drawerOpen ? <IcX /> : <IcMenu />}
         </button>
@@ -191,9 +190,9 @@ function MainLayoutInner({ children }: { children: React.ReactNode }) {
       {/* ── Mobile drawer ── */}
       {drawerOpen && (
         <>
-          <div className="lg:hidden fixed inset-0 z-30 bg-ink/30 backdrop-blur-sm" onClick={() => setDrawer(false)} />
+          <div className="lg:hidden fixed inset-0 z-30 bg-ink/30 backdrop-blur-sm" onClick={() => setDrawerPath(null)} />
           <aside className="lg:hidden fixed top-14 left-0 bottom-0 w-72 z-40 bg-canvas rounded-tr-3xl shadow-lift flex flex-col overflow-y-auto animate-[pageIn_0.2s_ease-out]">
-            <SidebarContent />
+            {sidebarContent}
           </aside>
         </>
       )}

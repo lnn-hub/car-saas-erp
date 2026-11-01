@@ -6,6 +6,7 @@ import { useParams, useRouter } from "next/navigation";
 import { api } from "@/lib/api";
 import { IconArrowLeft } from "@/components/icons";
 import { COLORS } from "@/lib/vehicle-data";
+import { useToday } from "@/lib/client-state";
 
 const FILES = process.env.NEXT_PUBLIC_API_URL || "http://localhost:4000";
 const fileSrc = (u: string) => (u.startsWith("http") ? u : `${FILES}${u}`);
@@ -124,12 +125,17 @@ function VehicleDetailContent() {
   // Sale form state
   const [salePrice, setSalePrice] = useState("");
   const [payType, setPayType] = useState("CASH");
-  const [soldAt, setSoldAt] = useState("");
+  const today = useToday();
+  const [soldAtInput, setSoldAt] = useState<string | null>(null); // null = өнөөдөр
+  const soldAt = soldAtInput ?? today;
   const [saleLoading, setSaleLoading] = useState(false);
 
   // Customer search
   const [custQuery, setCustQuery] = useState("");
-  const [custResults, setCustResults] = useState<Customer[]>([]);
+  // Хайлтын хариу аль үгэнд ирснийг хадгална. Одоогийн үгтэй таарахгүй бол хоосон гэж үзнэ.
+  const [found, setFound] = useState<{ q: string; list: Customer[] }>({ q: "", list: [] });
+  const custResults = custQuery.length >= 2 && found.q === custQuery ? found.list : [];
+  const clearResults = () => setFound({ q: "", list: [] });
   const [selCustomer, setSelCustomer] = useState<Customer | null>(null);
   const [custMode, setCustMode] = useState<"search" | "new">("search");
   const [newCustName, setNewCustName] = useState("");
@@ -141,21 +147,17 @@ function VehicleDetailContent() {
   }
   useEffect(() => {
     load();
-    setSoldAt(new Date().toISOString().slice(0, 10));
-  }, [id]);
+  }, [id]); // eslint-disable-line react-hooks/exhaustive-deps
 
   // Customer search debounce
   useEffect(() => {
     if (custMode !== "search") return;
     if (searchRef.current) clearTimeout(searchRef.current);
-    if (custQuery.length < 2) {
-      setCustResults([]);
-      return;
-    }
+    if (custQuery.length < 2) return;
     searchRef.current = setTimeout(async () => {
       try {
         const d = await api.searchCustomers(custQuery);
-        setCustResults(Array.isArray(d) ? d.slice(0, 6) : []);
+        setFound({ q: custQuery, list: Array.isArray(d) ? d.slice(0, 6) : [] });
       } catch {}
     }, 300);
   }, [custQuery, custMode]);
@@ -299,12 +301,12 @@ function VehicleDetailContent() {
     setSalePrice(vehicle?.price ? String(Number(vehicle.price)) : "");
     setPayType("CASH");
     setCustQuery("");
-    setCustResults([]);
+    clearResults();
     setSelCustomer(null);
     setCustMode("search");
     setNewCustName("");
     setNewCustPhone("");
-    setSoldAt(new Date().toISOString().slice(0, 10));
+    setSoldAt(null);
   }
 
   if (!vehicle)
@@ -894,7 +896,7 @@ function VehicleDetailContent() {
                                     onClick={() => {
                                       setSelCustomer(c);
                                       setCustQuery("");
-                                      setCustResults([]);
+                                      clearResults();
                                     }}
                                     className="w-full flex items-center justify-between px-3 py-2.5 hover:bg-[#f3efe9] text-left transition-colors"
                                   >
@@ -911,7 +913,7 @@ function VehicleDetailContent() {
                             {custQuery.length >= 2 &&
                               custResults.length === 0 && (
                                 <p className="text-xs text-[#6f6a64] mt-1.5">
-                                  Олдсонгүй — "Шинэ" дарж нэмнэ үү
+                                  Олдсонгүй — «Шинэ» дарж нэмнэ үү
                                 </p>
                               )}
                           </>

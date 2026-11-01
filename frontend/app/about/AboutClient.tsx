@@ -1,4 +1,5 @@
 "use client";
+import Link from "next/link";
 import { Suspense, useEffect } from "react";
 import { optimizeImg, SiteInitial } from "@/lib/site";
 import { useSiteData } from "@/lib/useSiteData";
@@ -57,7 +58,7 @@ function AboutContent({ initial }: { initial: SiteInitial | null }) {
           <div className="relative grid lg:grid-cols-[1.1fr_1fr] gap-10 items-center px-6 sm:px-12 lg:px-16 py-14 sm:py-20 lg:py-24">
             <div>
               <nav className="text-sm text-white/50 mb-6">
-                <a href="/" className="hover:text-white transition-colors py-2">Нүүр</a>
+                <Link href="/" className="hover:text-white transition-colors py-2">Нүүр</Link>
                 <span className="mx-2">/</span>
                 <span className="text-white/80">Бидний тухай</span>
               </nav>
@@ -69,7 +70,7 @@ function AboutContent({ initial }: { initial: SiteInitial | null }) {
               <p className="text-white/65 sm:text-lg leading-relaxed mt-6 max-w-lg">
                 {company?.name ? `${company.name} нь ` : "Бид "}зөвхөн нягт шалгагдсан, мэдээлэл нь бүрэн ил тод машиныг санал болгож, сонголтоос эхлээд гэрээ хийх хүртэл тань хамт байна.
               </p>
-              <a
+              <Link
                 href="/#contact"
                 className="keep-white group inline-flex items-center gap-3 bg-white text-ink pl-6 pr-2 h-14 rounded-full font-medium hover:bg-brand-soft transition-colors mt-8"
               >
@@ -77,7 +78,7 @@ function AboutContent({ initial }: { initial: SiteInitial | null }) {
                 <span className="w-10 h-10 rounded-full bg-ink text-white flex items-center justify-center group-hover:bg-brand transition-colors">
                   <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2}><path d="M5 12h14M13 6l6 6-6 6" /></svg>
                 </span>
-              </a>
+              </Link>
             </div>
 
             {collage.length >= 3 && (

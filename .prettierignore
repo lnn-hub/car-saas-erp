@@ -1,0 +1,7 @@
+node_modules
+.next
+package-lock.json
+frontend/next-env.d.ts
+frontend/AGENTS.md
+backend/scripts/demo-images.json
+uploads

@@ -66,7 +66,7 @@ export default function LeadsPage() {
     <div className="px-4 sm:px-6 py-4 sm:py-6 max-w-4xl mx-auto w-full space-y-4 sm:space-y-5">
       <div>
         <h1 className="font-display text-2xl sm:text-[32px] font-semibold tracking-[-0.03em] text-ink leading-tight">Хүсэлтүүд</h1>
-        <p className="text-sm text-zinc-500 mt-1">Вэбсайтаас ирсэн "Үзэх цаг товлох", "Хүсэлт үлдээх" маягтууд</p>
+        <p className="text-sm text-zinc-500 mt-1">Вэбсайтаас ирсэн «Үзэх цаг товлох», «Хүсэлт үлдээх» маягтууд</p>
       </div>
 
       <div className="-mx-4 px-4 flex gap-2 overflow-x-auto no-scrollbar">

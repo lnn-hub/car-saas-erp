@@ -1,11 +1,14 @@
 {
   "name": "backend",
   "version": "1.0.0",
-  "description": "",
-  "main": "index.js",
+  "description": "Автосалоны удирдлагын системийн API (Express + PostgreSQL)",
+  "main": "src/index.js",
   "scripts": {
     "start": "node src/index.js",
-    "dev": "nodemon src/index.js"
+    "dev": "nodemon src/index.js",
+    "check": "node --check src/index.js && node -e \"for (const f of require('fs').readdirSync('src/routes')) require('./src/routes/' + f)\" && echo 'backend: OK'",
+    "create-admin": "node scripts/create-admin.js",
+    "seed-demo": "node scripts/seed-demo.js"
   },
   "keywords": [],
   "author": "",
@@ -26,5 +29,9 @@
   },
   "devDependencies": {
     "nodemon": "^3.1.14"
+  },
+  "private": true,
+  "engines": {
+    "node": ">=20"
   }
 }

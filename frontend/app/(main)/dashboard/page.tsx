@@ -3,6 +3,7 @@ import React, { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { api } from '@/lib/api';
 import { useRole } from '@/lib/role';
+import { useClientValue, useSessionUser } from '@/lib/client-state';
 import { SalesChart } from '@/components/admin/SalesChart';
 
 interface Summary { total_sold: string; total_revenue: string; total_profit: string; avg_profit: string; }
@@ -40,17 +41,14 @@ export default function DashboardPage() {
   const [vehicles, setVehicles] = useState<Vehicle[]>([]);
   const [vLoaded, setVLoaded] = useState(false);
   const [sales, setSales]     = useState<{ sold_at: string; sale_price: string }[] | null>(null);
-  const [userName, setUserName] = useState('');
-  const [hour, setHour]         = useState(0);
+  const userName = useSessionUser()?.name || '';
+  const hour     = useClientValue(() => new Date().getHours(), 12);
   const { canSeeMoney, isAdmin } = useRole();
 
   useEffect(() => {
-    setHour(new Date().getHours());
     api.getSummary().then(setSummary).catch(console.error);
     api.getVehicles().then(d => { setVehicles(d); setVLoaded(true); }).catch(() => setVLoaded(true));
     api.getSales().then(setSales).catch(() => setSales([]));
-    const u = JSON.parse(localStorage.getItem('user') || '{}');
-    setUserName(u.name || '');
   }, []);
 
   const counts = { ARRIVED: 0, PUBLISHED: 0, RESERVED: 0, SOLD: 0 };
