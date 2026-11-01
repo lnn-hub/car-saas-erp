@@ -19,8 +19,6 @@ export const BRANDS_MODELS: Record<string, string[]> = {
   'Бусад':        [],
 };
 
-export const BRANDS = Object.keys(BRANDS_MODELS);
-
 export const COLORS = [
   { value: 'Цагаан',    hex: '#ffffff' },
   { value: 'Хар',       hex: '#1a1a1a' },
@@ -36,7 +34,7 @@ export const COLORS = [
   { value: 'Цайвар цэнхэр', hex: '#38bdf8' },
 ];
 
-export const WEEKDAYS = ['Ням', 'Даваа', 'Мягмар', 'Лхагва', 'Пүрэв', 'Баасан', 'Бямба'];
+const WEEKDAYS = ['Ням', 'Даваа', 'Мягмар', 'Лхагва', 'Пүрэв', 'Баасан', 'Бямба'];
 
 export function getWeekday(dateStr: string): string {
   if (!dateStr) return '';

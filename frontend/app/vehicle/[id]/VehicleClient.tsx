@@ -2,13 +2,13 @@
 import { useEffect, useRef, useState, Suspense } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
-import { BACKEND, companyQuery, optimizeImg, Vehicle, VehicleDetail } from '@/lib/site';
+import { BACKEND, optimizeImg, Vehicle, VehicleDetail } from '@/lib/site';
 import { FUEL, TRANS, fmtDrop, fmtEngine, fmtPrice } from '@/lib/format';
 import { useCompany } from '@/lib/useSiteData';
 import { useCompare, COMPARE_MAX } from '@/lib/compare';
 import { SiteHeader } from '@/components/site/SiteHeader';
 import { SiteFooter } from '@/components/site/SiteFooter';
-import { LeasingCalculator } from '@/components/site/LeasingCalculator';
+import { LeasingWidget } from '@/components/site/LeasingCalculator';
 import { BrandMark } from '@/components/site/BrandMark';
 import { Lightbox } from '@/components/site/Lightbox';
 import { CarPlaceholder, VehicleCard, VehicleCardSkeleton } from '@/components/site/VehicleCard';
@@ -30,7 +30,6 @@ const Ic = {
   check:  <svg className="w-3.5 h-3.5" {...sv} strokeWidth={3}><path d="M20 6L9 17l-5-5"/></svg>,
   grid:   <svg className="w-4 h-4" {...sv}><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/></svg>,
   link:   <svg className="w-4 h-4" {...sv} strokeWidth={2}><path d="M10 13a5 5 0 007.07 0l3-3a5 5 0 00-7.07-7.07l-1.5 1.5"/><path d="M14 11a5 5 0 00-7.07 0l-3 3a5 5 0 007.07 7.07l1.5-1.5"/></svg>,
-  calc:   <svg className="w-4 h-4" {...sv}><rect x="4" y="2" width="16" height="20" rx="3"/><path d="M8 6h8M8 11h.01M12 11h.01M16 11h.01M8 15h.01M12 15h.01M16 15h.01M8 19h.01M12 19h.01M16 19h.01"/></svg>,
   arrow:  <svg className="w-4 h-4" {...sv} strokeWidth={2}><path d="M5 12h14M13 6l6 6-6 6"/></svg>,
 };
 
@@ -62,7 +61,7 @@ function VehicleContent({ id, initial }: { id: string; initial: VehicleDetail | 
     const prevTitle = document.title;
     async function load(retry = 0) {
       try {
-        const r = await fetch(`${BACKEND}/api/public/vehicles/${id}${companyQuery()}`);
+        const r = await fetch(`${BACKEND}/api/public/vehicles/${id}`);
         const d = await r.json();
         if (cancelled) return;
         if (!d.error) {
@@ -76,7 +75,7 @@ function VehicleContent({ id, initial }: { id: string; initial: VehicleDetail | 
         else setLoad(false);
       }
     }
-    fetch(`${BACKEND}/api/public/vehicles${companyQuery()}`)
+    fetch(`${BACKEND}/api/public/vehicles`)
       .then(r => r.json())
       .then(d => { if (!cancelled) setOthers((d.vehicles || []).filter((x: Vehicle) => x.id !== id).slice(0, 4)); })
       .catch(() => { if (!cancelled) setOthers([]); });
@@ -111,7 +110,6 @@ function VehicleContent({ id, initial }: { id: string; initial: VehicleDetail | 
     </Shell>
   );
 
-  const leasingOn = v.company?.features?.leasing !== false;
   const images = v.images || [];
   const fullImgs = images.map(u => imgSrc(u, 2000));
   const price = fmtPrice(v.price);
@@ -144,8 +142,6 @@ function VehicleContent({ id, initial }: { id: string; initial: VehicleDetail | 
   const credit    = descLines.find(l => l.startsWith('Зургийн эх сурвалж'));
   const intro     = descLines.filter(l => l && !l.startsWith('•') && !l.startsWith('Зургийн эх сурвалж')).join('\n\n');
   const chats     = chatChannels(v.company, `Сайн байна уу, ${v.year} оны ${v.brand} ${v.model} машины талаар лавлах гэсэн юм.`);
-
-  const goLeasing = () => document.getElementById('leasing')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
 
   async function copyLink() {
     try {
@@ -297,11 +293,6 @@ function VehicleContent({ id, initial }: { id: string; initial: VehicleDetail | 
               </dl>
             </section>
 
-            {leasingOn && (
-              <LeasingCalculator price={price ? Number(v.price) : null} phone={v.company?.phone}
-                chatHref={chats[0]?.href} chatLabel={chats[0]?.label} />
-            )}
-
             {credit && <p className="text-xs text-zinc-500 px-2">{credit}</p>}
           </div>
 
@@ -323,20 +314,6 @@ function VehicleContent({ id, initial }: { id: string; initial: VehicleDetail | 
                 <div className="font-display text-2xl font-semibold text-ink mt-1">Тохиролцоно</div>
               )}
               <div className="text-sm text-zinc-500 mt-2">{v.year} он{v.color ? ` · ${v.color}` : ''}{km ? ` · ${km}` : ''}</div>
-
-              {leasingOn && (
-                <button type="button" onClick={goLeasing}
-                  className="group w-full mt-5 flex items-center justify-between gap-3 rounded-2xl bg-zinc-50 hover:bg-brand-soft px-4 py-3.5 text-left transition-colors">
-                  <span className="flex items-center gap-3">
-                    <span className="w-9 h-9 rounded-full bg-white ring-1 ring-ink/[0.06] text-brand flex items-center justify-center">{Ic.calc}</span>
-                    <span>
-                      <span className="block text-sm font-medium text-ink">Лизингийн тооцоолол</span>
-                      <span className="block text-xs text-zinc-500">Сарын төлбөрөө тооцоолох</span>
-                    </span>
-                  </span>
-                  <span className="text-zinc-400 group-hover:text-brand group-hover:translate-x-0.5 transition-all">{Ic.arrow}</span>
-                </button>
-              )}
 
               {v.company?.phone && (
                 <div className="space-y-2 mt-5">
@@ -362,7 +339,7 @@ function VehicleContent({ id, initial }: { id: string; initial: VehicleDetail | 
                 </div>
               )}
 
-              {v.company?.features?.compare !== false && (() => {
+              {(() => {
                 const inCompare = compareIds.includes(v.id);
                 const full = !inCompare && compareIds.length >= COMPARE_MAX;
                 return (
@@ -426,12 +403,6 @@ function VehicleContent({ id, initial }: { id: string; initial: VehicleDetail | 
       {/* Mobile: хөвөгч доод мөр */}
       {v.company?.phone && (
         <div className="lg:hidden fixed inset-x-3 bottom-[calc(0.75rem+env(safe-area-inset-bottom))] z-40 glass rounded-full p-1.5 flex gap-1.5">
-          {leasingOn && (
-            <button type="button" onClick={goLeasing} aria-label="Лизингийн тооцоолол"
-              className="shrink-0 w-12 h-12 flex items-center justify-center rounded-full bg-white border border-zinc-200 text-ink">
-              {Ic.calc}
-            </button>
-          )}
           <a href={`tel:${v.company.phone}`}
             className="flex-1 flex items-center justify-center gap-2 bg-brand active:bg-brand-dark text-white text-sm font-medium h-12 rounded-full">
             <IcPhone cls="w-4 h-4" /> Залгах
@@ -445,6 +416,9 @@ function VehicleContent({ id, initial }: { id: string; initial: VehicleDetail | 
 
       <LeadForm open={leadOpen} onClose={() => setLeadOpen(false)} kind="VIEWING"
         vehicle={{ id: v.id, title: `${v.year} ${v.brand} ${v.model}` }} />
+
+      <LeasingWidget key={v.id} price={price ? Number(v.price) : null} phone={v.company?.phone}
+        chatHref={chats[0]?.href} chatLabel={chats[0]?.label} />
     </div>
   );
 }

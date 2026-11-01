@@ -61,7 +61,6 @@ export default function SettingsPage() {
 
   const [logo, setLogo]       = useState<string | null>(null);
   const [fb, setFb] = useState<{ connected: boolean; pageName: string | null }>({ connected: false, pageName: null });
-  const [planInfo, setPlanInfo] = useState<{ plan: string; max_vehicles: number | null; vehicle_count: number } | null>(null);
   const [logoBusy, setLogoBusy] = useState(false);
   const [logoErr, setLogoErr]   = useState('');
   const logoRef = useRef<HTMLInputElement>(null);
@@ -81,33 +80,6 @@ export default function SettingsPage() {
     finally { setLogoBusy(false); }
   }
 
-  const [seed, setSeed] = useState<{ running: boolean; done: number; total: number; message: string; error: string | null; failed?: string[]; finishedAt?: string | null } | null>(null);
-  const [seedErr, setSeedErr] = useState('');
-  // Жишээ өгөгдөл оруулахыг зөвхөн системийн эзэмшигч (SUPERADMIN_EMAILS) хийнэ
-  const [canSeed, setCanSeed] = useState(false);
-
-  useEffect(() => {
-    const u = JSON.parse(localStorage.getItem('user') || '{}');
-    if (!u.superadmin) return;
-    setCanSeed(true);
-    api.demoSeedStatus().then(setSeed).catch(() => {});
-  }, []);
-
-  useEffect(() => {
-    if (!seed?.running) return;
-    const t = setInterval(() => {
-      api.demoSeedStatus().then(setSeed).catch(() => {});
-    }, 3000);
-    return () => clearInterval(t);
-  }, [seed?.running]);
-
-  async function startSeed() {
-    if (!confirm('10 жишээ машин (зурагтай) оруулах уу? Өмнө оруулсан жишээ машинууд шинэчлэгдэнэ.')) return;
-    setSeedErr('');
-    try { setSeed(await api.startDemoSeed()); }
-    catch (err: unknown) { setSeedErr(err instanceof Error ? err.message : 'Алдаа гарлаа'); }
-  }
-
   const loadTeam = () => api.getTeam().then(setTeam).catch(console.error);
 
   useEffect(() => {
@@ -118,7 +90,6 @@ export default function SettingsPage() {
         messenger_url: d.messenger_url || '', viber_phone: d.viber_phone || '', whatsapp_phone: d.whatsapp_phone || '',
       });
       setLogo(d.logo_url || null);
-      setPlanInfo({ plan: d.plan || 'basic', max_vehicles: d.max_vehicles ?? null, vehicle_count: d.vehicle_count ?? 0 });
       setFb({ connected: !!d.fb_connected, pageName: d.fb_page_name || null });
     }).finally(() => setLoading(false));
     loadTeam();
@@ -183,26 +154,6 @@ export default function SettingsPage() {
         <h1 className="font-display text-2xl sm:text-[32px] font-semibold tracking-[-0.03em] text-ink">Тохиргоо</h1>
         <p className="text-xs sm:text-sm text-[#5f5a54] mt-0.5">Вэбсайтад харагдах мэдээлэл, манай баг</p>
       </div>
-
-      {planInfo && (
-        <Section title="Багц ба хэрэглээ" hint={`Багц: ${planInfo.plan}`}>
-          <div className="p-5">
-            <div className="flex items-center justify-between text-sm mb-2">
-              <span className="text-[#5f5a54]">Нэмсэн машин</span>
-              <span className="font-semibold tabular-nums text-[#1c1917]">{planInfo.vehicle_count} / {planInfo.max_vehicles ?? 'хязгааргүй'}</span>
-            </div>
-            {planInfo.max_vehicles ? (
-              <div className="h-2 bg-[#f3efe9] rounded-full overflow-hidden">
-                <div className={`h-full ${planInfo.vehicle_count >= planInfo.max_vehicles ? 'bg-brand' : 'bg-[#46413c]'}`}
-                  style={{ width: `${Math.min(100, (planInfo.vehicle_count / planInfo.max_vehicles) * 100)}%` }} />
-              </div>
-            ) : null}
-            {planInfo.max_vehicles && planInfo.vehicle_count >= planInfo.max_vehicles ? (
-              <div className="text-xs text-brand mt-2">Хязгаарт хүрсэн байна. Шинэ машин нэмэхийн тулд багцаа ахиулна уу.</div>
-            ) : null}
-          </div>
-        </Section>
-      )}
 
       <Section title="Компанийн лого" hint="Header дээр харагдана">
         <div className="p-5 flex items-center gap-5">
@@ -323,41 +274,6 @@ export default function SettingsPage() {
             className="text-xs font-medium text-brand hover:text-brand-dark py-2.5 pr-3">+ Гишүүн нэмэх</button>
         </div>
       </Section>
-
-      {canSeed && (
-      <Section title="Жишээ өгөгдөл" hint="Demo харуулахад">
-        <div className="p-5 space-y-3">
-          <p className="text-sm text-[#5f5a54] leading-relaxed">
-            Toyota, Lexus-ийн 10 жишээ машиныг мэдээлэл, зурагтай нь вэбсайтад оруулна.
-            Нэг минут орчим үргэлжилнэ. Дахин дарахад өмнөх жишээ машинууд шинэчлэгдэнэ, бусад машинд хөндлөнгөөс орохгүй.
-          </p>
-          <button type="button" onClick={startSeed} disabled={seed?.running}
-            className="px-5 py-2.5 bg-[#111] hover:bg-brand disabled:opacity-50 text-white text-sm rounded-full transition-colors font-medium">
-            {seed?.running ? 'Оруулж байна...' : 'Жишээ машин оруулах'}
-          </button>
-          {seed?.running && (
-            <div>
-              <div className="h-1.5 bg-[#f3efe9] rounded-full overflow-hidden">
-                <div className="h-full bg-brand transition-all" style={{ width: `${seed.total ? (seed.done / seed.total) * 100 : 5}%` }} />
-              </div>
-              <div className="text-xs text-[#5f5a54] mt-1.5">{seed.message} ({seed.done}/{seed.total || 10})</div>
-            </div>
-          )}
-          {seed && !seed.running && !seed.error && seed.total > 0 && !(seed.failed?.length) && (
-            <div className="bg-zinc-50 border border-zinc-200 rounded-lg px-3 py-2 text-xs text-zinc-700">Дууслаа - нүүр хуудсыг шинэчилж харна уу</div>
-          )}
-          {!!seed?.failed?.length && !seed.running && (
-            <div className="bg-zinc-50 border border-zinc-200 rounded-lg px-3 py-2 text-xs text-zinc-700 space-y-1">
-              <div className="font-bold">{seed.failed.length} машин амжилтгүй болсон:</div>
-              {seed.failed.map((f) => <div key={f}>{f}</div>)}
-            </div>
-          )}
-          {(seed?.error || seedErr) && (
-            <div className="bg-danger-soft border border-danger-line rounded-lg px-3 py-2 text-xs text-danger">{seed?.error || seedErr}</div>
-          )}
-        </div>
-      </Section>
-      )}
 
       {editing && (
         <div className="fixed inset-0 z-50 bg-black/50 flex items-end sm:items-center justify-center sm:px-4"

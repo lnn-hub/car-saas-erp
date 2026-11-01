@@ -1,11 +1,12 @@
 "use client";
 import { useEffect, useState, Suspense } from "react";
-import { optimizeImg, SiteInitial } from "@/lib/site";
+import { imgSrcSet, optimizeImg, SiteInitial } from "@/lib/site";
 import { useSiteData } from "@/lib/useSiteData";
 import { FUEL } from "@/lib/format";
 import { useCompare, COMPARE_MAX } from "@/lib/compare";
 import { SiteHeader } from "@/components/site/SiteHeader";
 import { MobileCallBar, SiteCta, SiteFooter } from "@/components/site/SiteFooter";
+import { LeasingWidget } from "@/components/site/LeasingCalculator";
 import { HeroSlides } from "@/components/site/HeroSlides";
 import { CompareModal } from "@/components/site/CompareModal";
 import { VehicleCard, VehicleCardSkeleton } from "@/components/site/VehicleCard";
@@ -36,6 +37,28 @@ function IcFilter({ cls = "w-4 h-4" }: { cls?: string }) {
     </svg>
   );
 }
+// Газрын зургийг ачаалахаас өмнө харагдах гудамжны схем (Google Maps-ийг дарсны дараа ачаална)
+function MapSketch() {
+  return (
+    <svg className="map-sketch absolute inset-0 w-full h-full" viewBox="0 0 600 300" preserveAspectRatio="xMidYMid slice" aria-hidden>
+      <rect width="600" height="300" fill="var(--map-bg)" />
+      <g fill="var(--map-block)">
+        {[[20, 20, 110, 70], [150, 20, 90, 70], [262, 20, 120, 50], [400, 20, 80, 90], [500, 20, 90, 60],
+          [20, 110, 70, 80], [110, 110, 130, 60], [262, 92, 120, 80], [500, 100, 90, 90],
+          [20, 210, 110, 70], [150, 190, 90, 90], [262, 194, 70, 86], [352, 194, 130, 50], [500, 210, 90, 70]].map(([x, y, w, h], i) => (
+          <rect key={i} x={x} y={y} width={w} height={h} rx="6" />
+        ))}
+      </g>
+      <path d="M-10 250 C 120 230, 200 280, 330 262 S 520 230, 620 250" fill="none" stroke="var(--map-water)" strokeWidth="16" strokeLinecap="round" />
+      <g fill="none" stroke="var(--map-road)" strokeLinecap="round">
+        <path d="M0 98 H600 M0 180 H600 M140 0 V300 M250 0 V300 M390 0 V300 M490 0 V300" strokeWidth="9" />
+        <path d="M-20 300 L 260 40 L 640 -10" strokeWidth="5" />
+      </g>
+      <circle cx="300" cy="150" r="70" fill="var(--color-brand)" opacity="0.08" />
+    </svg>
+  );
+}
+
 function IcChevron() {
   return (
     <svg className="w-4 h-4 text-zinc-400 pointer-events-none absolute right-4 top-1/2 -translate-y-1/2" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2}>
@@ -71,7 +94,6 @@ function HomeContent({ initial }: { initial: SiteInitial | null }) {
   const [sheetOpen, setSheetOpen] = useState(false);
   const [leadOpen, setLeadOpen] = useState(false);
   const [mapOn, setMapOn] = useState(false);
-  const compareOn = company?.features?.compare !== false;
   const compared = vehicles.filter((v) => compare.includes(v.id));
 
   const brandCounts = vehicles.reduce<Record<string, number>>((m, v) => ((m[v.brand] = (m[v.brand] || 0) + 1), m), {});
@@ -144,6 +166,8 @@ function HomeContent({ initial }: { initial: SiteInitial | null }) {
     }`;
 
   const chats = chatChannels(company);
+  // Холбоо барих картын арын зураг: салоны машинуудын нэг (hero-гийнхоос өөр байхаар сүүлийнхийг авна)
+  const contactPhoto = [...vehicles].reverse().find((v) => v.main_image)?.main_image ?? null;
   const info = [
     company?.email && {
       key: "mail", href: `mailto:${company.email}`, label: "И-мэйл", value: company.email, ext: false,
@@ -380,7 +404,7 @@ function HomeContent({ initial }: { initial: SiteInitial | null }) {
                   <VehicleCard
                     v={v}
                     priority={i < 4}
-                    compareOn={compareOn}
+                    compareOn
                     compared={compare.includes(v.id)}
                     onCompare={toggleCompare}
                   />
@@ -405,12 +429,17 @@ function HomeContent({ initial }: { initial: SiteInitial | null }) {
           {company?.phone || info.length ? (
             <div className={`grid grid-cols-1 gap-3 sm:gap-4 ${company?.phone && info.length ? "lg:grid-cols-[1.05fr_1fr]" : ""}`}>
               {company?.phone && (
-                <div className="reveal relative overflow-hidden bg-brand text-white rounded-[24px] sm:rounded-[28px] p-6 sm:p-10 flex flex-col justify-between gap-10 min-h-[280px] sm:min-h-[360px]">
-                  <div className="pointer-events-none absolute -right-24 -top-24 w-96 h-96" style={{ background: "radial-gradient(closest-side, rgb(255 255 255 / 0.14), transparent)" }} />
-                  <div className="pointer-events-none absolute -left-16 -bottom-24 w-72 h-72" style={{ background: "radial-gradient(closest-side, rgb(0 0 0 / 0.14), transparent)" }} />
-                  <div className="relative flex items-center gap-3">
-                    <span className="w-11 h-11 rounded-full bg-white/15 flex items-center justify-center"><IcPhone cls="w-5 h-5" /></span>
-                    <span className="text-sm text-white/75">Утсаар шууд холбогдох</span>
+                <div className="reveal relative overflow-hidden bg-[#121010] text-white rounded-[24px] sm:rounded-[28px] p-6 sm:p-10 flex flex-col justify-between gap-10 min-h-[320px] sm:min-h-[400px]">
+                  {contactPhoto && (
+                    // eslint-disable-next-line @next/next/no-img-element
+                    <img src={optimizeImg(contactPhoto, 1200) || undefined} srcSet={imgSrcSet(contactPhoto, [640, 960, 1280])}
+                      sizes="(max-width: 1024px) 100vw, 50vw" alt="" loading="lazy" decoding="async"
+                      className="absolute inset-0 w-full h-full object-cover" />
+                  )}
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/55 to-black/25" />
+                  <div className="relative self-start flex items-center gap-2.5 rounded-full bg-black/35 ring-1 ring-white/15 pl-1.5 pr-4 py-1.5">
+                    <span className="keep-white w-8 h-8 rounded-full bg-white text-ink flex items-center justify-center"><IcPhone cls="w-4 h-4" /></span>
+                    <span className="text-sm text-white/90">Утсаар шууд холбогдох</span>
                   </div>
                   <div className="relative">
                     <a href={`tel:${company.phone}`} className="block font-display text-[40px] sm:text-6xl lg:text-7xl font-semibold tracking-tight tabular-nums leading-none hover:opacity-90 transition-opacity">
@@ -420,13 +449,13 @@ function HomeContent({ initial }: { initial: SiteInitial | null }) {
                       <a href={`tel:${company.phone}`} className="keep-white inline-flex items-center gap-2 bg-white text-ink h-12 px-5 rounded-full text-sm font-medium hover:bg-brand-soft transition-colors">
                         <IcPhone cls="w-4 h-4" /> Залгах
                       </a>
-                      <button type="button" onClick={() => setLeadOpen(true)} className="inline-flex items-center gap-2 bg-white/15 hover:bg-white/25 text-white h-12 px-5 rounded-full text-sm font-medium transition-colors">
+                      <button type="button" onClick={() => setLeadOpen(true)} className="inline-flex items-center gap-2 bg-white/15 hover:bg-white/25 ring-1 ring-white/20 text-white h-12 px-5 rounded-full text-sm font-medium transition-colors">
                         <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2}><rect x="3" y="4" width="18" height="18" rx="3" /><path d="M16 2v4M8 2v4M3 10h18" /></svg>
                         Үзэх цаг товлох
                       </button>
                       {chats.map((ch) => (
                         <a key={ch.key} href={ch.href} target="_blank" rel="noreferrer" aria-label={ch.label} title={ch.label}
-                          className="w-12 h-12 rounded-full bg-white/15 hover:bg-white/25 flex items-center justify-center transition-colors">
+                          className="w-12 h-12 rounded-full bg-white/15 hover:bg-white/25 ring-1 ring-white/20 flex items-center justify-center transition-colors">
                           <ChatIcon ch={ch.key} cls="w-5 h-5" />
                         </a>
                       ))}
@@ -475,10 +504,14 @@ function HomeContent({ initial }: { initial: SiteInitial | null }) {
                       ) : (
                         // Google Maps-ийг дарсны дараа л ачаална (утсанд гүйлгэлтийг удаашруулахгүй)
                         <button type="button" onClick={() => setMapOn(true)}
-                          className="absolute inset-0 w-full h-full flex flex-col items-center justify-center gap-3 text-zinc-600 hover:text-ink transition-colors"
-                          style={{ backgroundImage: "radial-gradient(rgb(0 0 0 / 0.07) 1px, transparent 1px)", backgroundSize: "18px 18px" }}>
-                          <span className="w-12 h-12 rounded-full bg-brand text-white flex items-center justify-center shadow-card"><IcPin cls="w-5 h-5" /></span>
-                          <span className="text-sm font-medium">Газрын зураг харах</span>
+                          className="group absolute inset-0 w-full h-full overflow-hidden">
+                          <MapSketch />
+                          <span className="absolute inset-0 flex flex-col items-center justify-center gap-3">
+                            <span className="relative w-12 h-12 rounded-full bg-brand text-white flex items-center justify-center shadow-lift ring-4 ring-white/70">
+                              <IcPin cls="w-5 h-5" />
+                            </span>
+                            <span className="keep-white rounded-full bg-white px-4 py-2 text-sm font-medium text-ink shadow-card group-hover:shadow-lift transition-shadow">Газрын зураг харах</span>
+                          </span>
                         </button>
                       )}
                     </div>
@@ -497,7 +530,7 @@ function HomeContent({ initial }: { initial: SiteInitial | null }) {
       <SiteCta company={company} />
       <SiteFooter company={company} />
 
-      {compareOn && compared.length > 0 && (
+      {compared.length > 0 && (
         <div className="fixed left-1/2 -translate-x-1/2 bottom-[calc(5.5rem+env(safe-area-inset-bottom))] lg:bottom-6 z-40 bg-ink/90 backdrop-blur-xl text-white rounded-full shadow-lift flex items-center gap-2 sm:gap-3 pl-2 pr-2 py-2 max-w-[calc(100vw-24px)] animate-[fadeUp_0.3s_var(--ease-out-expo)]">
           <div className="flex -space-x-2 pl-1">
             {compared.map((v) => (
@@ -606,6 +639,7 @@ function HomeContent({ initial }: { initial: SiteInitial | null }) {
         </div>
       )}
       <MobileCallBar company={company} />
+      <LeasingWidget phone={company?.phone} chatHref={chats[0]?.href} chatLabel={chats[0]?.label} />
     </div>
   );
 }

@@ -238,6 +238,7 @@ html.theme-dark, html.theme-dark body { background-color: #0f0e0d; }
 .theme-dark .shadow-card { box-shadow: 0 1px 2px rgb(0 0 0 / 0.3); }
 .theme-dark .shadow-lift { box-shadow: 0 24px 48px -16px rgb(0 0 0 / 0.6); }
 .theme-dark .contact-map { filter: invert(0.9) hue-rotate(180deg) saturate(0.6); }
+.theme-dark .map-sketch { --map-bg: #1d1b19; --map-block: #262321; --map-road: #36322e; --map-water: #1c2d29; }
 .theme-dark .keep-white { background-color: #ffffff; color: #121010; }
 /* Footer нь угаасаа бараан загвартай: харанхуй горимд цайвар горимын саарал өнгөөрөө үлдэнэ */
 .theme-dark .keep-palette {
@@ -269,3 +270,6 @@ html:not(.theme-dark) .glass { border-color: rgb(18 16 16 / 0.1); }
   .theme-dark .glass { background: rgb(27 25 23 / 0.97); }
   .backdrop-blur-md, .backdrop-blur-sm, .backdrop-blur-xl, .backdrop-blur { -webkit-backdrop-filter: none; backdrop-filter: none; }
 }
+
+/* Газрын зургийн урьдчилсан схем (холбоо барих хэсэг) */
+.map-sketch { --map-bg: #ece7df; --map-block: #e1d9ce; --map-road: #ffffff; --map-water: #cfe1db; }

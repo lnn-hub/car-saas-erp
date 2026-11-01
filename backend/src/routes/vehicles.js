@@ -4,6 +4,7 @@ const pool = require('../db/pool');
 const auth = require('../middleware/auth');
 const { requireAdmin, requireMoney, canSeeMoney } = auth;
 const { publishPost, FbError } = require('../utils/facebook');
+const { getCompany } = require('../db/company');
 
 // GET /api/vehicles — бүх машин
 router.get('/', auth, async (req, res) => {
@@ -14,10 +15,8 @@ router.get('/', auth, async (req, res) => {
         (SELECT url FROM vehicle_images WHERE vehicle_id = v.id AND is_main = TRUE LIMIT 1) AS main_image
        FROM vehicles v
        LEFT JOIN vehicle_costs vc ON vc.vehicle_id = v.id
-       WHERE v.company_id = $1
        GROUP BY v.id
-       ORDER BY v.created_at DESC`,
-      [req.user.company_id]
+       ORDER BY v.created_at DESC`
     );
     res.json(canSeeMoney(req.user) ? rows : rows.map(({ total_cost, ...r }) => r));
   } catch (err) {
@@ -29,7 +28,7 @@ router.get('/', auth, async (req, res) => {
 router.get('/:id', auth, async (req, res) => {
   try {
     const [vehicle, costs, images] = await Promise.all([
-      pool.query('SELECT * FROM vehicles WHERE id = $1 AND company_id = $2', [req.params.id, req.user.company_id]),
+      pool.query('SELECT * FROM vehicles WHERE id = $1', [req.params.id]),
       pool.query('SELECT * FROM vehicle_costs WHERE vehicle_id = $1 ORDER BY created_at', [req.params.id]),
       pool.query('SELECT * FROM vehicle_images WHERE vehicle_id = $1 ORDER BY sort_order', [req.params.id]),
     ]);
@@ -42,13 +41,6 @@ router.get('/:id', auth, async (req, res) => {
 
 // POST /api/vehicles — машин нэмэх
 router.post('/', auth, async (req, res) => {
-  try {
-    const { rows: lim } = await pool.query(
-      `SELECT c.max_vehicles, (SELECT COUNT(*)::int FROM vehicles WHERE company_id = c.id) AS cnt
-       FROM companies c WHERE c.id = $1`, [req.user.company_id]);
-    if (lim[0] && lim[0].max_vehicles != null && lim[0].cnt >= lim[0].max_vehicles)
-      return res.status(403).json({ error: `Багцын хязгаарт (${lim[0].max_vehicles} машин) хүрсэн байна. Багцаа ахиулна уу` });
-  } catch (err) { return serverError(res, err); }
   const { vin, brand, model, year, mileage, color, fuel_type, transmission, engine_cc, description,
           arrived_at, manufactured_date, has_plates, price } = req.body;
   if (!vin || !brand || !model || !year)
@@ -62,9 +54,9 @@ router.post('/', auth, async (req, res) => {
 
   try {
     const { rows } = await pool.query(
-      `INSERT INTO vehicles (company_id, vin, brand, model, year, mileage, color, fuel_type, transmission, engine_cc, description, arrived_at, manufactured_date, has_plates, created_by, price, status)
-       VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15,$16,'PUBLISHED') RETURNING *`,
-      [req.user.company_id, vin, brand, model, year, mileage || 0, color, fuel_type || 'PETROL', transmission || 'AUTO',
+      `INSERT INTO vehicles (vin, brand, model, year, mileage, color, fuel_type, transmission, engine_cc, description, arrived_at, manufactured_date, has_plates, created_by, price, status)
+       VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15,'PUBLISHED') RETURNING *`,
+      [vin, brand, model, year, mileage || 0, color, fuel_type || 'PETROL', transmission || 'AUTO',
        engine_cc, description, arrived_at || null, mfgDate, has_plates === true || has_plates === 'true', req.user.id, listPrice]
     );
     res.status(201).json(rows[0]);
@@ -94,7 +86,7 @@ router.patch('/:id', auth, async (req, res) => {
   try {
     // Үнэ буурвал өмнөх өндөр үнийг хадгална (сайтад "Үнэ буурсан" гэж харагдана)
     if (req.body.price !== undefined) {
-      const { rows: [cur] } = await pool.query('SELECT price, prev_price FROM vehicles WHERE id=$1 AND company_id=$2', [req.params.id, req.user.company_id]);
+      const { rows: [cur] } = await pool.query('SELECT price, prev_price FROM vehicles WHERE id=$1', [req.params.id]);
       if (cur) {
         const next = req.body.price === '' || req.body.price === null ? null : Number(req.body.price);
         const old = cur.price != null ? Number(cur.price) : null;
@@ -108,10 +100,10 @@ router.patch('/:id', auth, async (req, res) => {
         }
       }
     }
-    vals.push(req.params.id, req.user.company_id);
+    vals.push(req.params.id);
     const { rows } = await pool.query(
       `UPDATE vehicles SET ${sets.join(', ')}, updated_at = NOW()
-       WHERE id = $${vals.length - 1} AND company_id = $${vals.length} RETURNING *`,
+       WHERE id = $${vals.length} RETURNING *`,
       vals
     );
     if (!rows[0]) return res.status(404).json({ error: 'Машин олдсонгүй' });
@@ -122,9 +114,7 @@ router.patch('/:id', auth, async (req, res) => {
 // DELETE /api/vehicles/:id — борлуулалтгүй машиныг устгах
 router.delete('/:id', auth, requireAdmin, async (req, res) => {
   try {
-    const { rows } = await pool.query(
-      'SELECT id FROM vehicles WHERE id=$1 AND company_id=$2', [req.params.id, req.user.company_id]
-    );
+    const { rows } = await pool.query('SELECT id FROM vehicles WHERE id=$1', [req.params.id]);
     if (!rows[0]) return res.status(404).json({ error: 'Машин олдсонгүй' });
     const { rows: sold } = await pool.query('SELECT 1 FROM sales WHERE vehicle_id=$1 LIMIT 1', [req.params.id]);
     if (sold[0]) return res.status(400).json({ error: 'Борлуулалтын түүхтэй машиныг устгах боломжгүй' });
@@ -148,8 +138,8 @@ router.patch('/:id/status', auth, async (req, res) => {
   try {
     const { rows } = await pool.query(
       `UPDATE vehicles SET status = $1, updated_at = NOW()
-       WHERE id = $2 AND company_id = $3 RETURNING *`,
-      [status, req.params.id, req.user.company_id]
+       WHERE id = $2 RETURNING *`,
+      [status, req.params.id]
     );
     if (!rows[0]) return res.status(404).json({ error: 'Машин олдсонгүй' });
     res.json(rows[0]);
@@ -166,8 +156,7 @@ router.post('/:id/costs', auth, requireMoney, async (req, res) => {
     return res.status(400).json({ error: 'Зардлын төрөл, дүн заавал шаардлагатай' });
 
   try {
-    // Машин нэвтэрсэн компанийнх мөн эсэхийг шалгана
-    const own = await pool.query('SELECT 1 FROM vehicles WHERE id=$1 AND company_id=$2', [req.params.id, req.user.company_id]);
+    const own = await pool.query('SELECT 1 FROM vehicles WHERE id=$1', [req.params.id]);
     if (!own.rowCount) return res.status(404).json({ error: 'Машин олдсонгүй' });
 
     const { rows } = await pool.query(
@@ -218,9 +207,9 @@ function buildMessage(v, company) {
 // POST /api/vehicles/:id/facebook
 router.post('/:id/facebook', auth, async (req, res) => {
   try {
-    const [{ rows: [v] }, { rows: [company] }, { rows: imgs }] = await Promise.all([
-      pool.query('SELECT * FROM vehicles WHERE id=$1 AND company_id=$2', [req.params.id, req.user.company_id]),
-      pool.query('SELECT phone, show_prices, fb_page_id, fb_page_token FROM companies WHERE id=$1', [req.user.company_id]),
+    const [{ rows: [v] }, company, { rows: imgs }] = await Promise.all([
+      pool.query('SELECT * FROM vehicles WHERE id=$1', [req.params.id]),
+      getCompany('phone, show_prices, fb_page_id, fb_page_token'),
       pool.query('SELECT url FROM vehicle_images WHERE vehicle_id=$1 ORDER BY sort_order', [req.params.id]),
     ]);
     if (!v) return res.status(404).json({ error: 'Машин олдсонгүй' });
@@ -243,9 +232,9 @@ router.post('/:id/facebook', auth, async (req, res) => {
 // GET /api/vehicles/:id/facebook/preview — постын бичвэрийг урьдчилан харах
 router.get('/:id/facebook/preview', auth, async (req, res) => {
   try {
-    const [{ rows: [v] }, { rows: [company] }] = await Promise.all([
-      pool.query('SELECT * FROM vehicles WHERE id=$1 AND company_id=$2', [req.params.id, req.user.company_id]),
-      pool.query('SELECT phone, show_prices FROM companies WHERE id=$1', [req.user.company_id]),
+    const [{ rows: [v] }, company] = await Promise.all([
+      pool.query('SELECT * FROM vehicles WHERE id=$1', [req.params.id]),
+      getCompany('phone, show_prices'),
     ]);
     if (!v) return res.status(404).json({ error: 'Машин олдсонгүй' });
     res.json({ message: buildMessage(v, company) });

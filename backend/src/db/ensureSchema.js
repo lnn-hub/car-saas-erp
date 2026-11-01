@@ -1,14 +1,11 @@
 const pool = require('./pool');
 
-// Олон компани, олон зурагтай үед удаашрахаас сэргийлэх индексүүд (дахин ажиллуулахад аюулгүй)
+// Олон машин, олон зурагтай үед удаашрахаас сэргийлэх индексүүд (дахин ажиллуулахад аюулгүй)
 const INDEXES = [
   'CREATE INDEX IF NOT EXISTS idx_vehicle_images_vehicle ON vehicle_images(vehicle_id, sort_order)',
-  'CREATE INDEX IF NOT EXISTS idx_leads_company_created ON leads(company_id, created_at DESC)',
-  'CREATE INDEX IF NOT EXISTS idx_vehicles_company_status ON vehicles(company_id, status)',
-  'CREATE INDEX IF NOT EXISTS idx_sales_company_sold_at ON sales(company_id, sold_at)',
-  'CREATE INDEX IF NOT EXISTS idx_customers_company ON customers(company_id)',
-  'CREATE UNIQUE INDEX IF NOT EXISTS idx_companies_slug_unique ON companies(slug) WHERE slug IS NOT NULL',
-  'CREATE INDEX IF NOT EXISTS idx_team_members_company ON team_members(company_id, sort_order)',
+  'CREATE INDEX IF NOT EXISTS idx_leads_created ON leads(created_at DESC)',
+  'CREATE INDEX IF NOT EXISTS idx_vehicles_status ON vehicles(status)',
+  'CREATE INDEX IF NOT EXISTS idx_sales_sold_at ON sales(sold_at)',
   // Нэг машин олон удаа зарагдахаас хамгаална (давхардал байвал үүсэхгүй, лог руу бичигдэнэ)
   'CREATE UNIQUE INDEX IF NOT EXISTS idx_sales_vehicle_unique ON sales(vehicle_id)',
 ];
@@ -26,10 +23,6 @@ async function ensureSchema() {
       ADD COLUMN IF NOT EXISTS email         VARCHAR(255),
       ADD COLUMN IF NOT EXISTS working_hours VARCHAR(255),
       ADD COLUMN IF NOT EXISTS about_text    TEXT,
-      ADD COLUMN IF NOT EXISTS is_active      BOOLEAN NOT NULL DEFAULT TRUE,
-      ADD COLUMN IF NOT EXISTS plan           VARCHAR(30) NOT NULL DEFAULT 'basic',
-      ADD COLUMN IF NOT EXISTS max_vehicles   INT,
-      ADD COLUMN IF NOT EXISTS features       JSONB NOT NULL DEFAULT '{}'::jsonb,
       ADD COLUMN IF NOT EXISTS messenger_url  VARCHAR(255),
       ADD COLUMN IF NOT EXISTS viber_phone    VARCHAR(30),
       ADD COLUMN IF NOT EXISTS whatsapp_phone VARCHAR(30),
@@ -40,7 +33,6 @@ async function ensureSchema() {
   await pool.query(`
     CREATE TABLE IF NOT EXISTS team_members (
       id         UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-      company_id UUID NOT NULL REFERENCES companies(id) ON DELETE CASCADE,
       name       VARCHAR(120) NOT NULL,
       position   VARCHAR(120),
       bio        TEXT,
@@ -61,7 +53,6 @@ async function ensureSchema() {
   await pool.query(`
     CREATE TABLE IF NOT EXISTS leads (
       id             UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-      company_id     UUID NOT NULL REFERENCES companies(id) ON DELETE CASCADE,
       vehicle_id     UUID REFERENCES vehicles(id) ON DELETE SET NULL,
       kind           VARCHAR(20) NOT NULL DEFAULT 'VIEWING',
       name           VARCHAR(120) NOT NULL,
@@ -88,7 +79,34 @@ async function ensureSchema() {
   }
 }
 
+// Систем нэг компанит болсон: хүснэгтүүдийн company_id баганыг заавал бөглөх шаардлагагүй болгоно.
+// Багана, өгөгдөл устахгүй. Анх шилжихэд үндсэн компаниас бусад (тест) компанийн ажилтнуудыг идэвхгүй болгоно,
+// эс бөгөөс тэд энэ компанийн бүх өгөгдлийг харах болно.
+const OLD_TENANT_TABLES = ['users', 'vehicles', 'customers', 'sales', 'leads', 'team_members'];
+async function dropTenancy() {
+  const { rows } = await pool.query(
+    `SELECT table_name, is_nullable FROM information_schema.columns
+     WHERE table_schema = 'public' AND column_name = 'company_id' AND table_name = ANY($1)`, [OLD_TENANT_TABLES]);
+  if (!rows.some((r) => r.is_nullable === 'NO')) return;
+  const client = await pool.connect();
+  try {
+    await client.query('BEGIN');
+    const { rowCount } = await client.query(
+      `UPDATE users SET is_active = FALSE
+       WHERE is_active AND company_id IS DISTINCT FROM (SELECT id FROM companies ORDER BY created_at ASC LIMIT 1)`);
+    if (rowCount) console.log(`Нэг компанит шилжилт: бусад компанийн ${rowCount} ажилтныг идэвхгүй болголоо`);
+    for (const r of rows) await client.query(`ALTER TABLE ${r.table_name} ALTER COLUMN company_id DROP NOT NULL`);
+    await client.query('COMMIT');
+  } catch (err) {
+    await client.query('ROLLBACK').catch(() => {});
+    throw err;
+  } finally { client.release(); }
+}
+
 module.exports = async function run() {
   await ensureSchema();
+  // Компанийн тохиргооны мөр заавал нэг байна
+  await pool.query("INSERT INTO companies (name) SELECT 'Автосалон' WHERE NOT EXISTS (SELECT 1 FROM companies)");
+  await dropTenancy();
   await ensureIndexes();
 };

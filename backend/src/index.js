@@ -9,7 +9,7 @@ app.set('trust proxy', 1); // Render-ийн proxy ард (бодит IP rate lim
 
 if (!process.env.JWT_SECRET || process.env.JWT_SECRET.length < 32)
   console.warn('АНХААРУУЛГА: JWT_SECRET сул эсвэл хоосон байна. 32+ тэмдэгтийн санамсаргүй утга тавина уу.');
-// FRONTEND_URL нь таслалаар тусгаарласан олон домэйн байж болно (компани бүрийн нийтийн сайт)
+// FRONTEND_URL нь таслалаар тусгаарласан олон домэйн байж болно (жишээ нь vercel.app болон өөрийн домэйн)
 const allowedOrigins = (process.env.FRONTEND_URL || '').split(',').map(s => s.trim()).filter(Boolean);
 app.use(cors({
   origin: allowedOrigins.length ? [...allowedOrigins, 'http://localhost:3000'] : true,
@@ -35,7 +35,6 @@ app.use('/api/settings',  require('./routes/settings'));
 app.use('/api/team',      require('./routes/team'));
 app.use('/api/leads',     require('./routes/leads'));
 app.use('/api/users',     require('./routes/users'));
-app.use('/api/admin',     require('./routes/admin'));
 app.use('/api/upload',    require('./routes/upload'));
 app.use('/uploads',       require('express').static(require('path').join(__dirname, '../uploads')));
 

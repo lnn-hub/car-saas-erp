@@ -3,9 +3,15 @@ const { serverError } = require('../utils/http');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const pool = require('../db/pool');
+const { getCompany } = require('../db/company');
 
 // Нийтийн бүртгэл байхгүй. Ажилтныг админ Тохиргоо → Ажилтнууд хэсгээс нэмнэ.
-const superEmails = () => (process.env.SUPERADMIN_EMAILS || '').split(',').map(e => e.trim().toLowerCase()).filter(Boolean);
+
+async function sendSession(res, user) {
+  const token = jwt.sign({ id: user.id, role: user.role }, process.env.JWT_SECRET, { expiresIn: '8h' });
+  const company = await getCompany('name');
+  res.json({ token, user: { id: user.id, name: user.name, role: user.role, company_name: company?.name || '' } });
+}
 
 // POST /api/auth/login
 router.post('/login', async (req, res) => {
@@ -15,9 +21,7 @@ router.post('/login', async (req, res) => {
 
   try {
     const { rows } = await pool.query(
-      `SELECT u.*, c.is_active AS company_active, c.name AS company_name
-       FROM users u JOIN companies c ON c.id = u.company_id
-       WHERE lower(u.email) = lower($1) AND u.is_active = TRUE`,
+      'SELECT * FROM users WHERE lower(email) = lower($1) AND is_active = TRUE',
       [email]
     );
     const user = rows[0];
@@ -27,20 +31,22 @@ router.post('/login', async (req, res) => {
     const valid = await bcrypt.compare(password, user.password);
     if (!valid) return res.status(401).json(BAD);
 
-    const superadmin = superEmails().includes(String(user.email).toLowerCase());
-    if (user.company_active === false && !superadmin)
-      return res.status(403).json({ error: 'Танай компанийн эрх түр хаагдсан байна' });
-
-    const token = jwt.sign(
-      { id: user.id, company_id: user.company_id, role: user.role, ...(superadmin ? { superadmin: true } : {}) },
-      process.env.JWT_SECRET,
-      { expiresIn: '8h' }
-    );
-
-    res.json({ token, user: { id: user.id, name: user.name, role: user.role, superadmin, company_name: user.company_name } });
+    await sendSession(res, user);
   } catch (err) {
     serverError(res, err);
   }
+});
+
+// POST /api/auth/demo — танилцуулгын горим: нууц үггүйгээр анхны админаар нэвтэрнэ.
+// Зөвхөн DEMO_LOGIN=true үед ажиллана. Бодит ашиглалтад унтраасан байх ёстой.
+router.post('/demo', async (req, res) => {
+  if (process.env.DEMO_LOGIN !== 'true') return res.status(404).json({ error: 'Олдсонгүй' });
+  try {
+    const { rows: [user] } = await pool.query(
+      "SELECT * FROM users WHERE role = 'ADMIN' AND is_active = TRUE ORDER BY created_at LIMIT 1");
+    if (!user) return res.status(404).json({ error: 'Админ хэрэглэгч алга' });
+    await sendSession(res, user);
+  } catch (err) { serverError(res, err); }
 });
 
 module.exports = router;

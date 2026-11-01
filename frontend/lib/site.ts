@@ -5,12 +5,8 @@ export const SITE_URL =
   process.env.NEXT_PUBLIC_SITE_URL ||
   (process.env.VERCEL_PROJECT_PRODUCTION_URL ? `https://${process.env.VERCEL_PROJECT_PRODUCTION_URL}` : "http://localhost:3000");
 
-// Олон компанит серверт: энэ нийтийн сайт аль компанийн өгөгдлийг харуулахыг тодорхойлно.
-// Тохируулаагүй бол анхны компани (нэг компанит байршуулалт).
-export const SITE_COMPANY = process.env.NEXT_PUBLIC_SITE_COMPANY || "";
-export const companyQuery = () => (SITE_COMPANY ? `?company=${encodeURIComponent(SITE_COMPANY)}` : "");
-
-export interface Features { reports?: boolean; sales?: boolean; team?: boolean; leasing?: boolean; compare?: boolean }
+// Танилцуулгын горим: админ руу нууц үггүй шууд орно (backend дээр DEMO_LOGIN=true хамт хэрэгтэй)
+export const DEMO_LOGIN = process.env.NEXT_PUBLIC_DEMO_LOGIN === "true";
 
 export interface TeamMember {
   id: string;
@@ -26,7 +22,6 @@ export interface Company {
   email?: string | null;
   working_hours?: string | null;
   logo_url: string | null;
-  features?: Features;
   messenger_url?: string | null;
   viber_phone?: string | null;
   whatsapp_phone?: string | null;

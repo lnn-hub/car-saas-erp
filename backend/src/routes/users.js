@@ -10,10 +10,10 @@ const FIELDS = 'id, name, email, role, is_active, created_at';
 
 router.use(auth, requireAdmin);
 
-// GET /api/users — компанийн ажилтнууд
+// GET /api/users — ажилтнууд
 router.get('/', async (req, res) => {
   try {
-    const { rows } = await pool.query(`SELECT ${FIELDS} FROM users WHERE company_id=$1 ORDER BY created_at`, [req.user.company_id]);
+    const { rows } = await pool.query(`SELECT ${FIELDS} FROM users ORDER BY created_at`);
     res.json(rows);
   } catch (err) { serverError(res, err); }
 });
@@ -31,8 +31,8 @@ router.post('/', async (req, res) => {
     if (exists.length) return res.status(409).json({ error: 'Энэ и-мэйлээр бүртгэл аль хэдийн байна' });
     const hash = await bcrypt.hash(password, 10);
     const { rows } = await pool.query(
-      `INSERT INTO users (company_id, name, email, password, role, is_active) VALUES ($1,$2,$3,$4,$5,TRUE) RETURNING ${FIELDS}`,
-      [req.user.company_id, name, email, hash, role]);
+      `INSERT INTO users (name, email, password, role, is_active) VALUES ($1,$2,$3,$4,TRUE) RETURNING ${FIELDS}`,
+      [name, email, hash, role]);
     res.status(201).json(rows[0]);
   } catch (err) { serverError(res, err); }
 });
@@ -54,9 +54,9 @@ router.patch('/:id', async (req, res) => {
     if (is_active !== undefined) { vals.push(!!is_active); sets.push(`is_active=$${vals.length}`); }
     if (password !== undefined) { vals.push(await bcrypt.hash(String(password), 10)); sets.push(`password=$${vals.length}`); }
     if (!sets.length) return res.status(400).json({ error: 'Өөрчлөх зүйл алга' });
-    vals.push(req.params.id, req.user.company_id);
+    vals.push(req.params.id);
     const { rows } = await pool.query(
-      `UPDATE users SET ${sets.join(', ')} WHERE id=$${vals.length - 1} AND company_id=$${vals.length} RETURNING ${FIELDS}`, vals);
+      `UPDATE users SET ${sets.join(', ')} WHERE id=$${vals.length} RETURNING ${FIELDS}`, vals);
     if (!rows[0]) return res.status(404).json({ error: 'Ажилтан олдсонгүй' });
     invalidateUser(rows[0].id);
     res.json(rows[0]);

@@ -11,11 +11,11 @@ cd backend && npm run dev &
 BACKEND_PID=$!
 
 echo "🌐 Frontend эхлүүлж байна (port 3000)..."
-cd ../frontend && node_modules/.bin/next dev --turbopack &
+cd ../frontend && npx next dev -p 3000 &
 FRONTEND_PID=$!
 
 echo ""
-echo "✅ Бүгд ажиллаж байна!"
+echo "  Бүгд ажиллаж байна!"
 echo "   Backend:  http://localhost:4001"
 echo "   Frontend: http://localhost:3000"
 echo ""

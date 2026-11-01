@@ -102,25 +102,17 @@ function dbHost() {
 }
 const isRemote = () => !/^(localhost|127\.0\.0\.1)$/.test(dbHost());
 
-// onProgress({ done, total, message }) - сервер дээрээс явц харуулахад ашиглана
-async function seedDemo({ companyId, onProgress = () => {} } = {}) {
+async function seedDemo() {
   if (isRemote() && !USE_CLOUDINARY)
     throw new Error('Production-д CLOUDINARY_* хувьсагч шаардлагатай (локал /uploads Render дээр хадгалагдахгүй).');
 
   fs.mkdirSync(UPLOAD_DIR, { recursive: true });
-  let cid = companyId;
-  if (!cid) {
-    const { rows: [company] } = await pool.query('SELECT id FROM companies ORDER BY created_at ASC LIMIT 1');
-    if (!company) throw new Error('Компани олдсонгүй');
-    cid = company.id;
-  }
-  const { rows: [admin] } = await pool.query("SELECT id FROM users WHERE company_id=$1 AND role='ADMIN' ORDER BY created_at LIMIT 1", [cid]);
+  const { rows: [admin] } = await pool.query("SELECT id FROM users WHERE role='ADMIN' AND is_active ORDER BY created_at LIMIT 1");
 
-  await pool.query("DELETE FROM vehicles WHERE company_id=$1 AND vin LIKE 'DEMO%'", [cid]);
+  await pool.query("DELETE FROM vehicles WHERE vin LIKE 'DEMO%'");
 
   const failed = [];
   for (const [n, c] of CARS.entries()) {
-    onProgress({ done: n, total: CARS.length, message: `${c.brand} ${c.model} оруулж байна...` });
     const imgs = IMAGES[c.key];
     const credit = [...new Set(imgs.map(x => `${x.author} (${x.license})`))].join(', ');
     const description = `${c.text}\n\n${c.list.map(l => `• ${l}`).join('\n')}\n\nЗургийн эх сурвалж: Wikimedia Commons - ${credit}.`;
@@ -128,10 +120,10 @@ async function seedDemo({ companyId, onProgress = () => {} } = {}) {
     let vehicleId = null;
     try {
       const { rows: [v] } = await pool.query(
-        `INSERT INTO vehicles (company_id, vin, brand, model, year, mileage, color, fuel_type, transmission,
+        `INSERT INTO vehicles (vin, brand, model, year, mileage, color, fuel_type, transmission,
                                engine_cc, status, description, arrived_at, manufactured_date, has_plates, created_by, price)
-         VALUES ($1,$2,$3,$4,$5,$6,$7,$8,'AUTO',$9,$10,$11, CURRENT_DATE - $12::int, $13, $14, $15, $16) RETURNING id`,
-        [cid, vin, c.brand, c.model, c.year, c.mileage, c.color, c.fuel, c.cc, c.status, description,
+         VALUES ($1,$2,$3,$4,$5,$6,$7,'AUTO',$8,$9,$10, CURRENT_DATE - $11::int, $12, $13, $14, $15) RETURNING id`,
+        [vin, c.brand, c.model, c.year, c.mileage, c.color, c.fuel, c.cc, c.status, description,
          10 + n * 3, c.mfg, n % 2 === 0, admin?.id || null,
          Math.round(c.costs.reduce((t, x) => t + x[1], 0) * 1.12 / 100000) * 100000]
       );
@@ -150,11 +142,8 @@ async function seedDemo({ companyId, onProgress = () => {} } = {}) {
       if (vehicleId) await pool.query('DELETE FROM vehicles WHERE id=$1', [vehicleId]).catch(() => {});
     }
   }
-  onProgress({ done: CARS.length, total: CARS.length, message: 'Дууслаа' });
   return { failed };
 }
-
-module.exports = { seedDemo, DEMO_COUNT: CARS.length };
 
 if (require.main === module) {
   console.log(`DB: ${dbHost()} | Зураг: ${USE_CLOUDINARY ? 'Cloudinary' : 'локал /uploads'}`);

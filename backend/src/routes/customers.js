@@ -17,9 +17,9 @@ router.get('/', async (req, res) => {
     const { rows } = q
       ? await pool.query(
           `SELECT id, name, phone, email FROM customers
-           WHERE company_id=$1 AND (name ILIKE $2 OR phone ILIKE $2) ORDER BY name LIMIT 20`,
-          [req.user.company_id, `%${q}%`])
-      : await pool.query('SELECT * FROM customers WHERE company_id=$1 ORDER BY created_at DESC', [req.user.company_id]);
+           WHERE name ILIKE $1 OR phone ILIKE $1 ORDER BY name LIMIT 20`,
+          [`%${q}%`])
+      : await pool.query('SELECT * FROM customers ORDER BY created_at DESC');
     res.json(rows);
   } catch (err) { serverError(res, err); }
 });
@@ -34,10 +34,8 @@ router.get('/list', async (req, res) => {
               MAX(s.sold_at) AS last_purchase_at
        FROM customers c
        LEFT JOIN sales s ON s.customer_id = c.id
-       WHERE c.company_id = $1
        GROUP BY c.id
-       ORDER BY COALESCE(MAX(s.sold_at), c.created_at) DESC`,
-      [req.user.company_id]);
+       ORDER BY COALESCE(MAX(s.sold_at), c.created_at) DESC`);
     res.json(rows);
   } catch (err) { serverError(res, err); }
 });
@@ -45,20 +43,20 @@ router.get('/list', async (req, res) => {
 // GET /api/customers/:id — дэлгэрэнгүй: худалдан авалт, сайтаас ирсэн хүсэлтүүд
 router.get('/:id', async (req, res) => {
   try {
-    const { rows: [c] } = await pool.query('SELECT * FROM customers WHERE id=$1 AND company_id=$2', [req.params.id, req.user.company_id]);
+    const { rows: [c] } = await pool.query('SELECT * FROM customers WHERE id=$1', [req.params.id]);
     if (!c) return res.status(404).json({ error: 'Үйлчлүүлэгч олдсонгүй' });
     const digits = String(c.phone || '').replace(/\D/g, '');
     const [sales, leads] = await Promise.all([
       pool.query(
         `SELECT s.id, s.sale_price, s.payment_type, s.sold_at, v.id AS vehicle_id, v.brand, v.model, v.year
          FROM sales s JOIN vehicles v ON v.id = s.vehicle_id
-         WHERE s.customer_id = $1 AND s.company_id = $2 ORDER BY s.sold_at DESC`, [c.id, req.user.company_id]),
+         WHERE s.customer_id = $1 ORDER BY s.sold_at DESC`, [c.id]),
       digits.length >= 8
         ? pool.query(
             `SELECT l.id, l.kind, l.preferred_time, l.message, l.status, l.created_at, v.brand, v.model, v.year
              FROM leads l LEFT JOIN vehicles v ON v.id = l.vehicle_id
-             WHERE l.company_id = $1 AND regexp_replace(l.phone, '\\D', '', 'g') LIKE '%' || $2
-             ORDER BY l.created_at DESC LIMIT 50`, [req.user.company_id, digits.slice(-8)])
+             WHERE regexp_replace(l.phone, '\\D', '', 'g') LIKE '%' || $1
+             ORDER BY l.created_at DESC LIMIT 50`, [digits.slice(-8)])
         : { rows: [] },
     ]);
     res.json({ ...c, sales: sales.rows, leads: leads.rows });
@@ -74,9 +72,9 @@ router.post('/', async (req, res) => {
   if (!name) return res.status(400).json({ error: 'Нэр заавал шаардлагатай' });
   try {
     const { rows } = await pool.query(
-      `INSERT INTO customers (company_id, name, phone, email, register, address, note)
-       VALUES ($1,$2,$3,$4,$5,$6,$7) RETURNING *`,
-      [req.user.company_id, name, ...FIELDS.slice(1).map((f) => clean(req.body[f], LIMITS[f]))]);
+      `INSERT INTO customers (name, phone, email, register, address, note)
+       VALUES ($1,$2,$3,$4,$5,$6) RETURNING *`,
+      [name, ...FIELDS.slice(1).map((f) => clean(req.body[f], LIMITS[f]))]);
     res.status(201).json(rows[0]);
   } catch (err) { serverError(res, err); }
 });
@@ -91,10 +89,10 @@ router.patch('/:id', async (req, res) => {
     vals.push(v); sets.push(`${f}=$${vals.length}`);
   }
   if (!sets.length) return res.status(400).json({ error: 'Өөрчлөх зүйл алга' });
-  vals.push(req.params.id, req.user.company_id);
+  vals.push(req.params.id);
   try {
     const { rows } = await pool.query(
-      `UPDATE customers SET ${sets.join(', ')} WHERE id=$${vals.length - 1} AND company_id=$${vals.length} RETURNING *`, vals);
+      `UPDATE customers SET ${sets.join(', ')} WHERE id=$${vals.length} RETURNING *`, vals);
     if (!rows[0]) return res.status(404).json({ error: 'Үйлчлүүлэгч олдсонгүй' });
     res.json(rows[0]);
   } catch (err) {
@@ -108,7 +106,7 @@ router.delete('/:id', requireAdmin, async (req, res) => {
   try {
     const { rows: s } = await pool.query('SELECT 1 FROM sales WHERE customer_id=$1 LIMIT 1', [req.params.id]);
     if (s.length) return res.status(400).json({ error: 'Худалдан авалтын түүхтэй үйлчлүүлэгчийг устгах боломжгүй' });
-    const { rowCount } = await pool.query('DELETE FROM customers WHERE id=$1 AND company_id=$2', [req.params.id, req.user.company_id]);
+    const { rowCount } = await pool.query('DELETE FROM customers WHERE id=$1', [req.params.id]);
     if (!rowCount) return res.status(404).json({ error: 'Үйлчлүүлэгч олдсонгүй' });
     res.json({ ok: true });
   } catch (err) {

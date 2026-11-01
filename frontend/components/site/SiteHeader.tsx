@@ -1,7 +1,7 @@
 "use client";
 import { useEffect, useState } from "react";
 import { usePathname, useRouter } from "next/navigation";
-import { BACKEND, Company } from "@/lib/site";
+import { BACKEND, Company, DEMO_LOGIN } from "@/lib/site";
 import { IcPhone, IcPin } from "./icons";
 import { BrandMark } from "./BrandMark";
 import { useTheme } from "@/lib/theme";
@@ -153,6 +153,9 @@ export function SiteHeader({ company }: { company: Company | null }) {
   const clock = useClock();
   const { dark, toggle } = useTheme();
   const cname = company?.name ?? "";
+  const router = useRouter();
+  // Танилцуулгын горимд нэвтрэх цонхгүйгээр шууд админ руу
+  const openAdmin = () => (DEMO_LOGIN ? router.push("/login") : setAdminModal(true));
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 24);
@@ -229,7 +232,7 @@ export function SiteHeader({ company }: { company: Company | null }) {
               <IcTheme dark={dark} />
             </button>
             <button
-              onClick={() => setAdminModal(true)}
+              onClick={() => openAdmin()}
               aria-label="Админ нэвтрэх"
               title="Админ нэвтрэх"
               className="hidden md:flex w-12 h-12 items-center justify-center rounded-full text-zinc-600 hover:text-ink hover:bg-zinc-100 transition-colors"
@@ -283,7 +286,7 @@ export function SiteHeader({ company }: { company: Company | null }) {
               <button
                 onClick={() => {
                   setMenu(false);
-                  setAdminModal(true);
+                  openAdmin();
                 }}
                 className={`flex items-center justify-center gap-2 bg-white text-ink border border-zinc-200 rounded-full py-3.5 text-sm font-medium ${company?.phone ? "" : "col-span-2"}`}
               >

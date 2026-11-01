@@ -8,6 +8,7 @@ const { v2: cloudinary } = require('cloudinary');
 const pool       = require('../db/pool');
 const auth       = require('../middleware/auth');
 const { requireAdmin } = auth;
+const { COMPANY_ROW, getCompany } = require('../db/company');
 
 // ─── Cloudinary config ───────────────────────────────────────────────────────
 const USE_CLOUDINARY = !!(
@@ -85,11 +86,8 @@ async function deleteImage(url) {
 router.post('/vehicle/:id', auth, upload.array('images', 20), async (req, res) => {
   const vehicleId = req.params.id;
   try {
-    const { rows } = await pool.query(
-      'SELECT id FROM vehicles WHERE id=$1 AND company_id=$2',
-      [vehicleId, req.user.company_id]
-    );
-    if (!rows[0]) return res.status(403).json({ error: 'Машин олдсонгүй' });
+    const { rows } = await pool.query('SELECT id FROM vehicles WHERE id=$1', [vehicleId]);
+    if (!rows[0]) return res.status(404).json({ error: 'Машин олдсонгүй' });
 
     const { rows: existing } = await pool.query(
       'SELECT COUNT(*)::int AS cnt, COALESCE(MAX(sort_order), -1)::int AS max FROM vehicle_images WHERE vehicle_id=$1', [vehicleId]
@@ -116,10 +114,7 @@ router.post('/vehicle/:id', auth, upload.array('images', 20), async (req, res) =
 router.post('/team/:id', auth, requireAdmin, upload.single('photo'), async (req, res) => {
   try {
     if (!req.file) return res.status(400).json({ error: 'Зураг сонгоно уу' });
-    const { rows } = await pool.query(
-      'SELECT photo_url FROM team_members WHERE id=$1 AND company_id=$2',
-      [req.params.id, req.user.company_id]
-    );
+    const { rows } = await pool.query('SELECT photo_url FROM team_members WHERE id=$1', [req.params.id]);
     if (!rows[0]) return res.status(404).json({ error: 'Олдсонгүй' });
 
     const url = await saveImage(req.file.buffer, 'team');
@@ -136,10 +131,10 @@ router.post('/team/:id', auth, requireAdmin, upload.single('photo'), async (req,
 router.post('/logo', auth, requireAdmin, upload.single('logo'), async (req, res) => {
   try {
     if (!req.file) return res.status(400).json({ error: 'Зураг сонгоно уу' });
-    const { rows } = await pool.query('SELECT logo_url FROM companies WHERE id=$1', [req.user.company_id]);
+    const company = await getCompany('logo_url');
     const url = await saveImage(req.file.buffer, 'logo');
-    if (rows[0]?.logo_url) await deleteImage(rows[0].logo_url);
-    await pool.query('UPDATE companies SET logo_url=$1 WHERE id=$2', [url, req.user.company_id]);
+    if (company?.logo_url) await deleteImage(company.logo_url);
+    await pool.query(`UPDATE companies SET logo_url=$1 WHERE id = ${COMPANY_ROW}`, [url]);
     res.json({ logo_url: url });
   } catch (err) { serverError(res, err); }
 });
@@ -147,9 +142,9 @@ router.post('/logo', auth, requireAdmin, upload.single('logo'), async (req, res)
 // DELETE /api/upload/logo
 router.delete('/logo', auth, requireAdmin, async (req, res) => {
   try {
-    const { rows } = await pool.query('SELECT logo_url FROM companies WHERE id=$1', [req.user.company_id]);
-    if (rows[0]?.logo_url) await deleteImage(rows[0].logo_url);
-    await pool.query('UPDATE companies SET logo_url=NULL WHERE id=$1', [req.user.company_id]);
+    const company = await getCompany('logo_url');
+    if (company?.logo_url) await deleteImage(company.logo_url);
+    await pool.query(`UPDATE companies SET logo_url=NULL WHERE id = ${COMPANY_ROW}`);
     res.json({ ok: true });
   } catch (err) { serverError(res, err); }
 });
@@ -157,14 +152,8 @@ router.delete('/logo', auth, requireAdmin, async (req, res) => {
 // DELETE /api/upload/image/:imageId
 router.delete('/image/:imageId', auth, async (req, res) => {
   try {
-    const { rows } = await pool.query(
-      `SELECT vi.*, v.company_id FROM vehicle_images vi
-       JOIN vehicles v ON v.id = vi.vehicle_id WHERE vi.id=$1`,
-      [req.params.imageId]
-    );
+    const { rows } = await pool.query('SELECT * FROM vehicle_images WHERE id=$1', [req.params.imageId]);
     if (!rows[0]) return res.status(404).json({ error: 'Зураг олдсонгүй' });
-    if (rows[0].company_id !== req.user.company_id)
-      return res.status(403).json({ error: 'Эрхгүй' });
 
     await deleteImage(rows[0].url);
     await pool.query('DELETE FROM vehicle_images WHERE id=$1', [req.params.imageId]);
@@ -180,30 +169,13 @@ router.delete('/image/:imageId', auth, async (req, res) => {
   } catch (err) { serverError(res, err); }
 });
 
-// PATCH /api/upload/image/:imageId/main
-router.patch('/image/:imageId/main', auth, async (req, res) => {
-  try {
-    const { rows } = await pool.query(
-      `SELECT vi.*, v.company_id FROM vehicle_images vi
-       JOIN vehicles v ON v.id = vi.vehicle_id WHERE vi.id=$1`,
-      [req.params.imageId]
-    );
-    if (!rows[0] || rows[0].company_id !== req.user.company_id)
-      return res.status(403).json({ error: 'Эрхгүй' });
-
-    await pool.query('UPDATE vehicle_images SET is_main=false WHERE vehicle_id=$1', [rows[0].vehicle_id]);
-    await pool.query('UPDATE vehicle_images SET is_main=true  WHERE id=$1', [req.params.imageId]);
-    res.json({ ok: true });
-  } catch (err) { serverError(res, err); }
-});
-
 // PATCH /api/upload/vehicle/:id/order { ids: [...] } — зургийн дараалал. Эхний зураг нь үндсэн болно.
 router.patch('/vehicle/:id/order', auth, async (req, res) => {
   const ids = Array.isArray(req.body.ids) ? req.body.ids.filter((x) => typeof x === 'string') : [];
   if (!ids.length) return res.status(400).json({ error: 'Зургийн дараалал хоосон байна' });
   const client = await pool.connect();
   try {
-    const { rows: v } = await client.query('SELECT 1 FROM vehicles WHERE id=$1 AND company_id=$2', [req.params.id, req.user.company_id]);
+    const { rows: v } = await client.query('SELECT 1 FROM vehicles WHERE id=$1', [req.params.id]);
     if (!v.length) return res.status(404).json({ error: 'Машин олдсонгүй' });
     const { rows: imgs } = await client.query('SELECT id FROM vehicle_images WHERE vehicle_id=$1', [req.params.id]);
     const own = new Set(imgs.map((r) => r.id));

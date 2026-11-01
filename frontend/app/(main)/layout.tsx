@@ -62,7 +62,6 @@ function MainLayoutInner({ children }: { children: React.ReactNode }) {
   const [userRole, setUserRole]   = useState('');
   const [companyName, setCompany] = useState('');
   const [logoUrl, setLogoUrl]   = useState<string | null>(null);
-  const [features, setFeatures]  = useState<{ reports?: boolean }>({});
   const [drawerOpen, setDrawer]   = useState(false);
   const [newLeads, setNewLeads]   = useState(0);
   const { dark, toggle: toggleDark } = useTheme();
@@ -75,7 +74,7 @@ function MainLayoutInner({ children }: { children: React.ReactNode }) {
     fetch(`${BACKEND}/api/settings`, {
       headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
     }).then(r => { if (r.status === 401) { localStorage.clear(); router.push('/login'); throw new Error('unauthorized'); } return r.json(); })
-      .then(d => { setCompany(d.name || ''); setLogoUrl(d.logo_url || null); setFeatures(d.features || {}); }).catch(() => {});
+      .then(d => { setCompany(d.name || ''); setLogoUrl(d.logo_url || null); }).catch(() => {});
   }, [router]);
 
   // Drawer хаах хуудас солигдоход
@@ -97,7 +96,7 @@ function MainLayoutInner({ children }: { children: React.ReactNode }) {
 
   const canSeeMoney = userRole === 'ADMIN' || userRole === 'FINANCE';
   const navItems = SIDE_NAV.filter(n =>
-    (n.href !== '/reports' || (features.reports !== false && canSeeMoney)) &&
+    (n.href !== '/reports' || canSeeMoney) &&
     (n.href !== '/settings' || userRole === 'ADMIN'));
 
   const logout = () => { localStorage.removeItem('token'); localStorage.removeItem('user'); router.push('/login'); };

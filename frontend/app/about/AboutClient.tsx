@@ -4,6 +4,8 @@ import { optimizeImg, SiteInitial } from "@/lib/site";
 import { useSiteData } from "@/lib/useSiteData";
 import { SiteHeader } from "@/components/site/SiteHeader";
 import { MobileCallBar, SiteCta, SiteFooter } from "@/components/site/SiteFooter";
+import { LeasingWidget } from "@/components/site/LeasingCalculator";
+import { chatChannels } from "@/lib/contact";
 
 const sv = { viewBox: "0 0 24 24", fill: "none", stroke: "currentColor", strokeWidth: 1.8, strokeLinecap: "round" as const, strokeLinejoin: "round" as const };
 const VALUES = [
@@ -168,6 +170,7 @@ function AboutContent({ initial }: { initial: SiteInitial | null }) {
       <SiteCta company={company} />
       <SiteFooter company={company} />
       <MobileCallBar company={company} />
+      <LeasingWidget phone={company?.phone} chatHref={chatChannels(company)[0]?.href} chatLabel={chatChannels(company)[0]?.label} />
     </div>
   );
 }

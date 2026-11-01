@@ -1,9 +1,10 @@
 'use client';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { api } from '@/lib/api';
 import { useCompany } from '@/lib/useSiteData';
+import { DEMO_LOGIN } from '@/lib/site';
 import { BrandMark } from '@/components/site/BrandMark';
 
 export default function LoginPage() {
@@ -12,19 +13,27 @@ export default function LoginPage() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
-  const [loading, setLoading] = useState(false);
+  // Танилцуулгын горимд нэвтрэх цонхгүйгээр шууд орно
+  const [loading, setLoading] = useState(DEMO_LOGIN);
 
-  async function handleSubmit(e: React.FormEvent) {
+  function save(res: { token: string; user: unknown }) {
+    localStorage.setItem('token', res.token);
+    localStorage.setItem('user', JSON.stringify(res.user));
+    router.push('/dashboard');
+  }
+  function fail(err: unknown) {
+    setError(err instanceof Error ? err.message : 'Алдаа гарлаа');
+    setLoading(false);
+  }
+
+  useEffect(() => {
+    if (DEMO_LOGIN) api.demoLogin().then(save).catch(fail);
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
+
+  function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     setLoading(true); setError('');
-    try {
-      const res = await api.login(email, password);
-      localStorage.setItem('token', res.token);
-      localStorage.setItem('user', JSON.stringify(res.user));
-      router.push('/dashboard');
-    } catch (err: unknown) {
-      setError(err instanceof Error ? err.message : 'Алдаа гарлаа');
-    } finally { setLoading(false); }
+    api.login(email, password).then(save).catch(fail);
   }
 
   const field = "w-full bg-white border border-zinc-200 rounded-2xl px-4 h-12 text-[15px] text-ink placeholder:text-zinc-400 focus:outline-none focus:border-ink/40 focus:ring-4 focus:ring-ink/5 transition";

@@ -1,6 +1,6 @@
 "use client";
 import { useEffect, useState } from "react";
-import { BACKEND, companyQuery } from "@/lib/site";
+import { BACKEND } from "@/lib/site";
 
 const DAYS = ["Өнөөдөр", "Маргааш", "Энэ долоо хоногт", "Хамаагүй"];
 const SLOTS = ["Өглөө 9-12", "Өдөр 12-17", "Орой 17-20"];
@@ -44,7 +44,7 @@ export function LeadForm({ open, onClose, kind, vehicle }: {
     setBusy(true);
     setError("");
     try {
-      const res = await fetch(`${BACKEND}/api/public/leads${companyQuery()}`, {
+      const res = await fetch(`${BACKEND}/api/public/leads`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({

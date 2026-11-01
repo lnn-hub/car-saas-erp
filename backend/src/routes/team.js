@@ -2,38 +2,36 @@ const router = require('express').Router();
 const { serverError } = require('../utils/http');
 const pool   = require('../db/pool');
 const auth   = require('../middleware/auth');
-const { requireFeature, requireAdmin } = auth;
+const { requireAdmin } = auth;
 
-router.use(auth, requireFeature('team'));
+router.use(auth);
 router.use((req, res, next) => req.method === 'GET' ? next() : requireAdmin(req, res, next));
 
 const FIELDS = 'id, name, position, bio, photo_url, sort_order';
 
-router.get('/', auth, async (req, res) => {
+router.get('/', async (req, res) => {
   try {
     const { rows } = await pool.query(
-      `SELECT ${FIELDS} FROM team_members WHERE company_id=$1 ORDER BY sort_order, created_at`,
-      [req.user.company_id]
-    );
+      `SELECT ${FIELDS} FROM team_members ORDER BY sort_order, created_at`);
     res.json(rows);
   } catch (err) { serverError(res, err); }
 });
 
-router.post('/', auth, async (req, res) => {
+router.post('/', async (req, res) => {
   const { name, position, bio } = req.body;
   if (!name || !name.trim()) return res.status(400).json({ error: 'Нэр оруулна уу' });
   try {
     const { rows } = await pool.query(
-      `INSERT INTO team_members (company_id, name, position, bio, sort_order)
-       VALUES ($1,$2,$3,$4,(SELECT COALESCE(MAX(sort_order),-1)+1 FROM team_members WHERE company_id=$1))
+      `INSERT INTO team_members (name, position, bio, sort_order)
+       VALUES ($1,$2,$3,(SELECT COALESCE(MAX(sort_order),-1)+1 FROM team_members))
        RETURNING ${FIELDS}`,
-      [req.user.company_id, name.trim(), position || null, bio || null]
+      [name.trim(), position || null, bio || null]
     );
     res.status(201).json(rows[0]);
   } catch (err) { serverError(res, err); }
 });
 
-router.patch('/:id', auth, async (req, res) => {
+router.patch('/:id', async (req, res) => {
   const { name, position, bio } = req.body;
   if (name !== undefined && !String(name).trim()) return res.status(400).json({ error: 'Нэр оруулна уу' });
   try {
@@ -42,18 +40,18 @@ router.patch('/:id', auth, async (req, res) => {
          name     = COALESCE($1, name),
          position = COALESCE($2, position),
          bio      = COALESCE($3, bio)
-       WHERE id=$4 AND company_id=$5
+       WHERE id=$4
        RETURNING ${FIELDS}`,
-      [name ? String(name).trim() : null, position ?? null, bio ?? null, req.params.id, req.user.company_id]
+      [name ? String(name).trim() : null, position ?? null, bio ?? null, req.params.id]
     );
     if (!rows[0]) return res.status(404).json({ error: 'Олдсонгүй' });
     res.json(rows[0]);
   } catch (err) { serverError(res, err); }
 });
 
-router.delete('/:id', auth, async (req, res) => {
+router.delete('/:id', async (req, res) => {
   try {
-    await pool.query('DELETE FROM team_members WHERE id=$1 AND company_id=$2', [req.params.id, req.user.company_id]);
+    await pool.query('DELETE FROM team_members WHERE id=$1', [req.params.id]);
     res.json({ ok: true });
   } catch (err) { serverError(res, err); }
 });
