@@ -191,6 +191,14 @@ export const api = {
     return data;
   },
 
+  fbConnect: (token: string, page_id?: string) => {
+    invalidateCache('/settings');
+    return request('/settings/facebook', { method: 'POST', body: JSON.stringify({ token, page_id }) });
+  },
+  fbDisconnect: () => { invalidateCache('/settings'); return request('/settings/facebook', { method: 'DELETE' }); },
+  fbPreview: (vehicleId: string) => request(`/vehicles/${vehicleId}/facebook/preview`),
+  fbPublish: (vehicleId: string) => { invalidateCache('/vehicles'); return request(`/vehicles/${vehicleId}/facebook`, { method: 'POST' }); },
+
   getLeads: () => request('/leads'),
   leadsCount: () => request('/leads/count'),
   updateLead: (id: string, status: string) => request(`/leads/${id}`, { method: 'PATCH', body: JSON.stringify({ status }) }),

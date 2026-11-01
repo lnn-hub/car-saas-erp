@@ -32,7 +32,10 @@ async function ensureSchema() {
       ADD COLUMN IF NOT EXISTS features       JSONB NOT NULL DEFAULT '{}'::jsonb,
       ADD COLUMN IF NOT EXISTS messenger_url  VARCHAR(255),
       ADD COLUMN IF NOT EXISTS viber_phone    VARCHAR(30),
-      ADD COLUMN IF NOT EXISTS whatsapp_phone VARCHAR(30)
+      ADD COLUMN IF NOT EXISTS whatsapp_phone VARCHAR(30),
+      ADD COLUMN IF NOT EXISTS fb_page_id     VARCHAR(40),
+      ADD COLUMN IF NOT EXISTS fb_page_name   VARCHAR(255),
+      ADD COLUMN IF NOT EXISTS fb_page_token  TEXT
   `);
   await pool.query(`
     CREATE TABLE IF NOT EXISTS team_members (
@@ -50,7 +53,9 @@ async function ensureSchema() {
   await pool.query(`
     ALTER TABLE vehicles
       ADD COLUMN IF NOT EXISTS prev_price       NUMERIC(15,2),
-      ADD COLUMN IF NOT EXISTS price_changed_at TIMESTAMPTZ
+      ADD COLUMN IF NOT EXISTS price_changed_at TIMESTAMPTZ,
+      ADD COLUMN IF NOT EXISTS fb_post_url      VARCHAR(255),
+      ADD COLUMN IF NOT EXISTS fb_posted_at     TIMESTAMPTZ
   `);
   // Сайтаас ирсэн хүсэлт (үзэх цаг товлох, машин захиалах)
   await pool.query(`

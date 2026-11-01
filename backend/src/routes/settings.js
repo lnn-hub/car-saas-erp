@@ -4,13 +4,14 @@ const pool = require('../db/pool');
 const auth = require('../middleware/auth');
 const { requireAdmin } = auth;
 const { resolveFeatures } = require('../utils/features');
+const { resolvePage, FbError } = require('../utils/facebook');
 
 // GET /api/settings — компанийн тохиргоо авах
 router.get('/', auth, async (req, res) => {
   try {
     const { rows } = await pool.query(
       `SELECT name, slug, phone, address, email, working_hours, logo_url, show_prices, plan, max_vehicles, features,
-              messenger_url, viber_phone, whatsapp_phone,
+              messenger_url, viber_phone, whatsapp_phone, fb_page_name, (fb_page_token IS NOT NULL) AS fb_connected,
               (SELECT COUNT(*)::int FROM vehicles WHERE company_id = $1) AS vehicle_count
        FROM companies WHERE id=$1`,
       [req.user.company_id]
@@ -66,6 +67,29 @@ router.patch('/', auth, requireAdmin, async (req, res) => {
        email ?? null, working_hours ?? null, name ? String(name).trim() : null]
     );
     res.json(rows[0]);
+  } catch (err) { serverError(res, err); }
+});
+
+// POST /api/settings/facebook { token, page_id? } — Facebook пэйж холбох (токеныг хөтөч рүү буцаахгүй)
+router.post('/facebook', auth, requireAdmin, async (req, res) => {
+  const token = String(req.body.token || '').trim();
+  if (token.length < 20) return res.status(400).json({ error: 'Facebook токеноо оруулна уу' });
+  try {
+    const page = await resolvePage(token, req.body.page_id ? String(req.body.page_id) : undefined);
+    await pool.query('UPDATE companies SET fb_page_id=$1, fb_page_name=$2, fb_page_token=$3 WHERE id=$4',
+      [page.id, page.name, page.token, req.user.company_id]);
+    res.json({ fb_connected: true, fb_page_name: page.name, pages: page.pages });
+  } catch (err) {
+    if (err instanceof FbError) return res.status(400).json({ error: err.message });
+    serverError(res, err);
+  }
+});
+
+// DELETE /api/settings/facebook — салгах
+router.delete('/facebook', auth, requireAdmin, async (req, res) => {
+  try {
+    await pool.query('UPDATE companies SET fb_page_id=NULL, fb_page_name=NULL, fb_page_token=NULL WHERE id=$1', [req.user.company_id]);
+    res.json({ fb_connected: false });
   } catch (err) { serverError(res, err); }
 });
 

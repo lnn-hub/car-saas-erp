@@ -3,6 +3,7 @@ const { serverError } = require('../utils/http');
 const pool = require('../db/pool');
 const auth = require('../middleware/auth');
 const { requireAdmin, requireMoney, canSeeMoney } = auth;
+const { publishPost, FbError } = require('../utils/facebook');
 
 // GET /api/vehicles — бүх машин
 router.get('/', auth, async (req, res) => {
@@ -177,6 +178,79 @@ router.post('/:id/costs', auth, requireMoney, async (req, res) => {
     res.status(201).json(rows[0]);
   } catch (err) {
     if (err.code === '22P02') return res.status(400).json({ error: 'Зардлын төрөл буруу байна' });
+    serverError(res, err);
+  }
+});
+
+// ─── Facebook пэйж рүү нийтлэх ──────────────────────────────────────────────
+const FUEL = { PETROL: 'Бензин', DIESEL: 'Дизель', HYBRID: 'Хибрид', ELECTRIC: 'Цахилгаан' };
+const siteUrl = () => process.env.PUBLIC_SITE_URL
+  || (process.env.FRONTEND_URL || '').split(',').map((s) => s.trim()).find((u) => u && !u.includes('localhost'))
+  || '';
+const fmtMoney = (n) => (n >= 1e6 ? `${(n / 1e6).toFixed(1).replace(/\.0$/, '')} сая ₮` : `${Math.round(n).toLocaleString('en-US')} ₮`);
+// Facebook зөвхөн нийтэд нээлттэй https зургийг татна. Cloudinary бол JPG, 1600px болгоно.
+const fbImage = (u) => {
+  if (!/^https:\/\//.test(u || '')) return null;
+  return u.includes('res.cloudinary.com') && u.includes('/upload/') ? u.replace('/upload/', '/upload/f_jpg,q_auto,w_1600/') : u;
+};
+
+function buildMessage(v, company) {
+  const specs = [
+    v.mileage > 0 ? `${Number(v.mileage).toLocaleString('en-US')} км` : null,
+    FUEL[v.fuel_type],
+    v.transmission === 'AUTO' ? 'Автомат' : v.transmission === 'MANUAL' ? 'Механик' : null,
+    v.engine_cc ? `${(v.engine_cc / 1000).toFixed(1)}L` : null,
+  ].filter(Boolean).join(' · ');
+  const lines = (v.description || '').split('\n').map((l) => l.trim());
+  const about = lines.filter((l) => l && !l.startsWith('Зургийн эх сурвалж')).join('\n');
+  const url = siteUrl() ? `${siteUrl().replace(/\/$/, '')}/vehicle/${v.id}` : '';
+  return [
+    `${v.year} ${v.brand} ${v.model}`,
+    company.show_prices && Number(v.price) > 0 ? `Үнэ: ${fmtMoney(Number(v.price))}` : 'Үнэ: тохиролцоно',
+    specs,
+    [v.color, v.has_plates ? 'Дугаартай' : null].filter(Boolean).join(' · '),
+    about ? `\n${about}` : '',
+    url ? `\nДэлгэрэнгүй: ${url}` : '',
+    company.phone ? `Утас: ${company.phone}` : '',
+  ].filter(Boolean).join('\n');
+}
+
+// POST /api/vehicles/:id/facebook
+router.post('/:id/facebook', auth, async (req, res) => {
+  try {
+    const [{ rows: [v] }, { rows: [company] }, { rows: imgs }] = await Promise.all([
+      pool.query('SELECT * FROM vehicles WHERE id=$1 AND company_id=$2', [req.params.id, req.user.company_id]),
+      pool.query('SELECT phone, show_prices, fb_page_id, fb_page_token FROM companies WHERE id=$1', [req.user.company_id]),
+      pool.query('SELECT url FROM vehicle_images WHERE vehicle_id=$1 ORDER BY sort_order', [req.params.id]),
+    ]);
+    if (!v) return res.status(404).json({ error: 'Машин олдсонгүй' });
+    if (!company?.fb_page_token) return res.status(400).json({ error: 'Facebook пэйж холбоогүй байна. Тохиргоо хэсгээс холбоно уу' });
+    const imageUrls = imgs.map((i) => fbImage(i.url)).filter(Boolean);
+    const message = buildMessage(v, company);
+    const post = await publishPost({
+      pageId: company.fb_page_id, token: company.fb_page_token, message, imageUrls,
+      link: siteUrl() ? `${siteUrl().replace(/\/$/, '')}/vehicle/${v.id}` : null,
+    });
+    await pool.query('UPDATE vehicles SET fb_post_url=$1, fb_posted_at=NOW() WHERE id=$2', [post.url, v.id]);
+    res.json({ ...post, skipped_images: imgs.length - Math.min(imageUrls.length, 10) > 0 ? imgs.length - post.photos : 0 });
+  } catch (err) {
+    if (err instanceof FbError) return res.status(400).json({ error: err.message });
+    if (err.code === '22P02') return res.status(404).json({ error: 'Машин олдсонгүй' });
+    serverError(res, err);
+  }
+});
+
+// GET /api/vehicles/:id/facebook/preview — постын бичвэрийг урьдчилан харах
+router.get('/:id/facebook/preview', auth, async (req, res) => {
+  try {
+    const [{ rows: [v] }, { rows: [company] }] = await Promise.all([
+      pool.query('SELECT * FROM vehicles WHERE id=$1 AND company_id=$2', [req.params.id, req.user.company_id]),
+      pool.query('SELECT phone, show_prices FROM companies WHERE id=$1', [req.user.company_id]),
+    ]);
+    if (!v) return res.status(404).json({ error: 'Машин олдсонгүй' });
+    res.json({ message: buildMessage(v, company) });
+  } catch (err) {
+    if (err.code === '22P02') return res.status(404).json({ error: 'Машин олдсонгүй' });
     serverError(res, err);
   }
 });

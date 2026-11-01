@@ -1,5 +1,6 @@
 "use client";
 import { useEffect, useRef, useState, Suspense } from "react";
+import Link from "next/link";
 import { useRole } from '@/lib/role';
 import { useParams, useRouter } from "next/navigation";
 import { api } from "@/lib/api";
@@ -38,6 +39,8 @@ interface Vehicle {
   manufactured_date: string | null;
   price: string | null;
   images: { id: string; url: string; is_main: boolean }[];
+  fb_post_url?: string | null;
+  fb_posted_at?: string | null;
   costs: Cost[];
 }
 
@@ -92,6 +95,23 @@ function VehicleDetailContent() {
   const [photoBusy, setPhotoBusy] = useState("");
   const [dragId, setDragId] = useState<string | null>(null);
   const [fileOver, setFileOver] = useState(false);
+  const [fbConnected, setFbConnected] = useState<boolean | null>(null);
+  const [fbPreview, setFbPreview] = useState<string | null>(null);
+  const [fbBusy, setFbBusy] = useState(false);
+  const [fbResult, setFbResult] = useState<{ url: string; photos: number } | null>(null);
+  const [fbError, setFbError] = useState("");
+  useEffect(() => { api.getSettings().then((d: { fb_connected?: boolean }) => setFbConnected(!!d.fb_connected)).catch(() => setFbConnected(false)); }, []);
+  async function openFb() {
+    setFbError(""); setFbResult(null); setFbPreview("");
+    try { const r = await api.fbPreview(id); setFbPreview(r.message); }
+    catch (e) { setFbPreview(null); setMsg(e instanceof Error ? e.message : "Алдаа"); }
+  }
+  async function publishFb() {
+    setFbBusy(true); setFbError("");
+    try { const r = await api.fbPublish(id); setFbResult(r); load(); }
+    catch (e) { setFbError(e instanceof Error ? e.message : "Алдаа"); }
+    finally { setFbBusy(false); }
+  }
   const [editOpen, setEditOpen] = useState(false);
   const [editBusy, setEditBusy] = useState(false);
   const [edit, setEdit] = useState({
@@ -619,6 +639,71 @@ function VehicleDetailContent() {
 
       </div>
       <div className="space-y-5 lg:sticky lg:top-6">
+      {/* Facebook */}
+      <div className="bg-white ring-1 ring-ink/[0.06] rounded-2xl p-4">
+        <div className="font-display text-base font-semibold text-ink mb-1 flex items-center gap-2">
+          <svg className="w-5 h-5 text-[#1877f2]" viewBox="0 0 24 24" fill="currentColor"><path d="M24 12a12 12 0 10-13.9 11.9v-8.4H7.1V12h3V9.4c0-3 1.8-4.7 4.5-4.7 1.3 0 2.7.2 2.7.2v3h-1.5c-1.5 0-2 .9-2 1.9V12h3.4l-.5 3.5h-2.9v8.4A12 12 0 0024 12z" /></svg>
+          Facebook
+        </div>
+        {vehicle.fb_posted_at && (
+          <div className="text-xs text-zinc-500 mb-3">
+            Нийтэлсэн: {new Date(vehicle.fb_posted_at).toISOString().slice(0, 10).replace(/-/g, ".")}
+            {vehicle.fb_post_url && <> · <a href={vehicle.fb_post_url} target="_blank" rel="noreferrer" className="text-brand underline">Пост үзэх</a></>}
+          </div>
+        )}
+        {fbConnected === false ? (
+          <p className="text-xs text-zinc-500 mt-1">
+            Пэйж холбоогүй байна. {isAdmin ? <Link href="/settings" className="text-brand underline">Тохиргооноос холбох</Link> : "Админд хандана уу."}
+          </p>
+        ) : (
+          <button type="button" onClick={openFb} disabled={fbConnected === null || vehicle.status === "SOLD"}
+            className="w-full mt-2 h-11 rounded-full bg-[#1877f2] hover:bg-[#166fe0] disabled:opacity-40 text-white text-sm font-medium transition-colors">
+            {vehicle.fb_posted_at ? "Дахин нийтлэх" : "Facebook-т нийтлэх"}
+          </button>
+        )}
+      </div>
+
+      {fbPreview !== null && (
+        <div className="fixed inset-0 z-[70] flex items-end sm:items-center justify-center sm:p-4" role="dialog" aria-modal="true">
+          <div className="absolute inset-0 bg-ink/40 backdrop-blur-sm" onClick={() => !fbBusy && setFbPreview(null)} />
+          <div className="relative w-full sm:max-w-lg bg-white rounded-t-[28px] sm:rounded-[28px] shadow-lift max-h-[90dvh] overflow-y-auto p-6 animate-[fadeUp_0.3s_var(--ease-out-expo)]">
+            {fbResult ? (
+              <div className="text-center py-4">
+                <div className="w-14 h-14 rounded-full bg-emerald-50 text-emerald-700 flex items-center justify-center mx-auto">
+                  <svg className="w-7 h-7" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2.5}><path d="M20 6L9 17l-5-5" /></svg>
+                </div>
+                <div className="font-display text-xl font-semibold text-ink mt-4">Facebook-т нийтлэгдлээ</div>
+                <p className="text-sm text-zinc-500 mt-1">{fbResult.photos} зурагтай пост пэйж дээр гарлаа.</p>
+                <div className="flex gap-2 mt-6">
+                  <a href={fbResult.url} target="_blank" rel="noreferrer" className="flex-1 h-11 rounded-full bg-[#1877f2] text-white text-sm font-medium flex items-center justify-center">Пост үзэх</a>
+                  <button type="button" onClick={() => setFbPreview(null)} className="flex-1 h-11 rounded-full bg-zinc-100 text-ink text-sm font-medium">Хаах</button>
+                </div>
+              </div>
+            ) : (
+              <>
+                <div className="font-display text-lg font-semibold text-ink">Facebook-т нийтлэх</div>
+                <p className="text-sm text-zinc-500 mt-1">{Math.min(vehicle.images?.length || 0, 10)} зураг ба доорх бичвэртэй пост пэйж дээр гарна.</p>
+                {vehicle.images?.length > 0 && (
+                  <div className="flex gap-1.5 mt-4 overflow-x-auto no-scrollbar">
+                    {vehicle.images.slice(0, 10).map((im) => (
+                      <img key={im.id} src={fileSrc(im.url)} alt="" className="w-16 h-12 rounded-lg object-cover shrink-0" />
+                    ))}
+                  </div>
+                )}
+                <pre className="mt-4 whitespace-pre-wrap font-sans text-sm text-ink bg-zinc-50 rounded-2xl p-4 max-h-64 overflow-y-auto">{fbPreview || "Ачааллаж байна..."}</pre>
+                {fbError && <div className="mt-3 bg-danger-soft border border-danger-line rounded-xl px-3 py-2 text-sm text-danger">{fbError}</div>}
+                <div className="flex gap-2 mt-5">
+                  <button type="button" onClick={() => setFbPreview(null)} disabled={fbBusy} className="h-11 px-5 rounded-full bg-zinc-100 text-ink text-sm font-medium">Болих</button>
+                  <button type="button" onClick={publishFb} disabled={fbBusy || !fbPreview} className="flex-1 h-11 rounded-full bg-[#1877f2] hover:bg-[#166fe0] disabled:opacity-50 text-white text-sm font-medium">
+                    {fbBusy ? "Нийтэлж байна..." : "Нийтлэх"}
+                  </button>
+                </div>
+              </>
+            )}
+          </div>
+        </div>
+      )}
+
       {/* Status change */}
       {vehicle.status !== "SOLD" && (
         <div className="bg-white ring-1 ring-ink/[0.06] rounded-2xl p-4">

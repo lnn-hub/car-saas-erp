@@ -3,6 +3,7 @@ import { useEffect, useRef, useState } from 'react';
 import { api } from '@/lib/api';
 import { useRole } from '@/lib/role';
 import { StaffManager } from '@/components/admin/StaffManager';
+import { FacebookConnect } from '@/components/admin/FacebookConnect';
 
 interface Settings {
   name: string; phone: string; address: string; email: string; working_hours: string; show_prices: boolean;
@@ -59,6 +60,7 @@ export default function SettingsPage() {
   const fileRef = useRef<HTMLInputElement>(null);
 
   const [logo, setLogo]       = useState<string | null>(null);
+  const [fb, setFb] = useState<{ connected: boolean; pageName: string | null }>({ connected: false, pageName: null });
   const [planInfo, setPlanInfo] = useState<{ plan: string; max_vehicles: number | null; vehicle_count: number } | null>(null);
   const [logoBusy, setLogoBusy] = useState(false);
   const [logoErr, setLogoErr]   = useState('');
@@ -117,6 +119,7 @@ export default function SettingsPage() {
       });
       setLogo(d.logo_url || null);
       setPlanInfo({ plan: d.plan || 'basic', max_vehicles: d.max_vehicles ?? null, vehicle_count: d.vehicle_count ?? 0 });
+      setFb({ connected: !!d.fb_connected, pageName: d.fb_page_name || null });
     }).finally(() => setLoading(false));
     loadTeam();
   }, []);
@@ -291,6 +294,8 @@ export default function SettingsPage() {
           {saving ? 'Хадгалж байна...' : 'Хадгалах'}
         </button>
       </form>
+
+      <FacebookConnect connected={fb.connected} pageName={fb.pageName} onChange={setFb} />
 
       <StaffManager />
 
