@@ -3,7 +3,7 @@ import { useEffect, useRef, useState, Suspense } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { BACKEND, companyQuery, optimizeImg, Vehicle, VehicleDetail } from '@/lib/site';
-import { FUEL, TRANS, fmtEngine, fmtPrice } from '@/lib/format';
+import { FUEL, TRANS, fmtDrop, fmtEngine, fmtPrice } from '@/lib/format';
 import { useCompany } from '@/lib/useSiteData';
 import { useCompare, COMPARE_MAX } from '@/lib/compare';
 import { SiteHeader } from '@/components/site/SiteHeader';
@@ -299,7 +299,15 @@ function VehicleContent({ id, initial }: { id: string; initial: VehicleDetail | 
             <div className={`${card} p-6 sm:p-7`}>
               <div className="text-sm text-zinc-500">Үнэ</div>
               {price ? (
-                <div className="font-display text-4xl sm:text-[44px] font-semibold text-ink tabular-nums tracking-tight leading-tight mt-1">{price}</div>
+                <>
+                  {fmtDrop(v.prev_price, v.price) && (
+                    <div className="flex items-center gap-2 mt-1">
+                      <span className="text-base text-zinc-400 line-through tabular-nums">{fmtPrice(v.prev_price)}</span>
+                      <span className="rounded-full bg-amber-400 px-2.5 py-0.5 text-xs font-semibold text-ink">Үнэ буурсан {fmtDrop(v.prev_price, v.price)}</span>
+                    </div>
+                  )}
+                  <div className={`font-display text-4xl sm:text-[44px] font-semibold tabular-nums tracking-tight leading-tight mt-1 ${fmtDrop(v.prev_price, v.price) ? 'text-brand' : 'text-ink'}`}>{price}</div>
+                </>
               ) : (
                 <div className="font-display text-2xl font-semibold text-ink mt-1">Тохиролцоно</div>
               )}

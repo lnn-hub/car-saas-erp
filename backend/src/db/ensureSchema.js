@@ -46,6 +46,12 @@ async function ensureSchema() {
       created_at TIMESTAMPTZ DEFAULT NOW()
     )
   `);
+  // Үнэ буурсныг харуулах: өмнөх (өндөр) үнэ, өөрчилсөн огноо
+  await pool.query(`
+    ALTER TABLE vehicles
+      ADD COLUMN IF NOT EXISTS prev_price       NUMERIC(15,2),
+      ADD COLUMN IF NOT EXISTS price_changed_at TIMESTAMPTZ
+  `);
   // Сайтаас ирсэн хүсэлт (үзэх цаг товлох, машин захиалах)
   await pool.query(`
     CREATE TABLE IF NOT EXISTS leads (

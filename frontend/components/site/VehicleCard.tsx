@@ -1,7 +1,7 @@
 "use client";
 import Link from "next/link";
 import { optimizeImg, Vehicle } from "@/lib/site";
-import { FUEL, fmtEngine, fmtKm, fmtPrice } from "@/lib/format";
+import { FUEL, fmtDrop, fmtEngine, fmtKm, fmtPrice } from "@/lib/format";
 
 export function CarPlaceholder({ className = "w-2/3" }: { className?: string }) {
   return (
@@ -30,6 +30,7 @@ export function VehicleCard({
   const src = optimizeImg(v.main_image, 720);
   const src2 = v.images?.[1] ? optimizeImg(v.images[1], 720) : null;
   const price = fmtPrice(v.price);
+  const drop = fmtDrop(v.prev_price, v.price);
   const km = fmtKm(v.mileage);
   const cc = fmtEngine(v.engine_cc);
   const specs = [km, FUEL[v.fuel_type], v.transmission === "AUTO" ? "Автомат" : "Механик", cc].filter(Boolean) as string[];
@@ -69,6 +70,11 @@ export function VehicleCard({
           <span className="bg-white/90 rounded-full px-2.5 py-1 text-[11px] sm:text-xs font-semibold text-ink tabular-nums">
             {v.year}
           </span>
+          {drop && (
+            <span className="inline-flex items-center rounded-full bg-amber-400 px-2.5 py-1 text-[11px] sm:text-xs font-semibold text-ink">
+              Үнэ буурсан
+            </span>
+          )}
           {v.has_plates && (
             <span className="hidden sm:inline-flex items-center rounded-full bg-brand/90 px-2.5 py-1 text-xs font-medium text-white">
               Дугаартай
@@ -114,7 +120,12 @@ export function VehicleCard({
 
         <div className="mt-auto pt-3 sm:pt-4 flex items-end justify-between gap-2">
           {price ? (
-            <div className="font-display text-[15px] sm:text-[22px] font-semibold text-ink tabular-nums leading-none tracking-tight whitespace-nowrap">{price}</div>
+            <div className="min-w-0">
+              {drop && (
+                <div className="text-[11px] sm:text-xs text-zinc-400 line-through tabular-nums mb-1 whitespace-nowrap">{fmtPrice(v.prev_price)}</div>
+              )}
+              <div className={`font-display text-[15px] sm:text-[22px] font-semibold tabular-nums leading-none tracking-tight whitespace-nowrap ${drop ? "text-brand" : "text-ink"}`}>{price}</div>
+            </div>
           ) : (
             <div className="text-sm text-zinc-500">Үнэ тохиролцоно</div>
           )}

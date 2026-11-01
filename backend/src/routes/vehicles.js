@@ -91,6 +91,22 @@ router.patch('/:id', auth, async (req, res) => {
   }
   if (!sets.length) return res.status(400).json({ error: 'Өөрчлөх мэдээлэл алга' });
   try {
+    // Үнэ буурвал өмнөх өндөр үнийг хадгална (сайтад "Үнэ буурсан" гэж харагдана)
+    if (req.body.price !== undefined) {
+      const { rows: [cur] } = await pool.query('SELECT price, prev_price FROM vehicles WHERE id=$1 AND company_id=$2', [req.params.id, req.user.company_id]);
+      if (cur) {
+        const next = req.body.price === '' || req.body.price === null ? null : Number(req.body.price);
+        const old = cur.price != null ? Number(cur.price) : null;
+        const prev = cur.prev_price != null ? Number(cur.prev_price) : null;
+        if (next !== old) {
+          let newPrev = null;
+          if (next != null && old != null && next < old) newPrev = Math.max(prev || 0, old);
+          else if (next != null && prev != null && next < prev) newPrev = prev;
+          vals.push(newPrev); sets.push(`prev_price = $${vals.length}`);
+          sets.push('price_changed_at = NOW()');
+        }
+      }
+    }
     vals.push(req.params.id, req.user.company_id);
     const { rows } = await pool.query(
       `UPDATE vehicles SET ${sets.join(', ')}, updated_at = NOW()

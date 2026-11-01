@@ -46,7 +46,8 @@ router.get('/team', async (req, res) => {
 
 // Нийтэд харагдах талбарууд (whitelist). vin, created_by, company_id, status, зардал зэрэг дотоод мэдээлэл ОРОХГҮЙ.
 const PUBLIC_COLS = `v.id, v.brand, v.model, v.year, v.color, v.fuel_type, v.transmission,
-  v.engine_cc, v.mileage, v.description, v.has_plates, v.manufactured_date, v.price`;
+  v.engine_cc, v.mileage, v.description, v.has_plates, v.manufactured_date, v.price,
+  CASE WHEN v.prev_price > v.price AND v.price_changed_at > NOW() - INTERVAL '30 days' THEN v.prev_price END AS prev_price`;
 
 // GET /api/public/vehicles
 router.get('/vehicles', async (req, res) => {
@@ -68,7 +69,7 @@ router.get('/vehicles', async (req, res) => {
     res.json({
       company_id: comp.id,
       show_prices: comp.show_prices,
-      vehicles: rows.map(v => ({ ...v, price: comp.show_prices ? v.price : null })),
+      vehicles: rows.map(v => ({ ...v, price: comp.show_prices ? v.price : null, prev_price: comp.show_prices ? v.prev_price : null })),
     });
   } catch (err) { serverError(res, err); }
 });
@@ -89,7 +90,7 @@ router.get('/vehicles/:id', async (req, res) => {
     if (!comp) return res.status(404).json({ error: 'Компани олдсонгүй' });
     if (!rows[0]) return res.status(404).json({ error: 'Машин олдсонгүй' });
 
-    res.json({ ...rows[0], price: comp.show_prices ? rows[0].price : null, company: comp });
+    res.json({ ...rows[0], price: comp.show_prices ? rows[0].price : null, prev_price: comp.show_prices ? rows[0].prev_price : null, company: comp });
   } catch (err) {
     if (err.code === '22P02') return res.status(404).json({ error: 'Машин олдсонгүй' });
     serverError(res, err);
