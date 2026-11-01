@@ -257,7 +257,7 @@ export default function ReportsPage() {
           ? [...Array(6)].map((_, i) => <div key={i} className="h-[132px] rounded-[22px] bg-white ring-1 ring-ink/[0.06] animate-pulse" />)
           : kpis.map((k) => (
             <div key={k.label} className={`relative overflow-hidden rounded-[22px] p-4 sm:p-5 print-avoid ${k.featured ? 'bg-ink text-white print:bg-white print:text-ink print:ring-1 print:ring-zinc-300' : 'bg-white ring-1 ring-ink/[0.06] shadow-card'} ${loading ? 'opacity-60' : ''}`}>
-              {k.featured && <div className="pointer-events-none absolute -right-10 -top-16 w-48 h-48 rounded-full bg-brand/70 blur-3xl print:hidden" />}
+              {k.featured && <div className="pointer-events-none absolute -right-10 -top-16 w-48 h-48 print:hidden" style={{ background: "radial-gradient(closest-side, color-mix(in oklab, var(--color-brand) 75%, transparent), transparent)" }} />}
               <div className={`relative text-xs sm:text-sm font-medium ${k.featured ? 'text-white/70 print:text-zinc-500' : 'text-zinc-500'}`}>{k.label}</div>
               <div className="relative mt-3 flex items-baseline gap-1.5">
                 <span className="font-display text-2xl sm:text-[30px] font-semibold tabular-nums tracking-tight leading-none">{k.value}</span>

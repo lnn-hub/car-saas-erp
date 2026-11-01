@@ -14,8 +14,8 @@ export function SiteCta({ company }: { company: Company | null }) {
   return (
     <section className="px-3 sm:px-4 py-6 sm:py-10">
       <div className="reveal relative max-w-7xl mx-auto overflow-hidden rounded-[24px] sm:rounded-[40px] bg-ink text-white px-5 py-9 sm:px-14 sm:py-16">
-        <div className="pointer-events-none absolute -top-40 -right-24 w-[520px] h-[520px] rounded-full bg-brand/60 blur-[120px]" />
-        <div className="pointer-events-none absolute -bottom-48 left-10 w-[420px] h-[420px] rounded-full bg-brand-light/20 blur-[120px]" />
+        <div className="pointer-events-none absolute -top-40 -right-24 w-[520px] h-[520px]" style={{ background: "radial-gradient(closest-side, color-mix(in oklab, var(--color-brand) 65%, transparent), transparent)" }} />
+        <div className="pointer-events-none absolute -bottom-48 left-10 w-[420px] h-[420px]" style={{ background: "radial-gradient(closest-side, color-mix(in oklab, var(--color-brand-light) 22%, transparent), transparent)" }} />
         <div
           className="pointer-events-none absolute inset-0 opacity-[0.08]"
           style={{ backgroundImage: "radial-gradient(rgb(255 255 255 / 0.6) 1px, transparent 1px)", backgroundSize: "22px 22px" }}

@@ -65,8 +65,8 @@ export default function LoginPage() {
 
       <div className="hidden lg:block p-3">
         <div className="relative h-full rounded-[32px] overflow-hidden bg-ink text-white flex flex-col justify-end p-12">
-          <div className="pointer-events-none absolute -top-32 -right-32 w-[560px] h-[560px] rounded-full bg-brand/70 blur-[130px]" />
-          <div className="pointer-events-none absolute bottom-0 -left-20 w-[400px] h-[400px] rounded-full bg-brand-light/20 blur-[120px]" />
+          <div className="pointer-events-none absolute -top-32 -right-32 w-[560px] h-[560px]" style={{ background: "radial-gradient(closest-side, color-mix(in oklab, var(--color-brand) 75%, transparent), transparent)" }} />
+          <div className="pointer-events-none absolute bottom-0 -left-20 w-[400px] h-[400px]" style={{ background: "radial-gradient(closest-side, color-mix(in oklab, var(--color-brand-light) 22%, transparent), transparent)" }} />
           <div className="pointer-events-none absolute inset-0 opacity-[0.08]" style={{ backgroundImage: "radial-gradient(rgb(255 255 255 / 0.6) 1px, transparent 1px)", backgroundSize: "22px 22px" }} />
           <div className="relative max-w-md">
             <div className="flex flex-wrap gap-2 mb-8">

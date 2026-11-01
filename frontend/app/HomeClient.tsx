@@ -70,6 +70,7 @@ function HomeContent({ initial }: { initial: SiteInitial | null }) {
   const [compareOpen, setCompareOpen] = useState(false);
   const [sheetOpen, setSheetOpen] = useState(false);
   const [leadOpen, setLeadOpen] = useState(false);
+  const [mapOn, setMapOn] = useState(false);
   const compareOn = company?.features?.compare !== false;
   const compared = vehicles.filter((v) => compare.includes(v.id));
 
@@ -405,8 +406,8 @@ function HomeContent({ initial }: { initial: SiteInitial | null }) {
             <div className={`grid grid-cols-1 gap-3 sm:gap-4 ${company?.phone && info.length ? "lg:grid-cols-[1.05fr_1fr]" : ""}`}>
               {company?.phone && (
                 <div className="reveal relative overflow-hidden bg-brand text-white rounded-[24px] sm:rounded-[28px] p-6 sm:p-10 flex flex-col justify-between gap-10 min-h-[280px] sm:min-h-[360px]">
-                  <div className="pointer-events-none absolute -right-24 -top-24 w-96 h-96 rounded-full bg-white/10 blur-3xl" />
-                  <div className="pointer-events-none absolute -left-16 -bottom-24 w-72 h-72 rounded-full bg-black/10 blur-3xl" />
+                  <div className="pointer-events-none absolute -right-24 -top-24 w-96 h-96" style={{ background: "radial-gradient(closest-side, rgb(255 255 255 / 0.14), transparent)" }} />
+                  <div className="pointer-events-none absolute -left-16 -bottom-24 w-72 h-72" style={{ background: "radial-gradient(closest-side, rgb(0 0 0 / 0.14), transparent)" }} />
                   <div className="relative flex items-center gap-3">
                     <span className="w-11 h-11 rounded-full bg-white/15 flex items-center justify-center"><IcPhone cls="w-5 h-5" /></span>
                     <span className="text-sm text-white/75">Утсаар шууд холбогдох</span>
@@ -464,13 +465,22 @@ function HomeContent({ initial }: { initial: SiteInitial | null }) {
                   </ul>
                   {company?.address && (
                     <div className="relative flex-1 min-h-[200px] sm:min-h-[220px] border-t border-zinc-100 bg-zinc-100">
-                      <iframe
-                        title="Байршил газрын зураг дээр"
-                        src={`https://maps.google.com/maps?q=${encodeURIComponent(company.address)}&z=14&output=embed`}
-                        loading="lazy"
-                        referrerPolicy="no-referrer-when-downgrade"
-                        className="contact-map absolute inset-0 w-full h-full border-0"
-                      />
+                      {mapOn ? (
+                        <iframe
+                          title="Байршил газрын зураг дээр"
+                          src={`https://maps.google.com/maps?q=${encodeURIComponent(company.address)}&z=14&output=embed`}
+                          referrerPolicy="no-referrer-when-downgrade"
+                          className="contact-map absolute inset-0 w-full h-full border-0"
+                        />
+                      ) : (
+                        // Google Maps-ийг дарсны дараа л ачаална (утсанд гүйлгэлтийг удаашруулахгүй)
+                        <button type="button" onClick={() => setMapOn(true)}
+                          className="absolute inset-0 w-full h-full flex flex-col items-center justify-center gap-3 text-zinc-600 hover:text-ink transition-colors"
+                          style={{ backgroundImage: "radial-gradient(rgb(0 0 0 / 0.07) 1px, transparent 1px)", backgroundSize: "18px 18px" }}>
+                          <span className="w-12 h-12 rounded-full bg-brand text-white flex items-center justify-center shadow-card"><IcPin cls="w-5 h-5" /></span>
+                          <span className="text-sm font-medium">Газрын зураг харах</span>
+                        </button>
+                      )}
                     </div>
                   )}
                 </div>

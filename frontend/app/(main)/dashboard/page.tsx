@@ -104,7 +104,7 @@ export default function DashboardPage() {
           ]),
         ].map(c => (
           <div key={c.label} className={`relative overflow-hidden rounded-[22px] p-4 sm:p-5 ${c.featured ? 'bg-ink text-white' : 'bg-white ring-1 ring-ink/[0.06] shadow-card'}`}>
-            {c.featured && <div className="pointer-events-none absolute -right-10 -top-16 w-48 h-48 rounded-full bg-brand/70 blur-3xl" />}
+            {c.featured && <div className="pointer-events-none absolute -right-10 -top-16 w-48 h-48" style={{ background: "radial-gradient(closest-side, color-mix(in oklab, var(--color-brand) 75%, transparent), transparent)" }} />}
             <div className="relative flex items-center justify-between mb-5 sm:mb-6">
               <span className={`text-xs sm:text-sm font-medium ${c.featured ? 'text-white/70' : 'text-zinc-500'}`}>{c.label}</span>
               <span className={`w-8 h-8 sm:w-9 sm:h-9 rounded-full flex items-center justify-center ${c.featured ? 'bg-white/10 text-white' : 'bg-zinc-100 text-ink'}`}>{c.icon}</span>

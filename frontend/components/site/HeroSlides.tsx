@@ -15,15 +15,19 @@ export function HeroSlides({ vehicles }: { vehicles: Vehicle[] }) {
   useEffect(() => {
     const t = setTimeout(() => {
       setMounted((m) => [...new Set([...m, i, (i + 1) % Math.max(slides.length, 1)])]);
-    }, i === 0 ? 2500 : 0);
+    }, i === 0 ? 1500 : 0);
     return () => clearTimeout(t);
   }, [i, slides.length]);
 
+  // Ачаалагдсан зургууд: дараагийн зураг бэлэн болсон үед л солино (хар дэлгэц гарахгүй)
+  const [loaded, setLoaded] = useState<number[]>([0]); // эхний зураг сервер талаас аль хэдийн харагдсан
   useEffect(() => {
     if (slides.length < 2 || paused) return;
-    const t = setTimeout(() => setI((x) => (x + 1) % slides.length), INTERVAL);
+    const next = (i + 1) % slides.length;
+    if (!loaded.includes(next)) return;
+    const t = setTimeout(() => setI(next), INTERVAL);
     return () => clearTimeout(t);
-  }, [slides.length, i, paused]);
+  }, [slides.length, i, paused, loaded]);
 
   if (!slides.length) return null;
   const idx = Math.min(i, slides.length - 1);
@@ -45,6 +49,7 @@ export function HeroSlides({ vehicles }: { vehicles: Vehicle[] }) {
               alt=""
               fetchPriority={k === 0 ? "high" : "low"}
               decoding="async"
+              onLoad={() => setLoaded((l) => (l.includes(k) ? l : [...l, k]))}
               className="w-full h-full object-cover sm:animate-[kenburns_14s_ease-in-out_infinite_alternate]"
             />
           </div>
