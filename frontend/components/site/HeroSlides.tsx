@@ -1,7 +1,7 @@
 "use client";
 import { useEffect, useState } from "react";
 import Link from "next/link";
-import { optimizeImg, Vehicle } from "@/lib/site";
+import { imgSrcSet, optimizeImg, Vehicle } from "@/lib/site";
 import { fmtPrice } from "@/lib/format";
 
 const INTERVAL = 6000;
@@ -10,6 +10,14 @@ export function HeroSlides({ vehicles }: { vehicles: Vehicle[] }) {
   const slides = vehicles.filter((v) => v.main_image).slice(0, 5);
   const [i, setI] = useState(0);
   const [paused, setPaused] = useState(false);
+  // Зөвхөн харагдаж буй болон дараагийн зургийг татна (утсанд эхэнд 5 том зураг зэрэг татахгүй)
+  const [mounted, setMounted] = useState<number[]>([0]);
+  useEffect(() => {
+    const t = setTimeout(() => {
+      setMounted((m) => [...new Set([...m, i, (i + 1) % Math.max(slides.length, 1)])]);
+    }, i === 0 ? 2500 : 0);
+    return () => clearTimeout(t);
+  }, [i, slides.length]);
 
   useEffect(() => {
     if (slides.length < 2 || paused) return;
@@ -25,16 +33,18 @@ export function HeroSlides({ vehicles }: { vehicles: Vehicle[] }) {
   return (
     <>
       <div className="absolute inset-0" aria-hidden>
-        {slides.map((v, k) => (
+        {slides.map((v, k) => (k === idx || mounted.includes(k)) && (
           <div
             key={v.id}
             className={`absolute inset-0 transition-opacity duration-[1.4s] ease-out ${k === idx ? "opacity-100" : "opacity-0"}`}
           >
             <img
-              src={optimizeImg(v.main_image, 1800)!}
+              src={optimizeImg(v.main_image, 1600)!}
+              srcSet={imgSrcSet(v.main_image, [640, 960, 1280, 1600])}
+              sizes="(max-width: 640px) 70vw, 100vw"
               alt=""
-              loading={k === 0 ? "eager" : "lazy"}
-              fetchPriority={k === 0 ? "high" : "auto"}
+              fetchPriority={k === 0 ? "high" : "low"}
+              decoding="async"
               className="w-full h-full object-cover sm:animate-[kenburns_14s_ease-in-out_infinite_alternate]"
             />
           </div>

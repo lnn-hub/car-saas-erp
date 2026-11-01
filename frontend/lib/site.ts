@@ -67,6 +67,22 @@ export interface VehicleDetail {
   company: Company;
 }
 
+const isCld = (url: string) => url.includes("res.cloudinary.com") && url.includes("/upload/") && !url.includes("/upload/f_auto");
+
+// Хэд хэдэн өргөнтэй хувилбар: хөтөч дэлгэцдээ тохирохыг нь сонгож татна (утсанд жижиг файл)
+export function imgSrcSet(u: string | null, widths: number[]) {
+  const url = imgUrl(u);
+  if (!url || !isCld(url)) return undefined;
+  return widths.map((w) => `${url.replace("/upload/", `/upload/f_auto,q_auto,w_${w}/`)} ${w}w`).join(", ");
+}
+
+// Маш жижиг (≈1KB) бүдэг хувилбар — зураг ачаалагдах хүртэл саарал хайрцагны оронд харагдана
+export function imgBlur(u: string | null) {
+  const url = imgUrl(u);
+  if (!url || !isCld(url)) return undefined;
+  return url.replace("/upload/", "/upload/f_auto,q_auto:low,w_40,e_blur:400/");
+}
+
 // Cloudinary зургийг хэрэгтэй хэмжээгээр нь (багаар, auto format) авна
 export function optimizeImg(u: string | null, width: number) {
   const url = imgUrl(u);

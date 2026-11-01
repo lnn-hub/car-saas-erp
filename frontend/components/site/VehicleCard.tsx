@@ -1,6 +1,6 @@
 "use client";
 import Link from "next/link";
-import { optimizeImg, Vehicle } from "@/lib/site";
+import { imgBlur, imgSrcSet, optimizeImg, Vehicle } from "@/lib/site";
 import { FUEL, fmtDrop, fmtEngine, fmtKm, fmtPrice } from "@/lib/format";
 
 export function CarPlaceholder({ className = "w-2/3" }: { className?: string }) {
@@ -29,6 +29,9 @@ export function VehicleCard({
 }) {
   const src = optimizeImg(v.main_image, 720);
   const src2 = v.images?.[1] ? optimizeImg(v.images[1], 720) : null;
+  const srcSet = imgSrcSet(v.main_image, [320, 480, 720]);
+  const blur = imgBlur(v.main_image);
+  const SIZES = "(max-width: 640px) 46vw, (max-width: 1024px) 31vw, 300px";
   const price = fmtPrice(v.price);
   const drop = fmtDrop(v.prev_price, v.price);
   const km = fmtKm(v.mileage);
@@ -41,13 +44,17 @@ export function VehicleCard({
       className="group relative w-full flex flex-col bg-white rounded-[22px] sm:rounded-[26px] p-1.5 sm:p-2 ring-1 ring-ink/[0.06] shadow-card hover:shadow-lift hover:-translate-y-1 transition-all duration-500 ease-out-expo"
     >
       {/* Зураг */}
-      <div className="relative aspect-[4/3] rounded-[17px] sm:rounded-[20px] overflow-hidden bg-zinc-100 text-zinc-500">
+      <div className="relative aspect-[4/3] rounded-[17px] sm:rounded-[20px] overflow-hidden bg-zinc-100 text-zinc-500 bg-cover bg-center"
+        style={blur ? { backgroundImage: `url(${blur})` } : undefined}>
         {src ? (
           <>
             <img
               src={src}
+              srcSet={srcSet}
+              sizes={SIZES}
               alt={`${v.year} ${v.brand} ${v.model}`}
               loading={priority ? "eager" : "lazy"}
+              decoding="async"
               className="absolute inset-0 w-full h-full object-cover group-hover:scale-[1.06] transition-transform duration-[1.2s] ease-out-expo"
             />
             {src2 && (
